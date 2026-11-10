@@ -80,3 +80,11 @@ def test_http_error_three_times_fails(tmp_path):
     s = FakeSession(tot=50, fail_first=3)
     with pytest.raises(FetchFailed):
         make_client(tmp_path, s).fetch_all("API1", {"x": "1"})
+
+
+def test_quota_counters_are_separate_files_per_api(tmp_path):
+    c = make_client(tmp_path, FakeSession(tot=50))
+    c.fetch_all("API_A", {"x": "1"})
+    c.fetch_all("API_B", {"x": "1"})
+    files = sorted(p.name for p in tmp_path.glob("quota_*"))
+    assert len(files) == 2 and any("API_A" in f for f in files) and any("API_B" in f for f in files)

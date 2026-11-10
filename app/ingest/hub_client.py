@@ -42,18 +42,16 @@ class HubClient:
         self.today = today or (lambda: dt.date.today().strftime("%Y%m%d"))
 
     # ---- quota ----
-    def _quota_path(self) -> Path:
-        return self.state_dir / f"quota_{self.today()}.json"
+    def _quota_path(self, api_id: str) -> Path:
+        # 데이터(API)별 파일 → 여러 수집기를 병렬로 돌려도 서로 덮어쓰지 않음
+        return self.state_dir / f"quota_{self.today()}_{api_id}.txt"
 
     def calls_used(self, api_id: str) -> int:
-        p = self._quota_path()
-        return json.loads(p.read_text("utf-8")).get(api_id, 0) if p.exists() else 0
+        p = self._quota_path(api_id)
+        return int(p.read_text("utf-8") or 0) if p.exists() else 0
 
     def _count_call(self, api_id: str) -> None:
-        p = self._quota_path()
-        q = json.loads(p.read_text("utf-8")) if p.exists() else {}
-        q[api_id] = q.get(api_id, 0) + 1
-        p.write_text(json.dumps(q), "utf-8")
+        self._quota_path(api_id).write_text(str(self.calls_used(api_id) + 1), "utf-8")
 
     # ---- checkpoint ----
     def _job_paths(self, api_id: str, params: dict) -> tuple[Path, Path]:
