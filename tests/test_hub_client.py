@@ -88,3 +88,24 @@ def test_quota_counters_are_separate_files_per_api(tmp_path):
     c.fetch_all("API_B", {"x": "1"})
     files = sorted(p.name for p in tmp_path.glob("quota_*"))
     assert len(files) == 2 and any("API_A" in f for f in files) and any("API_B" in f for f in files)
+
+
+class QuotaSession(FakeSession):
+    """처음 n번은 정상, 그다음은 허브처럼 403(쿼터 초과)."""
+
+    def __init__(self, ok_calls, tot=250):
+        super().__init__(tot=tot)
+        self.ok_calls = ok_calls
+
+    def get(self, url, params=None, timeout=None):
+        if len(self.calls) >= self.ok_calls:
+            self.calls.append(dict(params))
+            return FakeResponse(403)
+        return super().get(url, params, timeout)
+
+
+def test_server_403_is_treated_as_quota_and_not_retried(tmp_path):
+    s = QuotaSession(ok_calls=2)
+    with pytest.raises(QuotaExceeded) as e:
+        make_client(tmp_path, s).fetch_all("API1", {"d": "1"})
+    assert e.value.next_page == 3 and len(s.calls) == 3  # 403은 재시도하지 않음

@@ -26,7 +26,7 @@ class Job:
 JOBS: dict[str, Job] = {j.name: j for j in [
     Job("pop_domestic", 583, "Daaa1t3at3tt8a8DD3t55538t35Dab1t", "읍면동 단위 내국인 유동인구", "range"),
     Job("pop_foreign_short", 589, "t18b1bttt8abaDt51b8aat85ttaa8t5b", "읍면동 단위 외국인 단기체류 유동인구", "range"),
-    Job("wifi_ap_daily", 593, "58tb1t581bDt88tat5D88tba1tt8ttt8", "와이파이 AP그룹별 일일 사용량", "daily"),
+    Job("wifi_ap_daily", 593, "1aa9D5DabtDt1at935b1tt5t1D95t5at", "와이파이 AP그룹별 일일 사용량", "daily"),
     Job("wifi_users_daily", 586, "tDtb1taa8aat816att6at6tba1aDtbba", "와이파이 일일 사용자수", "daily"),
     Job("wifi_ap_info", 618, "Dtb18ta1btbD1Da1a81aaDttab6tDabb", "제주 공공와이파이 AP 정보", "daily",
         date_param="baseDate"),

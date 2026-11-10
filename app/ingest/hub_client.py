@@ -71,6 +71,8 @@ class HubClient:
                 r = self.session.get(url, params=query, timeout=30)
                 if r.status_code == 200:
                     return r.json()
+                if r.status_code == 403:  # 허브는 일일 쿼터 초과 시 403을 돌려줌(2026-11-10 확인) → 재시도하지 않음
+                    raise QuotaExceeded(api_id, number)
                 last = f"HTTP {r.status_code}"
             except requests.RequestException as e:  # 네트워크 오류도 재시도
                 last = repr(e)
