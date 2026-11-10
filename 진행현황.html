@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="refresh" content="60">
+<title>숨비소리 진행 현황</title>
+<style>
+  :root { --navy:#1F3A5F; --teal:#2A7F7F; --sand:#F6F1E7; --red:#B5473A; --gray:#5B6770; --line:#D7DEE6; }
+  body { font-family:'Malgun Gothic',sans-serif; margin:0; background:#F7F9FB; color:#1f2a37; }
+  header { background:var(--navy); color:#fff; padding:18px 28px; }
+  header h1 { margin:0; font-size:22px; } header p { margin:4px 0 0; color:#C9D6E3; font-size:13px; }
+  main { max-width:1100px; margin:0 auto; padding:20px 24px 60px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin:16px 0; }
+  h2 { margin:0 0 12px; font-size:18px; color:var(--navy); }
+  .todo { border-left:6px solid var(--red); }
+  .step { background:var(--sand); border-radius:8px; padding:12px 16px; margin:10px 0; }
+  .step h3 { margin:0 0 6px; font-size:15px; } .step ol, .step ul { margin:6px 0 0 18px; padding:0; } .step li { margin:3px 0; }
+  .tag { display:inline-block; font-size:12px; padding:1px 8px; border-radius:10px; margin-left:6px; vertical-align:middle; }
+  .must { background:var(--red); color:#fff; } .opt { background:#E3E8EE; color:var(--gray); } .done { background:var(--teal); color:#fff; }
+  .wip { background:#E9A23B; color:#fff; } .wait { background:#E3E8EE; color:var(--gray); }
+  table { border-collapse:collapse; width:100%; font-size:14px; } th, td { border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; }
+  th { background:var(--navy); color:#fff; font-weight:600; } tr.today td { background:#FFF8E6; }
+  code { background:#EEF3F7; padding:1px 5px; border-radius:4px; }
+  .muted { color:var(--gray); font-size:13px; } .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .kpi { background:#EEF3F7; border-radius:8px; padding:10px 12px; } .kpi b { font-size:22px; color:var(--navy); display:block; }
+  .msg { background:#fff; border:1px dashed var(--teal); border-radius:8px; padding:10px 12px; white-space:pre-wrap; font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>숨비소리 · 제주 데이터 관제실 — 진행 현황</h1>
+  <p>마지막 갱신: 2026-11-10 (화) 17:35 · 제출 마감 2026-11-20 (금) 10:00 · 이 페이지는 60초마다 자동 새로고침됩니다</p>
+</header>
+<main>
+
+<section>
+  <h2>한눈에 보기</h2>
+  <div class="grid">
+    <div class="kpi"><span class="muted">마감까지</span><b>D-10</b></div>
+    <div class="kpi"><span class="muted">구현 태스크</span><b>7.5 / 9</b></div>
+    <div class="kpi"><span class="muted">자동 테스트</span><b>57 통과</b></div>
+    <div class="kpi"><span class="muted">실제 데이터 수집</span><b>대기</b><span class="muted">허브 키 필요</span></div>
+  </div>
+</section>
+
+<section class="todo">
+  <h2>지금 해 주실 일</h2>
+
+  <div class="step">
+    <h3>① 제주데이터허브 프로젝트키 발급 <span class="tag must">가장 급함</span></h3>
+    <p class="muted">실제 데이터를 받으려면 꼭 필요합니다. 하루 호출 한도가 있어 오늘 시작하면 하루를 아낍니다. 예상 15분.</p>
+    <ol>
+      <li><a href="https://jejudatahub.net/login" target="_blank">jejudatahub.net</a>에 로그인합니다 (계정이 없으면 회원가입).</li>
+      <li>아래 데이터 페이지를 하나씩 열어 <b>「프로젝트 담기」</b>를 누르고 같은 프로젝트에 담습니다 (프로젝트 이름 예: <code>숨비소리</code>).
+        <ul>
+          <li>필수 9개:
+            <a href="https://jejudatahub.net/data/view/data/583" target="_blank">583 내국인 유동인구</a> ·
+            <a href="https://jejudatahub.net/data/view/data/593" target="_blank">593 와이파이 AP그룹별 일일</a> ·
+            <a href="https://jejudatahub.net/data/view/data/618" target="_blank">618 와이파이 AP 정보</a> ·
+            <a href="https://jejudatahub.net/data/view/data/613" target="_blank">613 정류소별 버스</a> ·
+            <a href="https://jejudatahub.net/data/view/data/612" target="_blank">612 버스 정류소</a> ·
+            <a href="https://jejudatahub.net/data/view/data/617" target="_blank">617 버스 일일 승객</a> ·
+            <a href="https://jejudatahub.net/data/view/data/586" target="_blank">586 와이파이 일일 사용자</a> ·
+            <a href="https://jejudatahub.net/data/view/data/579" target="_blank">579 일별 기상</a> ·
+            <a href="https://jejudatahub.net/data/view/data/578" target="_blank">578 기상관측소</a></li>
+          <li>함께 담기(선택 4개):
+            <a href="https://jejudatahub.net/data/view/data/589" target="_blank">589 외국인 단기체류</a> ·
+            <a href="https://jejudatahub.net/data/view/data/611" target="_blank">611 버스 노선</a> ·
+            <a href="https://jejudatahub.net/data/view/data/580" target="_blank">580 방문목적별 입도객</a> ·
+            <a href="https://jejudatahub.net/data/view/data/582" target="_blank">582 국가별 입도객</a></li>
+          <li>파일 내려받기: <a href="https://jejudatahub.net/data/view/data/761" target="_blank">761 축제행사 CSV</a> → 받은 파일을 <code>2611_JEJU\data\manual\</code> 폴더에 넣어 주세요 (폴더는 만들어 두었습니다).</li>
+        </ul>
+      </li>
+      <li>상단 <b>마이페이지 → 프로젝트 관리 → 해당 프로젝트</b>에서 <b>프로젝트키</b>를 복사합니다.</li>
+      <li><code>2611_JEJU</code> 폴더의 <code>.env.example</code> 파일을 복사해 이름을 <code>.env</code>로 바꿉니다.</li>
+      <li><code>.env</code>를 메모장으로 열어 <code>JEJU_HUB_PROJECT_KEY=여기에_프로젝트키</code> 줄의 <code>여기에_프로젝트키</code> 부분을 복사한 키로 바꾸고 저장합니다.</li>
+      <li>채팅에 "키 넣었어"라고만 알려 주세요. <b>키 값은 채팅에 붙이지 마세요.</b></li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <h3>② 로컬 판단 모델(tev1) 설치 허락 <span class="tag must">답변만</span></h3>
+    <p class="muted">채팅에 "설치해도 돼" 또는 "하지 마"로 답해 주세요. 예상 1분.</p>
+    <ul>
+      <li>설치하는 것: Ollama(로컬 모델 실행기) + tev1 0.8B(약 0.8GB)와 4B(약 4.4GB)</li>
+      <li>이 PC에서 Ollama 기본 포트(11434)를 다른 프로그램이 이미 쓰고 있어 <b>다른 포트로</b> 띄웁니다. 기존 프로그램은 건드리지 않습니다.</li>
+      <li>설치 후 짧은 실험: 한국어 원인 판정 10건, 센터 PC를 가정한 CPU 전용 속도 측정 → 결과를 이 페이지에 올립니다.</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h3>③ 팀원 hjshin93님께 역할 전달 <span class="tag must">메시지 복사</span></h3>
+    <p class="muted">아래 내용을 그대로 복사해 보내시면 됩니다. 예상 2분.</p>
+    <div class="msg">[숨비소리] 역할 분담 공유드려요.
+- 팀장(nnin, Data Scientist): 이상 탐지·Agent·평가·센터 탑재
+- 팀원(hjshin93, Data Analyst): ① 수집된 데이터 점검(빠진 날·이상한 값) ② 와이파이 AP·정류소 → 읍면동 매핑 검수 ③ 실제 이상 사례 검토·해석 ④ 기획서·결과 설명자료 작성
+일정: 11/11 수집 시작 → 11/12~16 구현 → 11/17 평가 → 11/18 기획서 확정 → 11/19 설치 재현·제출 준비
+기획서 초안: 2611_JEJU/기획서/숨비소리_AI_Agent_기획서_v0.1.docx</div>
+  </div>
+
+  <div class="step">
+    <h3>④ 그 밖에 <span class="tag opt">선택</span></h3>
+    <ul>
+      <li>대회 갤러리(다른 팀 기획서 36건) 열람: 휴대폰 인증이 필요합니다. 하시면 겹치는 주제가 있는지 제가 확인하겠습니다.</li>
+      <li>Ego Lite 업데이트 알림이 계속 뜹니다. 업데이트를 원하시면 알려 주세요.</li>
+      <li>마지막 제출(11/19 예정)은 작전실 화면에서 <b>직접</b> 눌러 주셔야 합니다. 저는 제출 버튼을 누르지 않습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>구현 진행</h2>
+  <table>
+    <tr><th style="width:30%">단계</th><th style="width:12%">상태</th><th>내용</th></tr>
+    <tr><td>1. 허브 수집기</td><td><span class="tag done">완료</span></td><td>페이지 넘김(100행), 하루 호출 한도 관리, 멈춘 곳부터 이어받기, 오류 3회 재시도. 데이터 13종 API 등록</td></tr>
+    <tr><td>2. 위치 매핑</td><td><span class="tag done">완료</span></td><td>행정동 43개 기준. 주소 → 없으면 가까운 정류소의 동. 실패 건은 따로 보고</td></tr>
+    <tr><td>3. 이상 탐지</td><td><span class="tag done">완료</span></td><td>방법 2개(요일 중앙값 기준, STL 분해). 빈 날을 "급감"으로 오인하지 않음</td></tr>
+    <tr><td>4. 원인 대조</td><td><span class="tag done">완료</span></td><td>같은 날 다른 신호의 동반 변화, 기상·공휴일·행사</td></tr>
+    <tr><td>5. 문서 검색(RAG)</td><td><span class="tag done">완료</span></td><td>문서 96건(허브 API 페이지, 반출 기준, 게시판 답변, 명세서 v13). 출처 위치 표기</td></tr>
+    <tr><td>6. Agent 루프</td><td><span class="tag done">완료</span></td><td>도구 5종, 오류 시 스스로 수정, 호출 한도</td></tr>
+    <tr><td>7. 검증기</td><td><span class="tag done">완료</span></td><td>숫자·근거·원인 주장 확인, 실패 시 재작성 요청(최대 2회), 끝까지 실패하면 문장 숨김</td></tr>
+    <tr><td>8. 브리핑·화면</td><td><span class="tag wip">진행 중</span></td><td>HTML 브리핑·템플릿 문장·삭제 ON/OFF 완료 / 관제판 화면은 실제 데이터 후</td></tr>
+    <tr><td>9. 평가</td><td><span class="tag wait">대기</span></td><td>가짜 이상 주입, 탐지 방법·LLM 백엔드(tev1 / 외부 / 규칙) 비교</td></tr>
+    <tr><td>로컬 판단 모델(tev1)</td><td><span class="tag wait">허락 대기</span></td><td>질문 분류, 원인 판정 확률, 데이터 오류 판정 — 외부 API 없이 동작</td></tr>
+    <tr><td>실제 데이터 수집</td><td><span class="tag wait">키 대기</span></td><td>주 분석 기간 2024-04 ~ 2025-03 + 최근 모니터링</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>일정</h2>
+  <table>
+    <tr><th style="width:14%">날짜</th><th>할 일</th><th style="width:26%">담당</th></tr>
+    <tr class="today"><td>11/10 (오늘)</td><td>계획 확정, 핵심 코드 1~8단계, 폴더 정리</td><td>nnin(+Claude) / 키 발급: nnin</td></tr>
+    <tr><td>11/11</td><td>데이터 수집 시작, tev1 실험</td><td>nnin / 수집 점검 hjshin93</td></tr>
+    <tr><td>11/12~13</td><td>실데이터 연결, 매핑 검수, 관제판 화면</td><td>nnin / 매핑 검수 hjshin93</td></tr>
+    <tr><td>11/14~16</td><td>LLM 백엔드 3단 연결, 화면 완성, 실제 사례 검토</td><td>nnin / 사례 검토 hjshin93</td></tr>
+    <tr><td>11/17</td><td>평가 실행, 결과 정리</td><td>nnin / 결과 해석 hjshin93</td></tr>
+    <tr><td>11/18</td><td>기획서 확정, 설치 매뉴얼</td><td>hjshin93 / 검토 nnin</td></tr>
+    <tr><td>11/19</td><td>새 환경 설치 재현, ZIP 구성, 제출</td><td>공동 / 제출 버튼은 팀장</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>오늘 정리한 것</h2>
+  <ul>
+    <li>목표 재정의: 특정 회사 맞춤이 아니라 <b>여러 회사 지원용 완성도 높은 포트폴리오 + 대회 제출</b></li>
+    <li>삭제: 지난 주제 후보 문서(<code>03_주제후보.md</code>), 게시판 정리의 옛 주제 시사점 절</li>
+    <li>수정: 시작 프롬프트(<code>00</code>)의 목표·진행 상황, 계획(<code>04</code>)의 LLM 구성(로컬 판단 모델 기본)</li>
+    <li>유지: 공고 분석(<code>01</code>), 게시판 답변(<code>02</code>), 계획(<code>04</code>), 데이터 확인(<code>05</code>), 기획서 초안, 원본 엑셀 2개(수정 금지)</li>
+  </ul>
+  <p class="muted">폴더: 00·01·02·04·05 문서 · app(코드) · tests(테스트) · docs/sources(검색 문서) · 기획서 · 진행현황.html(이 페이지)</p>
+</section>
+
+</main>
+</body>
+</html>
