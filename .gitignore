@@ -1,0 +1,16 @@
+# secrets
+.env
+# 대회 제공 허브 데이터 목록 — 외부 배포 금지
+*.xlsx
+03_주제후보.md
+# local env / caches
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/raw/
+data/state/
+.superpowers/
+기획서/_build/node_modules/
+~$*
+data/cache/
