@@ -17,7 +17,6 @@ PLAN = [
     ("bus_stations", "2025-03-31", "2025-03-31"),
     ("bus_routes", "2025-03-31", "2025-03-31"),
     ("weather_stations", "2025-03-31", "2025-03-31"),
-    ("wifi_ap_info", "2025-03-31", "2025-03-31"),
     ("visitors_purpose", "2024-04-01", "2025-07-31"),
     ("visitors_country", "2024-04-01", "2025-07-31"),
     ("bus_total_daily", "2024-04-01", "2026-11-05"),
@@ -32,6 +31,9 @@ PLAN = [
 def main() -> None:
     LOG.mkdir(parents=True, exist_ok=True)
     procs = []
+    # 와이파이 AP 정보(618)는 페이지 순서가 호출마다 바뀌어 반복 수집 후 합친다(app/ingest/union.py)
+    if not (ROOT / "data" / "cache" / "wifi_ap_info.parquet").exists():
+        subprocess.run([sys.executable, "-m", "app.ingest.union", "20250331"], cwd=ROOT, check=False)
     for job, start, end in PLAN:
         log = open(LOG / f"{job}.log", "a", encoding="utf-8")
         p = subprocess.Popen([sys.executable, "-m", "app.ingest.run", job, start, end], cwd=ROOT,
