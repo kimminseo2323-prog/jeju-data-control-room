@@ -8,7 +8,7 @@ from typing import Any, Protocol
 import pandas as pd
 
 from app.analytics.context import check_context, find_co_movements
-from app.analytics.detect import detect_anomalies
+from app.analytics.detect import detect_anomalies, group_episodes
 
 SIGNAL_SOURCES = {
     "유동인구": "제주데이터허브 읍면동 단위 내국인 유동인구(583), 방문인구(visitPop) 합계",
@@ -103,7 +103,12 @@ class Toolbox:
         found = detect_anomalies(s, method=method, threshold=float(threshold))
         rows = [{"date": str(a.date.date()), "value": round(a.value, 1), "expected": round(a.expected, 1),
                  "pct": round(a.pct * 100, 1), "score": round(a.score, 2), "direction": a.direction} for a in found]
-        return {"signal": signal, "emd": emd, "method": method, "threshold": threshold, "count": len(rows), "anomalies": rows}, [SIGNAL_SOURCES.get(signal, signal)]
+        eps = [{"start": str(e.start.date()), "end": str(e.end.date()), "days": e.days, "kind": e.kind, "direction": e.direction,
+                "peak_date": str(e.peak.date.date()), "peak_pct": round(e.peak.pct * 100, 1), "peak_value": round(e.peak.value, 1),
+                "peak_expected": round(e.peak.expected, 1)} for e in group_episodes(found)]
+        eps.sort(key=lambda x: -abs(x["peak_pct"]))
+        return {"signal": signal, "emd": emd, "method": method, "threshold": threshold, "count": len(rows),
+                "episode_count": len(eps), "episodes": eps, "anomalies": rows}, [SIGNAL_SOURCES.get(signal, signal)]
 
     def _t_find_co_movements(self, date, emd, window=0):
         sigs = {}

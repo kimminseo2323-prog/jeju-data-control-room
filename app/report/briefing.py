@@ -25,6 +25,18 @@ def template_text(results: dict) -> str:
         if not d["anomalies"]:
             lines.append(f"{d['emd']} {d['signal']}에서 기준을 넘는 이상 신호는 없었습니다 [{rid}].")
             continue
+        if d.get("episodes"):
+            lines.append(f"{d['emd']} {d['signal']}에서 이상 구간 {d['episode_count']}개(이상일 {d['count']}일)가 확인됐습니다 [{rid}].")
+            for e in d["episodes"][:5]:
+                word = "많았" if e["direction"] == "up" else "적었"
+                span = e["start"] if e["start"] == e["end"] else f"{e['start']}~{e['end']}"
+                lines.append(f"{span}({e['kind']}): 가장 큰 날 {e['peak_date']} 값은 {e['peak_value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 "
+                             f"기대값 {e['peak_expected']:,}보다 {abs(e['peak_pct'])}% {word}습니다 [{rid}].")
+                hit = ctx.get((e["peak_date"], d["emd"]))
+                if hit and hit[1].data["items"]:
+                    details = ", ".join(i["detail"] for i in hit[1].data["items"])
+                    lines.append(f"같은 날 확인된 맥락은 {details}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+            continue
         lines.append(f"{d['emd']} {d['signal']}에서 이상 신호 {d['count']}건이 확인됐습니다 [{rid}].")
         for a in d["anomalies"][:5]:
             word = "많았" if a["direction"] == "up" else "적었"

@@ -48,3 +48,15 @@ def test_result_store_delete_off_keeps_files(tmp_path):
     p = st.save("briefing", "<html></html>")
     st.cleanup()
     assert p.exists()
+
+
+def test_template_with_episodes_passes_verifier():
+    r = dict(RESULTS)
+    d = dict(r["R1"].data)
+    d["episode_count"] = 1
+    d["episodes"] = [{"start": "2025-01-28", "end": "2025-01-30", "days": 3, "kind": "지속 변화", "direction": "up",
+                      "peak_date": "2025-01-29", "peak_pct": 35.4, "peak_value": 1353.5, "peak_expected": 1000.0}]
+    r["R1"] = ToolResult("R1", "detect_anomalies", {}, d, ["허브 583"])
+    text = template_text(r)
+    assert "지속 변화" in text and "2025-01-28~2025-01-30" in text and "설날" in text
+    assert verify(text, r).ok, verify(text, r).errors

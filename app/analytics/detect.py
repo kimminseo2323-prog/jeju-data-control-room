@@ -72,3 +72,34 @@ def detect_anomalies(s: pd.Series, method: Literal["seasonal_z", "robust_resid"]
         if abs(score) >= threshold:
             out.append(Anomaly(t, float(s[t]), float(expected[t]), float(score), "up" if score > 0 else "down"))
     return out
+
+
+@dataclass(frozen=True)
+class Episode:
+    """연속된 같은 방향 이상일 묶음. 3일 이상이면 '지속 변화'(성수기 전환 등), 그 미만은 '일시 급변'."""
+    start: pd.Timestamp
+    end: pd.Timestamp
+    days: int
+    direction: str
+    peak: Anomaly
+
+    @property
+    def kind(self) -> str:
+        return "지속 변화" if self.days >= 3 else "일시 급변"
+
+
+def group_episodes(anoms: list[Anomaly], max_gap: int = 1) -> list[Episode]:
+    out: list[Episode] = []
+    cur: list[Anomaly] = []
+    for a in sorted(anoms, key=lambda x: x.date):
+        if cur and (a.direction != cur[-1].direction or (a.date - cur[-1].date).days > max_gap):
+            out.append(_episode(cur)); cur = []
+        cur.append(a)
+    if cur:
+        out.append(_episode(cur))
+    return out
+
+
+def _episode(items: list[Anomaly]) -> Episode:
+    peak = max(items, key=lambda x: abs(x.score))
+    return Episode(items[0].date, items[-1].date, len(items), items[0].direction, peak)

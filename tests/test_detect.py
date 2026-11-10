@@ -57,3 +57,21 @@ def test_to_daily_filters():
     df = pd.DataFrame({"baseDate": ["20250101", "20250101"], "emd": ["성산읍", "애월읍"], "visitPop": [10, 5]})
     s = to_daily(df, "baseDate", "visitPop", filters={"emd": "애월읍"})
     assert s.tolist() == [5]
+
+
+def test_consecutive_anomalies_group_into_episodes():
+    from app.analytics.detect import group_episodes
+    d = pd.Timestamp("2024-07-26")
+    mk = lambda k, pct, dirn="up": Anomaly(d + pd.Timedelta(days=k), 100 * (1 + pct), 100.0, 5.0 + k, dirn)
+    anoms = [mk(0, 0.8), mk(1, 0.9), mk(2, 1.3), mk(3, 1.0), mk(10, 0.5), mk(12, -0.4, "down")]
+    eps = group_episodes(anoms, max_gap=1)
+    assert [(e.start.day, e.end.day, e.days, e.kind) for e in eps] == [
+        (26, 29, 4, "지속 변화"), (5, 5, 1, "일시 급변"), (7, 7, 1, "일시 급변")]
+    assert eps[0].peak.date == d + pd.Timedelta(days=3) and eps[0].peak.score == 8.0
+
+
+def test_direction_change_splits_episode():
+    from app.analytics.detect import group_episodes
+    d = pd.Timestamp("2024-05-05")
+    a = [Anomaly(d, 150, 100, 4, "up"), Anomaly(d + pd.Timedelta(days=1), 50, 100, -4, "down")]
+    assert len(group_episodes(a)) == 2
