@@ -51,15 +51,22 @@ def _expected_stl(s: pd.Series) -> pd.Series:
     return res.trend + res.seasonal
 
 
-def detect_anomalies(s: pd.Series, method: Literal["seasonal_z", "robust_resid"] = "seasonal_z",
-                     threshold: float = 3.0) -> list[Anomaly]:
+def score_series(s: pd.Series, method: Literal["seasonal_z", "robust_resid"] = "seasonal_z"):
+    """(정리된 시계열, 기대값, 표준화 점수). 관측이 28일 미만이면 None."""
     s = s.astype(float).asfreq("D")
     if s.dropna().shape[0] < 28:
-        return []
+        return None
     expected = _expected_seasonal(s) if method == "seasonal_z" else _expected_stl(s)
     resid = (s - expected).where(s.notna())
-    scale = _robust_scale(resid)
-    z = resid / scale
+    return s, expected, resid / _robust_scale(resid)
+
+
+def detect_anomalies(s: pd.Series, method: Literal["seasonal_z", "robust_resid"] = "seasonal_z",
+                     threshold: float = 3.0) -> list[Anomaly]:
+    scored = score_series(s, method)
+    if scored is None:
+        return []
+    s, expected, z = scored
     out = []
     for t, score in z.dropna().items():
         if abs(score) >= threshold:
