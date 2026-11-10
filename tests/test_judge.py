@@ -51,3 +51,8 @@ def test_judge_uses_local_model_when_available():
 def test_judge_falls_back_to_rules_when_model_down():
     j = judge_cause(EVID_HOLIDAY, http=FakeHTTP(ok=False))
     assert j.backend == "rule" and j.choice == "holiday" and "연결" in j.note
+
+
+def test_sustained_shift_without_context_is_seasonal():
+    ev = {"anomaly": {**EVID_HOLIDAY["anomaly"], "kind": "지속 변화", "days": 4}, "context": [], "co_movements": []}
+    assert rule_judge(ev).choice == "season" and "season" in CAUSES

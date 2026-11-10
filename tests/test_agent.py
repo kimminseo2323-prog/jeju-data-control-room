@@ -101,3 +101,19 @@ def test_unfixable_answer_is_withheld():
     run = run_agent("질문", llm, tb, max_revisions=2)
     assert not run.verified and run.revisions == 2
     assert "검증을 통과하지 못해" in run.final_text and "99999" not in run.final_text
+
+
+def test_detect_with_period_filters_output_not_input():
+    tb, day = make_toolbox()
+    full = tb.dispatch("detect_anomalies", {"signal": "유동인구", "emd": "서귀포시 성산읍"}, "R1").data
+    near = tb.dispatch("detect_anomalies", {"signal": "유동인구", "emd": "서귀포시 성산읍",
+                                            "start": str((day - pd.Timedelta(days=3)).date()),
+                                            "end": str((day + pd.Timedelta(days=3)).date())}, "R2").data
+    assert full["count"] >= 1 and [a["date"] for a in near["anomalies"]] == [str(day.date())]
+    assert near["anomalies"][0]["expected"] == full["anomalies"][0]["expected"]  # 같은 기준선
+
+
+def test_co_movements_can_exclude_the_analysed_signal():
+    tb, day = make_toolbox()
+    data = tb.dispatch("find_co_movements", {"date": str(day.date()), "emd": "서귀포시 성산읍", "exclude_signal": "유동인구"}, "R1").data
+    assert "유동인구" not in data["checked"]

@@ -71,7 +71,8 @@ class Toolbox:
              "parameters": {"type": "object", "properties": {"signal": sig, "emd": emd, "start": date, "end": date,
                             "method": {"type": "string", "enum": ["seasonal_z", "robust_resid"]}, "threshold": {"type": "number"}}, "required": ["signal", "emd"]}},
             {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호도 함께 크게 움직였는지 확인한다.",
-             "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "window": {"type": "integer"}}, "required": ["date", "emd"]}},
+             "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "window": {"type": "integer"},
+                            "exclude_signal": {"type": "string", "description": "분석 중인 신호(자기 자신 제외)"}}, "required": ["date", "emd"]}},
             {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사 정보를 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd}, "required": ["date", "emd"]}},
             {"name": "search_docs", "description": "데이터 명세·API 문서·반출 기준·게시판 답변에서 관련 내용을 검색한다(출처 포함).",
@@ -99,8 +100,11 @@ class Toolbox:
         return data, [SIGNAL_SOURCES.get(signal, signal)]
 
     def _t_detect_anomalies(self, signal, emd, start=None, end=None, method="seasonal_z", threshold=3.0):
-        s = _period(self.store.series(signal, emd), start, end)
-        found = detect_anomalies(s, method=method, threshold=float(threshold))
+        # 기준선은 전체 기간으로 계산하고, 기간 인자는 결과만 거른다(잘라서 계산하면 기준선이 달라짐)
+        full = self.store.series(signal, emd)
+        lo = pd.Timestamp(start) if start else full.index.min()
+        hi = pd.Timestamp(end) if end else full.index.max()
+        found = [a for a in detect_anomalies(full, method=method, threshold=float(threshold)) if lo <= a.date <= hi]
         rows = [{"date": str(a.date.date()), "value": round(a.value, 1), "expected": round(a.expected, 1),
                  "pct": round(a.pct * 100, 1), "score": round(a.score, 2), "direction": a.direction} for a in found]
         eps = [{"start": str(e.start.date()), "end": str(e.end.date()), "days": e.days, "kind": e.kind, "direction": e.direction,
@@ -110,9 +114,11 @@ class Toolbox:
         return {"signal": signal, "emd": emd, "method": method, "threshold": threshold, "count": len(rows),
                 "episode_count": len(eps), "episodes": eps, "anomalies": rows}, [SIGNAL_SOURCES.get(signal, signal)]
 
-    def _t_find_co_movements(self, date, emd, window=0):
+    def _t_find_co_movements(self, date, emd, window=0, exclude_signal=None):
         sigs = {}
         for name in self.store.signals():
+            if name == exclude_signal:
+                continue
             try:
                 sigs[name] = self.store.series(name, emd)
             except ToolError:

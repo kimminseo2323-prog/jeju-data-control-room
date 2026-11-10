@@ -16,10 +16,11 @@ CAUSES = {
     "holiday": "공휴일·연휴가 주된 원인이다.",
     "event": "축제·행사가 주된 원인이다.",
     "tourism_demand": "관광 수요가 늘거나 줄어 같은 지역의 여러 신호가 함께 움직였다.",
+    "season": "여러 날 이어진 변화로, 성수기·비수기 같은 계절적 전환이 주된 원인이다.",
     "data_issue": "실제 변화가 아니라 데이터 누락·집계 오류로 보인다.",
     "unknown": "주어진 근거로는 원인을 판단하기 어렵다.",
 }
-CAUSE_KO = {"weather": "날씨", "holiday": "공휴일·연휴", "event": "축제·행사", "tourism_demand": "관광 수요 변화",
+CAUSE_KO = {"weather": "날씨", "holiday": "공휴일·연휴", "event": "축제·행사", "tourism_demand": "관광 수요 변화", "season": "계절 전환(성수기·비수기)",
             "data_issue": "데이터 오류 의심", "unknown": "판단 불가"}
 DEFAULT_HOST = os.getenv("JUDGE_HOST", "http://127.0.0.1:11500")
 DEFAULT_MODEL = os.getenv("JUDGE_MODEL", "tev1:4b")
@@ -51,10 +52,12 @@ def rule_judge(evidence: dict) -> Judgment:
         choice = "event"
     elif len(co) >= 1:
         choice = "tourism_demand"
+    elif evidence.get("anomaly", {}).get("kind") == "지속 변화":
+        choice = "season"
     else:
         choice = "unknown"
     probs = {k: (0.75 if k == choice else 0.25 / (len(CAUSES) - 1)) for k in CAUSES}
-    return Judgment(choice, probs, 0.5, "rule", "규칙: 기상 > 공휴일 > 행사 > 동반 변화 > 판단 불가")
+    return Judgment(choice, probs, 0.5, "rule", "규칙: 기상 > 공휴일 > 행사 > 동반 변화 > 지속 변화면 계절 전환 > 판단 불가")
 
 
 def _state_text(evidence: dict) -> str:
