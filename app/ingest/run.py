@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import os
 import sys
 from pathlib import Path
@@ -13,12 +14,33 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-from app.ingest.hub_client import FetchFailed, HubClient, QuotaExceeded
+from app.ingest.hub_client import FetchFailed, HubClient, QuotaExceeded, job_paths
 from app.ingest.jobs import JOBS, expand
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = ROOT / "data" / "state"
 CACHE = ROOT / "data" / "cache"
+
+
+def export_completed(job, start: dt.date, end: dt.date, state_dir: Path = STATE, out_path: Path | None = None) -> dict:
+    """끝까지 받은 요청만 모아 캐시로 내보낸다. 받다 만 요청(달·날짜)은 행이 무작위로 빠져 있어 제외."""
+    reqs = expand(job, start, end)
+    frames = []
+    for params in reqs:
+        sp, rp = job_paths(state_dir, job.api_id, params)
+        if not (sp.exists() and json.loads(sp.read_text("utf-8")).get("done")):
+            continue
+        rows = [json.loads(l) for l in rp.read_text("utf-8").splitlines() if l] if rp.exists() else []
+        df = pd.DataFrame(rows)
+        for k, v in params.items():
+            df[f"_req_{k}"] = v
+        frames.append(df)
+    out = pd.concat(frames, ignore_index=True).drop_duplicates() if frames else pd.DataFrame()
+    out_path = out_path or CACHE / f"{job.name}.parquet"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if not out.empty:
+        out.to_parquet(out_path, index=False)
+    return {"requests": len(reqs), "completed": len(frames), "rows": int(len(out)), "partial": len(frames) < len(reqs)}
 
 
 def run(job_name: str, start: dt.date, end: dt.date) -> bool:
@@ -35,6 +57,8 @@ def run(job_name: str, start: dt.date, end: dt.date) -> bool:
             rows = client.fetch_all(job.api_id, params)
         except QuotaExceeded as e:
             print(f"[{job_name}] 쿼터 소진: {i}/{len(reqs)}번째 요청 {params} 의 {e.next_page}페이지부터 내일 이어받기")
+            info = export_completed(job, start, end)
+            print(f"[{job_name}] 완료된 요청만 임시 캐시로 저장: {info}")
             return False
         except FetchFailed as e:
             print(f"[{job_name}] 실패: {e}")

@@ -19,6 +19,12 @@ PAGE_LIMIT = 100
 MAX_ATTEMPTS = 3
 
 
+def job_paths(state_dir: Path, api_id: str, params: dict) -> tuple[Path, Path]:
+    """(API, 파라미터)별 진행 상태 파일과 받은 행(jsonl) 파일 경로."""
+    key = hashlib.sha1(json.dumps(params, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
+    return Path(state_dir) / f"{api_id}_{key}.json", Path(state_dir) / f"{api_id}_{key}.jsonl"
+
+
 class QuotaExceeded(Exception):
     def __init__(self, api_id: str, next_page: int):
         super().__init__(f"daily quota reached for {api_id}; resume at page {next_page}")
@@ -55,8 +61,7 @@ class HubClient:
 
     # ---- checkpoint ----
     def _job_paths(self, api_id: str, params: dict) -> tuple[Path, Path]:
-        key = hashlib.sha1(json.dumps(params, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
-        return self.state_dir / f"{api_id}_{key}.json", self.state_dir / f"{api_id}_{key}.jsonl"
+        return job_paths(self.state_dir, api_id, params)
 
     # ---- fetching ----
     def _get_page(self, api_id: str, params: dict, number: int) -> dict:
