@@ -1,0 +1,67 @@
+"""일 단위 시계열 이상 탐지 — 두 방법을 같은 인터페이스로 제공.
+
+seasonal_z  : 같은 요일 앞뒤 4주 값의 중앙값을 기대값으로, 잔차를 MAD로 표준화
+robust_resid: STL(주기 7, robust) 분해 잔차를 MAD로 표준화. 결측일은 보간해 적합만 하고 판정에서는 제외
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Literal
+
+import numpy as np
+import pandas as pd
+from statsmodels.tsa.seasonal import STL
+
+MAD_K = 1.4826
+
+
+@dataclass(frozen=True)
+class Anomaly:
+    date: pd.Timestamp
+    value: float
+    expected: float
+    score: float
+    direction: str  # "up" | "down"
+
+    @property
+    def pct(self) -> float:
+        return (self.value / self.expected - 1.0) if self.expected else float("nan")
+
+
+def _robust_scale(resid: pd.Series) -> float:
+    r = resid.dropna()
+    mad = float(np.median(np.abs(r - np.median(r)))) * MAD_K if len(r) else 0.0
+    return mad if mad > 0 else float(r.std() or 1.0)
+
+
+def _expected_seasonal(s: pd.Series, weeks: int = 4, min_obs: int = 3) -> pd.Series:
+    out = pd.Series(np.nan, index=s.index)
+    for t in s.index:
+        neigh = [t + pd.Timedelta(weeks=k) for k in range(-weeks, weeks + 1) if k != 0]
+        vals = s.reindex(neigh).dropna()
+        if len(vals) >= min_obs:
+            out[t] = float(vals.median())
+    return out
+
+
+def _expected_stl(s: pd.Series) -> pd.Series:
+    filled = s.interpolate(limit_direction="both")
+    # seasonal=13, trend=29(약 4주): 2주 이내의 짧은 변화를 이상으로 남기고, 잔차가 노이즈 크기를 과소추정하지 않도록 함
+    res = STL(filled, period=7, seasonal=13, trend=29, robust=True).fit()
+    return res.trend + res.seasonal
+
+
+def detect_anomalies(s: pd.Series, method: Literal["seasonal_z", "robust_resid"] = "seasonal_z",
+                     threshold: float = 3.0) -> list[Anomaly]:
+    s = s.astype(float).asfreq("D")
+    if s.dropna().shape[0] < 28:
+        return []
+    expected = _expected_seasonal(s) if method == "seasonal_z" else _expected_stl(s)
+    resid = (s - expected).where(s.notna())
+    scale = _robust_scale(resid)
+    z = resid / scale
+    out = []
+    for t, score in z.dropna().items():
+        if abs(score) >= threshold:
+            out.append(Anomaly(t, float(s[t]), float(expected[t]), float(score), "up" if score > 0 else "down"))
+    return out
