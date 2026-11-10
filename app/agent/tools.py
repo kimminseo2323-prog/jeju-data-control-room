@@ -103,7 +103,7 @@ class Toolbox:
         found = detect_anomalies(s, method=method, threshold=float(threshold))
         rows = [{"date": str(a.date.date()), "value": round(a.value, 1), "expected": round(a.expected, 1),
                  "pct": round(a.pct * 100, 1), "score": round(a.score, 2), "direction": a.direction} for a in found]
-        return {"signal": signal, "emd": emd, "method": method, "threshold": threshold, "anomalies": rows}, [SIGNAL_SOURCES.get(signal, signal)]
+        return {"signal": signal, "emd": emd, "method": method, "threshold": threshold, "count": len(rows), "anomalies": rows}, [SIGNAL_SOURCES.get(signal, signal)]
 
     def _t_find_co_movements(self, date, emd, window=0):
         sigs = {}

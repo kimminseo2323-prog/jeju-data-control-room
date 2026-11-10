@@ -76,3 +76,28 @@ def test_tool_specs_cover_all_dispatchable_tools():
     tb, _ = make_toolbox()
     names = {t["name"] for t in tb.specs()}
     assert names == {"get_series", "detect_anomalies", "find_co_movements", "check_context", "search_docs"}
+
+
+def test_failed_verification_is_sent_back_and_revised():
+    tb, day = make_toolbox()
+    llm = ScriptedLLM([
+        LLMReply(tool_calls=[ToolCall("c1", "detect_anomalies", {"signal": "유동인구", "emd": "서귀포시 성산읍"})]),
+        LLMReply(text="방문인구가 99999명이었습니다 [R1]."),           # 틀린 숫자
+        LLMReply(text="성산읍에서 이상 신호 1건이 확인됐습니다 [R1]."),  # 수정본
+    ])
+    run = run_agent("질문", llm, tb)
+    assert run.verified and run.revisions == 1
+    assert any("검증" in m["content"] for m in llm.seen[-1] if m["role"] == "user")
+    assert run.final_text.startswith("성산읍")
+
+
+def test_unfixable_answer_is_withheld():
+    tb, _ = make_toolbox()
+    bad = LLMReply(text="방문인구가 99999명이었습니다 [R1].")
+    llm = ScriptedLLM([
+        LLMReply(tool_calls=[ToolCall("c1", "detect_anomalies", {"signal": "유동인구", "emd": "서귀포시 성산읍"})]),
+        bad, bad, bad,
+    ])
+    run = run_agent("질문", llm, tb, max_revisions=2)
+    assert not run.verified and run.revisions == 2
+    assert "검증을 통과하지 못해" in run.final_text and "99999" not in run.final_text
