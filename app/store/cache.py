@@ -1,0 +1,115 @@
+"""수집 캐시(data/cache/*.parquet) → 읍면동별 일 단위 신호, 기상, 행사, 데이터 품질 지표."""
+from __future__ import annotations
+
+from functools import cached_property
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from app.agent.tools import ToolError
+from app.analytics.series import to_daily
+from app.store.geo import assign_emd, haversine_m, normalize_emd
+
+SIGNALS = ["유동인구", "와이파이", "버스"]
+
+
+class CacheStore:
+    def __init__(self, cache_dir: Path | str, events: pd.DataFrame | None = None):
+        self.dir = Path(cache_dir)
+        self.events = events
+
+    def _read(self, name: str) -> pd.DataFrame:
+        p = self.dir / f"{name}.parquet"
+        return pd.read_parquet(p) if p.exists() else pd.DataFrame()
+
+    # ---- 위치 매핑 ----
+    @cached_property
+    def stations(self) -> pd.DataFrame:
+        st = self._read("bus_stations")
+        if st.empty:
+            return st
+        st = st.rename(columns={"latitude": "lat", "longitude": "lon"})
+        st["emd"] = st["stationAddress"].map(normalize_emd)
+        known = st[st["emd"].notna()]
+        rest = assign_emd(st[st["emd"].isna()].drop(columns=["emd"]), known[["lat", "lon", "emd"]].astype({"lat": float, "lon": float}))
+        out = pd.concat([known.assign(method="address"), rest.assigned], ignore_index=True)
+        out["lat"], out["lon"] = out["lat"].astype(float), out["lon"].astype(float)
+        self._station_unmatched = len(rest.unmatched) + len(rest.out_of_range)
+        return out
+
+    @cached_property
+    def ap_groups(self) -> pd.DataFrame:
+        ap = self._read("wifi_ap_info")
+        if ap.empty:
+            return pd.DataFrame(columns=["apGroupName", "emd", "category"])
+        ap = ap.rename(columns={"latitude": "lat", "longitude": "lon"})
+        res = assign_emd(ap, self.stations[["lat", "lon", "emd"]], address_col="addressDong")
+        self._ap_unmatched_groups = set(res.unmatched["apGroupName"]) | set(res.out_of_range["apGroupName"])
+        g = res.assigned.groupby("apGroupName").agg(emd=("emd", lambda s: s.mode().iat[0]),
+                                                    category=("category", lambda s: s.mode().iat[0]))
+        return g.reset_index()
+
+    @cached_property
+    def station_of_emd(self) -> dict:
+        ws = self._read("weather_stations")
+        if ws.empty or self.stations.empty:
+            return {}
+        ws = ws.assign(lat=ws["latitude"].astype(float), lon=ws["longitude"].astype(float))
+        cent = self.stations.groupby("emd")[["lat", "lon"]].mean()
+        out = {}
+        for emd, r in cent.iterrows():
+            d = haversine_m(r["lat"], r["lon"], ws["lat"].to_numpy(), ws["lon"].to_numpy())
+            out[emd] = ws["observatoryName"].iat[int(np.argmin(d))]
+        return out
+
+    @cached_property
+    def weather(self) -> pd.DataFrame:
+        w = self._read("weather_daily")
+        if w.empty:
+            return pd.DataFrame(columns=["date", "station", "rain_mm", "wind_max"])
+        return pd.DataFrame({"date": pd.to_datetime(w["baseDate"].astype(str), format="%Y%m%d"),
+                             "station": w["observatoryName"],
+                             "rain_mm": pd.to_numeric(w["dailyRainfall"], errors="coerce"),
+                             "wind_max": pd.to_numeric(w["maximumWindSpeed"], errors="coerce")})
+
+    # ---- 신호 ----
+    @cached_property
+    def _frames(self) -> dict[str, pd.DataFrame]:
+        pop = self._read("pop_domestic")
+        if not pop.empty:
+            pop = pop.assign(emd_full=(pop["city"] + " " + pop["emd"]).map(lambda x: normalize_emd(x)))
+        wifi = self._read("wifi_ap_daily")
+        if not wifi.empty:
+            wifi = wifi.merge(self.ap_groups[["apGroupName", "emd"]], on="apGroupName", how="inner").rename(columns={"emd": "emd_full"})
+        bus = self._read("bus_station_daily")
+        if not bus.empty:
+            bus = bus.merge(self.stations[["stationId", "emd"]], on="stationId", how="inner").rename(columns={"emd": "emd_full"})
+        return {"유동인구": (pop, "visitPop"), "와이파이": (wifi, "userCount"), "버스": (bus, "userCount")}
+
+    def signals(self) -> list[str]:
+        return [k for k, (df, _) in self._frames.items() if not df.empty]
+
+    def regions(self, signal: str) -> list[str]:
+        df, _ = self._frames.get(signal, (pd.DataFrame(), None))
+        return sorted(df["emd_full"].dropna().unique()) if not df.empty else []
+
+    def series(self, signal: str, emd: str) -> pd.Series:
+        df, col = self._frames.get(signal, (pd.DataFrame(), None))
+        if df.empty:
+            raise ToolError(f"no collected data for signal={signal!r}; available={self.signals()}")
+        if emd not in set(df["emd_full"].dropna()):
+            raise ToolError(f"no data for signal={signal!r} emd={emd!r}")
+        dates = pd.to_datetime(df["baseDate"].astype(str), format="%Y%m%d")
+        return to_daily(df, "baseDate", col, filters={"emd_full": emd},
+                        start=str(dates.min().date()), end=str(dates.max().date()))
+
+    def quality(self) -> dict:
+        as_of = {}
+        for k, (df, _) in self._frames.items():
+            if not df.empty:
+                as_of[k] = str(pd.to_datetime(df["baseDate"].astype(str), format="%Y%m%d").max().date())
+        _ = self.ap_groups
+        return {"bus_stations": {"mapped": int(len(self.stations)), "unmatched": int(getattr(self, "_station_unmatched", 0))},
+                "wifi_ap_groups": {"mapped": int(len(self.ap_groups)), "unmatched": len(getattr(self, "_ap_unmatched_groups", set()))},
+                "as_of": as_of}
