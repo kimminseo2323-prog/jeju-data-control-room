@@ -21,7 +21,7 @@ from app.analytics.detect import group_episodes, score_series, detect_anomalies
 from app.llm.judge import CAUSE_KO, evidence_text, judge_cause, model_status
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
-from app.report.briefing import ResultStore, render_briefing, template_text
+from app.report.briefing import ResultStore, markdown_safe, render_briefing, template_text
 from app.store.cache import CacheStore
 
 st.set_page_config(page_title="제주 데이터 관제실", page_icon="📡", layout="wide")
@@ -221,7 +221,7 @@ with tab_ask:
             st.caption(f"질문 분류: {INTENT_KO[run.intent]} ({run.router}{f' {run.intent_prob:.0%}' if run.intent_prob > 0 else ''}) · "
                        f"읍면동: {s.emd or '-'} · 신호: {s.signal} · 날짜/기간: {when}")
             st.markdown(("✅ 검증 통과" if run.verified else "⚠️ 검증 미통과(답변 보류)"))
-            st.markdown(run.final_text.replace("\n", "  \n"))
+            st.markdown(markdown_safe(run.final_text))
             if run.results:
                 with st.expander(f"근거: 도구 호출 {len(run.results)}건과 결과", expanded=False):
                     for rid, r in run.results.items():

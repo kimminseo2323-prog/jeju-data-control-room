@@ -45,6 +45,11 @@ def template_text(results: dict) -> str:
     return "\n".join(lines)
 
 
+def markdown_safe(text: str) -> str:
+    """화면 마크다운용: '~'는 취소선 기호라 기간 표기(2024-07-26~2024-07-29)가 지워진 것처럼 보이므로 이스케이프, 줄바꿈 유지."""
+    return text.replace("~", "\\~").replace("\n", "  \n")
+
+
 def _opposite(item: dict, direction: str | None) -> bool:
     """성수기·비수기 표시가 이상 방향과 반대인가(급증인데 비수기 등)."""
     v = item.get("value")

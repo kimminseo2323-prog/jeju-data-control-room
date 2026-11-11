@@ -106,3 +106,11 @@ def test_opposite_season_is_not_called_a_cause_candidate():
     assert len(cand) == 1 and "설날" in cand[0] and "비수기" not in cand[0]
     assert any("비수기" in l and "반대" in l for l in text.split("\n"))
     assert verify(text, r).ok, verify(text, r).errors
+
+
+def test_markdown_safe_keeps_date_ranges_from_strikethrough():
+    # 화면(st.markdown)은 '~'가 두 번 나오면 그 사이를 취소선으로 그린다(질문하기 탭에서 발견, 2026-11-11)
+    from app.report.briefing import markdown_safe
+    out = markdown_safe("2024-07-26~2024-07-29(지속 변화) [R1].\n2024-07-31~2024-08-02(지속 변화) [R1].")
+    assert "~" not in out.replace("\~", "")
+    assert out.count("  \n") == 1   # 줄바꿈 유지
