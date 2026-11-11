@@ -131,9 +131,13 @@ def route(q: str, http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_
         ans = r.json()["answers"]["intent"]
         if ans.get("choice") not in INTENTS:
             raise ValueError(ans)
-        return ans["choice"], float(ans.get("probabilities", {}).get(ans["choice"], ans.get("confidence", 0))), model
     except Exception:
         return rule_route(q), 0.0, "rule"
+    # 모델이 '범위 밖'이라 했는데 키워드가 분석 질문을 가리키면 규칙을 따른다
+    # (범위 안 질문을 거절하는 쪽이 범위 밖 질문에 분석 결과를 보여 주는 쪽보다 나쁘다고 판단)
+    if ans["choice"] == "other" and (rule := rule_route(q)) != "other":
+        return rule, 0.0, f"{model}+rule"
+    return ans["choice"], float(ans.get("probabilities", {}).get(ans["choice"], ans.get("confidence", 0))), model
 
 
 # ---------------- 흐름 ----------------

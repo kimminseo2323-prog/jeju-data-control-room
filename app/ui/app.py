@@ -199,7 +199,7 @@ with tab_ask:
             s = run.slots
             when = str(s.date.date()) if s.date is not None else (f"{s.start.date()}~{s.end.date()}" if s.start is not None else "전체 기간")
             st.markdown(f"**Q. {run.question}**")
-            st.caption(f"질문 분류: {INTENT_KO[run.intent]} ({run.router}{f' {run.intent_prob:.0%}' if run.router != 'rule' else ''}) · "
+            st.caption(f"질문 분류: {INTENT_KO[run.intent]} ({run.router}{f' {run.intent_prob:.0%}' if run.intent_prob > 0 else ''}) · "
                        f"읍면동: {s.emd or '-'} · 신호: {s.signal} · 날짜/기간: {when}")
             st.markdown(("✅ 검증 통과" if run.verified else "⚠️ 검증 미통과(답변 보류)"))
             st.markdown(run.final_text.replace("\n", "  \n"))

@@ -1,0 +1,420 @@
+{
+ "summary": {
+  "model": "tev1:4b",
+  "design": {
+   "set": "design",
+   "n": 24,
+   "model_accuracy": 0.875,
+   "rule_accuracy": 0.917,
+   "hybrid_accuracy": 0.958,
+   "sec_median": 0.049
+  },
+  "heldout": {
+   "set": "heldout",
+   "n": 12,
+   "model_accuracy": 0.833,
+   "rule_accuracy": 0.333,
+   "hybrid_accuracy": 0.833,
+   "sec_median": 0.049
+  },
+  "note": "design 세트는 결합 방식 설계에 사용, heldout 세트는 설계 전에 적어 두고 평가에만 사용"
+ },
+ "rows": [
+  {
+   "set": "design",
+   "question": "7월에 유동인구가 이상하게 많았던 곳 알려줘",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "scan",
+   "hybrid": "scan",
+   "model_prob": 0.92,
+   "backend": "tev1:4b",
+   "seconds": 0.293
+  },
+  {
+   "set": "design",
+   "question": "5월에 이상 신호 있었던 읍면동 목록",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "scan",
+   "hybrid": "scan",
+   "model_prob": 0.992,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "연동에서 6월에 이상한 날 있었어?",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "scan",
+   "hybrid": "scan",
+   "model_prob": 0.862,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "버스 이용이 갑자기 줄어든 지역 찾아줘",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "scan",
+   "hybrid": "scan",
+   "model_prob": 0.922,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "1월 와이파이 이용자가 튄 날짜가 언제야",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "scan",
+   "hybrid": "scan",
+   "model_prob": 0.797,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "여름에 사람이 몰린 동네 어디야",
+   "gold": "scan",
+   "model": "other",
+   "rule": "scan",
+   "hybrid": "scan",
+   "model_prob": 0.0,
+   "backend": "tev1:4b+rule",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "이호동 7월 28일에 사람이 왜 이렇게 많았어?",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "explain",
+   "hybrid": "explain",
+   "model_prob": 0.873,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "성산읍 이상 신호 원인이 뭐야",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "explain",
+   "hybrid": "explain",
+   "model_prob": 0.995,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "애월읍 와이파이 이용자가 12월 말에 급증한 이유",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "explain",
+   "hybrid": "explain",
+   "model_prob": 0.968,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "어린이날에 왜 연동 유동인구가 늘었지",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "explain",
+   "hybrid": "explain",
+   "model_prob": 0.97,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "한림읍 버스 승차가 2월에 줄어든 건 날씨 때문이야?",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "explain",
+   "hybrid": "explain",
+   "model_prob": 0.976,
+   "backend": "tev1:4b",
+   "seconds": 0.052
+  },
+  {
+   "set": "design",
+   "question": "구좌읍 방문객이 늘어난 배경을 설명해줘",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "other",
+   "hybrid": "explain",
+   "model_prob": 0.961,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "버스 데이터는 어디서 가져온 거야?",
+   "gold": "docs",
+   "model": "docs",
+   "rule": "docs",
+   "hybrid": "docs",
+   "model_prob": 0.97,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "유동인구 visitPop 컬럼은 무슨 뜻이야",
+   "gold": "docs",
+   "model": "docs",
+   "rule": "docs",
+   "hybrid": "docs",
+   "model_prob": 0.975,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "반출 가능한 데이터 기준이 뭐야?",
+   "gold": "docs",
+   "model": "docs",
+   "rule": "docs",
+   "hybrid": "docs",
+   "model_prob": 0.966,
+   "backend": "tev1:4b",
+   "seconds": 0.048
+  },
+  {
+   "set": "design",
+   "question": "와이파이 AP 정보 API 일일 쿼터가 몇 건이야",
+   "gold": "docs",
+   "model": "other",
+   "rule": "docs",
+   "hybrid": "docs",
+   "model_prob": 0.0,
+   "backend": "tev1:4b+rule",
+   "seconds": 0.071
+  },
+  {
+   "set": "design",
+   "question": "데이터명세서에 버스 카드 승하차 정보 항목 설명해줘",
+   "gold": "docs",
+   "model": "docs",
+   "rule": "docs",
+   "hybrid": "docs",
+   "model_prob": 0.949,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "결과물 권리는 누구한테 있어?",
+   "gold": "docs",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.678,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "오늘 점심 메뉴 추천해줘",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.999,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "이번 달 날씨 어때?",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.976,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "파이썬 리스트 정렬하는 법 알려줘",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.998,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "design",
+   "question": "제주도 맛집 추천",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.999,
+   "backend": "tev1:4b",
+   "seconds": 0.047
+  },
+  {
+   "set": "design",
+   "question": "너는 누구야?",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.89,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "design",
+   "question": "서울 지하철 혼잡도 알려줘",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.994,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "heldout",
+   "question": "작년 추석 연휴에 평소보다 붐볐던 동네 보여줘",
+   "gold": "scan",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.556,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "heldout",
+   "question": "3월 한 달 동안 와이파이 접속이 비정상적인 곳",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "other",
+   "hybrid": "scan",
+   "model_prob": 0.978,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "heldout",
+   "question": "정류소 승차 인원이 크게 떨어진 날이 있었나",
+   "gold": "scan",
+   "model": "scan",
+   "rule": "other",
+   "hybrid": "scan",
+   "model_prob": 0.939,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "heldout",
+   "question": "중문동 관광객이 10월에 많아진 까닭은?",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "other",
+   "hybrid": "explain",
+   "model_prob": 0.933,
+   "backend": "tev1:4b",
+   "seconds": 0.052
+  },
+  {
+   "set": "heldout",
+   "question": "표선면 유동인구 급감, 비 때문일까?",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "explain",
+   "hybrid": "explain",
+   "model_prob": 0.882,
+   "backend": "tev1:4b",
+   "seconds": 0.05
+  },
+  {
+   "set": "heldout",
+   "question": "서귀포 송산동 버스 승차가 늘어난 게 축제 영향인지 봐줘",
+   "gold": "explain",
+   "model": "explain",
+   "rule": "other",
+   "hybrid": "explain",
+   "model_prob": 0.961,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  },
+  {
+   "set": "heldout",
+   "question": "기상 데이터 관측소는 몇 군데야",
+   "gold": "docs",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.945,
+   "backend": "tev1:4b",
+   "seconds": 0.051
+  },
+  {
+   "set": "heldout",
+   "question": "유동인구 데이터는 몇 시간 단위로 집계돼?",
+   "gold": "docs",
+   "model": "docs",
+   "rule": "other",
+   "hybrid": "docs",
+   "model_prob": 0.6,
+   "backend": "tev1:4b",
+   "seconds": 0.048
+  },
+  {
+   "set": "heldout",
+   "question": "센터 밖으로 가지고 나갈 수 있는 자료 범위",
+   "gold": "docs",
+   "model": "docs",
+   "rule": "other",
+   "hybrid": "docs",
+   "model_prob": 0.928,
+   "backend": "tev1:4b",
+   "seconds": 0.048
+  },
+  {
+   "set": "heldout",
+   "question": "주식 시세 알려줘",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.999,
+   "backend": "tev1:4b",
+   "seconds": 0.048
+  },
+  {
+   "set": "heldout",
+   "question": "영어로 자기소개서 써줘",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.998,
+   "backend": "tev1:4b",
+   "seconds": 0.047
+  },
+  {
+   "set": "heldout",
+   "question": "부산 해운대 인파 예측해줘",
+   "gold": "other",
+   "model": "other",
+   "rule": "other",
+   "hybrid": "other",
+   "model_prob": 0.994,
+   "backend": "tev1:4b",
+   "seconds": 0.049
+  }
+ ]
+}

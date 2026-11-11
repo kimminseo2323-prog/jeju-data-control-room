@@ -57,30 +57,37 @@ HELDOUT = [
 ]
 
 
+def run_set(name: str, cases, host: str, model: str) -> tuple[dict, list[dict]]:
+    rows = []
+    for q, gold in cases:
+        t0 = time.perf_counter()
+        hybrid, prob, backend = route(q, host=host, model=model)   # 모델 우선 + '범위 밖'일 때 규칙 보완
+        sec = time.perf_counter() - t0
+        model_only = "other" if backend.endswith("+rule") else hybrid
+        rule = rule_route(q)
+        rows.append({"set": name, "question": q, "gold": gold, "model": model_only, "rule": rule, "hybrid": hybrid,
+                     "model_prob": round(prob, 3), "backend": backend, "seconds": round(sec, 3)})
+        marks = "".join("O" if x == gold else "X" for x in (model_only, rule, hybrid))
+        print(f"[{name}] {marks} gold={gold:8s} model={model_only:8s} rule={rule:8s} hybrid={hybrid:8s} {q}")
+    n = len(rows)
+    acc = {k: round(sum(r[k] == r["gold"] for r in rows) / n, 3) for k in ("model", "rule", "hybrid")}
+    return {"set": name, "n": n, **{f"{k}_accuracy": v for k, v in acc.items()},
+            "sec_median": sorted(r["seconds"] for r in rows)[n // 2]}, rows
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="tev1:4b")
     ap.add_argument("--host", default="http://127.0.0.1:11500")
     a = ap.parse_args()
-    rows, ok_model, ok_rule = [], 0, 0
-    for q, gold in CASES:
-        t0 = time.perf_counter()
-        pred, prob, backend = route(q, host=a.host, model=a.model)
-        sec = time.perf_counter() - t0
-        rule = rule_route(q)
-        ok_model += pred == gold
-        ok_rule += rule == gold
-        rows.append({"question": q, "gold": gold, "model_pred": pred, "model_prob": round(prob, 3), "backend": backend,
-                     "rule_pred": rule, "seconds": round(sec, 3)})
-        print(f"{'O' if pred == gold else 'X'}{'o' if rule == gold else 'x'} gold={gold:8s} model={pred:8s} rule={rule:8s} {q}")
-    n = len(CASES)
-    summary = {"model": a.model, "n": n, "model_accuracy": ok_model / n, "rule_accuracy": ok_rule / n,
-               "backend_used": sorted({r["backend"] for r in rows}),
-               "sec_median": sorted(r["seconds"] for r in rows)[n // 2]}
+    s1, r1 = run_set("design", CASES, a.host, a.model)
+    s2, r2 = run_set("heldout", HELDOUT, a.host, a.model)
+    summary = {"model": a.model, "design": s1, "heldout": s2,
+               "note": "design 세트는 결합 방식 설계에 사용, heldout 세트는 설계 전에 적어 두고 평가에만 사용"}
     print(json.dumps(summary, ensure_ascii=False))
     out = Path("eval/results"); out.mkdir(parents=True, exist_ok=True)
     (out / f"intent_probe_{a.model.replace(':', '_')}.json").write_text(
-        json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1), "utf-8")
+        json.dumps({"summary": summary, "rows": r1 + r2}, ensure_ascii=False, indent=1), "utf-8")
 
 
 if __name__ == "__main__":
