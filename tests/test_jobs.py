@@ -34,4 +34,6 @@ def test_ap_info_uses_basedate_param():
 def test_daily_quota_per_job_reflects_approved_increase():
     from app.ingest.jobs import JOBS
     assert JOBS["bus_station_daily"].daily_quota == 5000      # 2026-11-11 허브 프로젝트 화면에서 '승인' 확인
-    assert JOBS["pop_domestic"].daily_quota == 1000
+    assert JOBS["pop_domestic"].daily_quota == 5000           # 2026-11-11 목록 2쪽에서 '승인' 확인
+    assert JOBS["wifi_ap_daily"].daily_quota == 5000
+    assert JOBS["wifi_ap_info"].daily_quota == 1000
