@@ -113,8 +113,16 @@ class ResultStore:
         self.saved.append(p)
         return p
 
+    def purge(self) -> int:
+        """설정과 관계없이 이번 실행에서 저장한 파일을 지금 지운다. 지운 개수를 돌려준다."""
+        n = 0
+        for p in self.saved:
+            if p.exists():
+                p.unlink()
+                n += 1
+        self.saved.clear()
+        return n
+
     def cleanup(self) -> None:
         if self.delete_on_exit:
-            for p in self.saved:
-                p.unlink(missing_ok=True)
-            self.saved.clear()
+            self.purge()

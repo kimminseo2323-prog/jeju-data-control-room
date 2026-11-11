@@ -87,3 +87,9 @@ def test_template_for_decrease_passes_verifier():
                                                                          "peak_date": "2025-01-14", "peak_pct": -48.2, "peak_value": 492.0, "peak_expected": 950.0, "peak_score": -4.1}]}, ["허브"])}
     text = template_text(res)
     assert "적었" in text and verify(text, res).ok, verify(text, res).errors
+
+
+def test_result_store_purge_deletes_even_when_keep_on_exit(tmp_path):
+    st = ResultStore(tmp_path, delete_on_exit=False)
+    p = st.save("briefing", "<html></html>")
+    assert st.purge() == 1 and not p.exists() and st.saved == []

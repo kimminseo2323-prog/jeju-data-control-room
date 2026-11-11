@@ -1,6 +1,7 @@
 """제주 데이터 관제실 — 화면. 실행: streamlit run app/ui/app.py"""
 from __future__ import annotations
 
+import atexit
 import sys
 from pathlib import Path
 
@@ -36,6 +37,14 @@ def get_store() -> CacheStore:
 @st.cache_resource
 def get_index():
     return build_index(load_corpus(ROOT))
+
+
+@st.cache_resource
+def get_results() -> ResultStore:
+    """브리핑 저장 폴더(data/results). 화면 서버를 끌 때(Ctrl+C) '종료 시 삭제'가 켜져 있으면 이번 실행에서 저장한 파일을 지운다."""
+    rs = ResultStore(ROOT / "data" / "results", delete_on_exit=True)
+    atexit.register(rs.cleanup)
+    return rs
 
 
 @st.cache_resource
@@ -82,7 +91,16 @@ with st.sidebar:
     method = st.radio("탐지 방법", ["seasonal_z", "robust_resid"],
                       format_func=lambda m: {"seasonal_z": "같은 요일 중앙값 기준", "robust_resid": "STL 분해 잔차"}[m])
     threshold = st.slider("민감도(점수 기준, 높을수록 엄격)", 2.5, 6.0, 3.5, 0.5)
-    delete_on_exit = st.toggle("세션 종료 시 저장 결과 삭제", value=True, help="센터 퇴실 시 삭제 원칙에 맞춘 기본값")
+    results_store = get_results()
+    results_store.delete_on_exit = st.toggle("화면 종료 시 저장한 브리핑 삭제", value=True,
+                                              help="센터 퇴실 시 삭제 원칙에 맞춘 기본값. 결과 폴더(data/results)에 저장한 파일만 해당합니다.")
+    n_saved = sum(p.exists() for p in results_store.saved)
+    if n_saved and st.button(f"저장한 브리핑 {n_saved}개 지금 삭제"):
+        st.session_state["purged"] = results_store.purge()
+        st.session_state.pop("saved_msg", None)
+        st.rerun()
+    if st.session_state.get("purged"):
+        st.caption(f"저장한 브리핑 {st.session_state.pop('purged')}개를 삭제했습니다.")
     st.caption(f"원인 판정 모델: {judge_status()}")
 
 q = store.quality()
@@ -176,7 +194,13 @@ with tab_detail:
         st.markdown(("✅ 검증 통과" if v.ok else "⚠️ 검증 미통과") + " — 모든 숫자가 계산 결과와 일치하는지 확인했습니다.")
         st.text(text)
         html = render_briefing(run, generated_at=pd.Timestamp.now(), data_as_of=q["as_of"])
-        st.download_button("브리핑 HTML 저장", html, file_name=f"briefing_{emd}_{row['최대일']}.html", mime="text/html")
+        b1, b2 = st.columns(2)
+        if b1.button("결과 폴더(data/results)에 저장"):
+            st.session_state["saved_msg"] = get_results().save(f"briefing_{emd}_{row['최대일']}".replace(" ", "_"), html).name
+            st.rerun()   # 사이드바의 삭제 버튼·개수를 바로 갱신
+        if st.session_state.get("saved_msg"):
+            b1.success(f"저장: {st.session_state['saved_msg']}")
+        b2.download_button("내 PC로 내려받기(HTML)", html, file_name=f"briefing_{emd}_{row['최대일']}.html", mime="text/html")
 
 EXAMPLES = ["7월에 유동인구가 이상하게 많았던 곳 알려줘", "이호동 7월 28일에 사람이 왜 이렇게 많았어?",
             "버스 데이터는 어디서 가져온 거야?", "반출 가능한 결과물 기준이 뭐야?"]
