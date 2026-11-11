@@ -128,3 +128,14 @@ def test_event_coverage_is_period_of_listed_events(cache_dir):
     pd.DataFrame({"콘텐츠명": ["이호테우축제", "탐라문화제"], "시작일": ["2024-08-02", "2024-10-09"], "종료일": ["2024-08-04", "2024-10-13"],
                   "시작시간": "", "종료시간": "", "요금": "", "주관": "", "주최": "", "후원": ""}).to_csv(m / "제주특별자치도주요행사정보.csv", index=False, encoding="cp949")
     assert CacheStore(cache_dir).coverage["event"] == (pd.Timestamp("2024-08-02"), pd.Timestamp("2024-10-09"))
+
+
+def test_foreign_visitor_signal_sums_nationalities(cache_dir):
+    pd.DataFrame({"baseDate": ["20250101", "20250101", "20250102"], "nationality": ["중국", "대만", "중국"],
+                  "city": ["서귀포시"] * 3, "emd": ["성산읍"] * 3, "visitPop": [30, 12, 25]}).to_parquet(cache_dir / "pop_foreign_short.parquet")
+    st = CacheStore(cache_dir)
+    assert "외국인" in st.signals()
+    s = st.series("외국인", "서귀포시 성산읍")
+    assert s[pd.Timestamp("2025-01-01")] == 42 and s[pd.Timestamp("2025-01-02")] == 25
+    nat = st.nationality_table("서귀포시 성산읍")
+    assert nat.loc[pd.Timestamp("2025-01-01"), "대만"] == 12

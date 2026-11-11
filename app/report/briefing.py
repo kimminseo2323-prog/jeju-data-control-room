@@ -9,7 +9,7 @@ import pandas as pd
 
 from app.agent.loop import AgentRun
 
-SIGNAL_UNIT = {"유동인구": "명", "와이파이": "명", "버스": "명"}
+SIGNAL_UNIT = {"유동인구": "명", "와이파이": "명", "버스": "명", "외국인": "명"}
 LIMITS = ("상관관계에 기반한 '원인 후보'이며 인과를 뜻하지 않습니다. "
           "유동인구 값은 하루 시간대별 인구의 합(연인원 성격)입니다.")
 
@@ -19,6 +19,7 @@ def template_text(results: dict) -> str:
     lines = []
     ctx = {(r.data.get("date"), r.data.get("emd")): (rid, r) for rid, r in results.items() if r.tool == "check_context"}
     cos = {(r.data.get("date"), r.data.get("emd")): (rid, r) for rid, r in results.items() if r.tool == "find_co_movements"}
+    nat = {(r.data.get("date"), r.data.get("emd")): (rid, r) for rid, r in results.items() if r.tool == "nationality_mix"}
     for rid, r in results.items():
         if r.tool != "detect_anomalies":
             continue
@@ -34,14 +35,14 @@ def template_text(results: dict) -> str:
                 span = e["start"] if e["start"] == e["end"] else f"{e['start']}~{e['end']}"
                 lines.append(f"{span}({e['kind']}): 가장 큰 날 {e['peak_date']} 값은 {e['peak_value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 "
                              f"기대값 {e['peak_expected']:,}보다 {abs(e['peak_pct'])}% {word}습니다 [{rid}].")
-                lines += _evidence_lines(e["peak_date"], d["emd"], ctx, cos, e["direction"])
+                lines += _evidence_lines(e["peak_date"], d["emd"], ctx, cos, e["direction"], nat)
             continue
         lines.append(f"{d['emd']} {d['signal']}에서 이상 신호 {d['count']}건이 확인됐습니다 [{rid}].")
         for a in d["anomalies"][:5]:
             word = "많았" if a["direction"] == "up" else "적었"
             lines.append(f"{a['date']} 값은 {a['value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 기대값 {a['expected']:,}보다 "
                          f"{abs(a['pct'])}% {word}습니다 [{rid}].")
-            lines += _evidence_lines(a["date"], d["emd"], ctx, cos, a["direction"])
+            lines += _evidence_lines(a["date"], d["emd"], ctx, cos, a["direction"], nat)
     return "\n".join(lines)
 
 
@@ -56,7 +57,13 @@ def _opposite(item: dict, direction: str | None) -> bool:
     return item.get("kind") == "visitors" and v is not None and direction in ("up", "down") and (v > 0) != (direction == "up")
 
 
-def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | None = None) -> list[str]:
+def _josa(word: str, with_final: str, without_final: str) -> str:
+    """받침이 있으면 with_final(이·은), 없으면 without_final(가·는)."""
+    c = word[-1] if word else ""
+    return with_final if "가" <= c <= "힣" and (ord(c) - 0xAC00) % 28 else without_final
+
+
+def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | None = None, nat: dict | None = None) -> list[str]:
     out = []
     hit = ctx.get((day, emd))
     if hit and hit[1].data["items"]:
@@ -76,6 +83,12 @@ def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | N
         for c in hit[1].data["co_movements"]:
             word = "많았" if c["direction"] == "up" else "적었"
             out.append(f"같은 시기 {c['signal']}도 {c['date']}에 평소보다 {word}습니다(점수 {c['z']}) [{hit[0]}].")
+    hit = (nat or {}).get((day, emd))
+    if hit and hit[1].data.get("top"):
+        t = hit[1].data["top"][0]
+        word = "많아" if t["diff"] > 0 else "적어"
+        share = f" 전체 변화의 {t['share_of_change']}%를 차지했습니다" if t.get("share_of_change") is not None else " 가장 크게 움직였습니다"
+        out.append(f"국적별로는 {t['nationality']}{_josa(t['nationality'], '이', '가')} 평소보다 {abs(t['diff']):,}명 {word}{share} [{hit[0]}].")
     return out
 
 

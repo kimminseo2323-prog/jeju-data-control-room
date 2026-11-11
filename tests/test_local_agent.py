@@ -128,3 +128,10 @@ def test_rule_rescues_in_scope_question_model_called_other():
 def test_model_other_kept_when_rule_agrees():
     intent, prob, backend = route("점심 메뉴 추천해줘", http=FakeHTTP("other"))
     assert (intent, backend) == ("other", "tev1:4b") and prob == 0.9
+
+
+def test_parse_foreign_visitor_signal():
+    from app.agent.local import parse_slots
+    lo, hi = pd.Timestamp("2024-04-01"), pd.Timestamp("2026-08-31")
+    assert parse_slots("성산읍 외국인 관광객이 7월 28일에 왜 늘었어?", lo, hi).signal == "외국인"
+    assert parse_slots("성산읍 7월 28일에 왜 사람이 많았어?", lo, hi).signal == "유동인구"

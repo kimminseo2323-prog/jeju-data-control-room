@@ -167,6 +167,16 @@ with tab_detail:
             co = res["R2"].data["co_movements"]
             st.write("\n".join(f"- {c['signal']} {c['date']} 점수 {c['z']}" for c in co) if co else
                      f"- 확인한 신호({', '.join(res['R2'].data['checked'])}) 중 동반 변화 없음")
+            if signal == "외국인":
+                st.markdown("#### 국적별 변화(평소 대비)")
+                try:
+                    nm = tb.dispatch("nationality_mix", {"date": str(day.date()), "emd": emd, "top": 5}, "R4")
+                    res["R4"] = nm
+                    st.dataframe(pd.DataFrame(nm.data["top"]).rename(columns={
+                        "nationality": "국적", "value": "그날", "expected": "기대값", "diff": "차이", "share_of_change": "전체 변화 중(%)"}),
+                        hide_index=True, width="stretch")
+                except Exception as e:   # 국적 자료가 없는 날
+                    st.caption(f"국적별 자료 없음: {e}")
         with right:
             st.markdown("#### 원인 후보 판정")
             evidence = {"anomaly": {"emd": emd, "signal": signal, "date": str(day.date()), "pct": float(row["기대 대비(%)"]),

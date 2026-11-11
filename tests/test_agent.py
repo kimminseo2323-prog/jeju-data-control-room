@@ -75,7 +75,7 @@ def test_max_steps_stops_loop():
 def test_tool_specs_cover_all_dispatchable_tools():
     tb, _ = make_toolbox()
     names = {t["name"] for t in tb.specs()}
-    assert names == {"get_series", "detect_anomalies", "scan_regions", "find_co_movements", "check_context", "search_docs"}
+    assert names == {"get_series", "detect_anomalies", "scan_regions", "find_co_movements", "check_context", "nationality_mix", "search_docs"}
 
 
 def test_failed_verification_is_sent_back_and_revised():
@@ -222,3 +222,17 @@ def test_context_outside_source_period_is_marked_not_covered():
     early = tb.dispatch("check_context", {"date": "2024-08-02", "emd": "제주시 이호동"}, "R2")
     assert late.data["not_covered"] == ["weather", "event"]
     assert early.data["not_covered"] == []
+
+
+def test_nationality_mix_names_who_drove_the_change():
+    idx = pd.date_range("2024-10-01", periods=140, freq="D")
+    import numpy as np
+    rng = np.random.default_rng(0)
+    nat = pd.DataFrame({"중국": 100 + rng.normal(0, 5, 140), "대만": 50 + rng.normal(0, 5, 140), "미국": 20 + rng.normal(0, 2, 140)}, index=idx)
+    day = idx[70]
+    nat.loc[day, "중국"] += 300   # 중국만 크게 늘어남
+    store = MemoryStore(series={("외국인", "제주시 건입동"): nat.sum(axis=1)}, nationality={"제주시 건입동": nat})
+    r = Toolbox(store, index=None).dispatch("nationality_mix", {"date": str(day.date()), "emd": "제주시 건입동"}, "R1")
+    top = r.data["top"][0]
+    assert top["nationality"] == "중국" and top["diff"] > 250
+    assert top["share_of_change"] > 80

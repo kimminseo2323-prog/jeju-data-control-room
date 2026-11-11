@@ -126,3 +126,17 @@ def test_template_says_context_not_checked_outside_source_period():
     text = template_text(res)
     assert "기상·축제·행사 자료 제공 기간 밖이라 확인하지 못했습니다 [R2]" in text
     assert verify(text, res).ok
+
+
+def test_template_reports_nationality_driving_the_change():
+    from app.agent.tools import ToolResult
+    from app.agent.verify import verify
+    from app.report.briefing import template_text
+    res = {"R1": ToolResult("R1", "detect_anomalies", {}, {"signal": "외국인", "emd": "제주시 건입동", "count": 1, "anomalies": [
+               {"date": "2024-07-28", "value": 2400.0, "expected": 1000.0, "pct": 140.0, "score": 8.0, "direction": "up"}]}),
+           "R2": ToolResult("R2", "nationality_mix", {}, {"date": "2024-07-28", "emd": "제주시 건입동", "total_diff": 1400.0, "nationalities": 12,
+                                                          "top": [{"nationality": "중국", "value": 1800.0, "expected": 600.0, "diff": 1200.0, "share_of_change": 85.7},
+                                                                  {"nationality": "대만", "value": 300.0, "expected": 200.0, "diff": 100.0, "share_of_change": 7.1}]})}
+    text = template_text(res)
+    assert "국적별로는 중국이 평소보다 1,200.0명 많아 전체 변화의 85.7%를 차지했습니다 [R2]." in text
+    assert verify(text, res).ok

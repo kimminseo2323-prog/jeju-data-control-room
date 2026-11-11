@@ -37,7 +37,8 @@ _RULES = [
     ("docs", re.compile(r"출처|정의|뜻|의미|컬럼|명세|API|api|반출|쿼터|수집 기준|가져온|데이터셋|문서")),
     ("scan", re.compile(r"이상|급증|급감|많았|적었|어디|언제|목록|찾아|튄")),
 ]
-_SIGNALS = [("와이파이", re.compile(r"와이파이|wifi|WiFi|WIFI")), ("버스", re.compile(r"버스|승차|정류"))]
+_SIGNALS = [("외국인", re.compile(r"외국인|해외|중국인|일본인|크루즈")), ("와이파이", re.compile(r"와이파이|wifi|WiFi|WIFI")),
+            ("버스", re.compile(r"버스|승차|정류"))]
 _EUP_MYEON_STEMS = {full.split(" ")[1][:-1]: full for full in EMD_43 if full.endswith(("읍", "면"))}
 
 
@@ -184,6 +185,13 @@ def _explain(q, s: Slots, tb: Toolbox, judge, method, threshold) -> tuple[str, d
     day = ep["peak_date"]
     r2, co = call("find_co_movements", {"date": day, "emd": s.emd, "window": 1, "exclude_signal": s.signal})
     r3, cx = call("check_context", {"date": day, "emd": s.emd, "signal": s.signal})
+    shown = {r1: det, r2: co, r3: cx}
+    if s.signal == "외국인":   # 어느 국적이 변화를 이끌었는지(화면·답변용, 판정 근거에는 넣지 않음)
+        try:
+            rn, nm = call("nationality_mix", {"date": day, "emd": s.emd})
+            shown[rn] = nm
+        except ToolError:
+            pass
     evidence = {"anomaly": {"emd": s.emd, "signal": s.signal, "date": day, "pct": ep["peak_pct"], "kind": ep["kind"], "days": ep["days"]},
                 "context": cx.data["items"], "co_movements": co.data["co_movements"], "not_covered": cx.data.get("not_covered", [])}
     j = judge(evidence)
@@ -194,7 +202,7 @@ def _explain(q, s: Slots, tb: Toolbox, judge, method, threshold) -> tuple[str, d
                                    "backend": j.backend, "note": j.note,
                                    "probabilities": {k: round(v * 100, 1) for k, v in j.probabilities.items()}},
                                   [f"로컬 판단 모델 {j.backend}" if j.backend != "rule" else "규칙 기반 판정(로컬 판단 모델 연결 실패)"])
-    lines = [template_text({r1: det, r2: co, r3: cx}),
+    lines = [template_text(shown),
              f"근거를 종합한 원인 후보는 '{CAUSE_KO[j.choice]}'(확률 {prob:.1f}%, 확신도 {j.level})입니다 [{r4}][{r2}][{r3}].",
              "이는 상관에 기반한 후보이며 인과를 뜻하지 않습니다."]
     return "\n".join(lines), call.results

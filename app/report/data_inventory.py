@@ -19,6 +19,7 @@ NAMES = {
     "wifi_ap_info": ("618", "제주 공공와이파이 AP 정보"),
     "bus_total_daily": ("617", "버스 일일 승객수"),
     "wifi_users_daily": ("586", "와이파이 일일 사용자수"),
+    "pop_foreign_short": ("589", "읍면동 단위 외국인 단기체류 유동인구"),
 }
 
 

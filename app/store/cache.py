@@ -13,7 +13,7 @@ from app.analytics.series import to_daily
 from app.store.events import events_period, load_events
 from app.store.geo import assign_emd, haversine_m, normalize_emd
 
-SIGNALS = ["유동인구", "와이파이", "버스"]
+SIGNALS = ["유동인구", "와이파이", "버스", "외국인"]
 
 
 def _norm_name(x) -> str:
@@ -141,7 +141,29 @@ class CacheStore:
         bus = self._read("bus_station_daily")
         if not bus.empty:
             bus = self._map_bus(bus)
-        return {"유동인구": (pop, "visitPop"), "와이파이": (wifi, "userCount"), "버스": (bus, "userCount")}
+        fr = self._foreign
+        return {"유동인구": (pop, "visitPop"), "와이파이": (wifi, "userCount"), "버스": (bus, "userCount"), "외국인": (fr, "visitPop")}
+
+    @cached_property
+    def _foreign(self) -> pd.DataFrame:
+        """읍면동 단위 외국인 단기체류 유동인구(589). 국적별 행 → 읍면동 이름 정규화(583과 같은 방식)."""
+        fr = self._read("pop_foreign_short")
+        if not fr.empty:
+            fr = fr.assign(emd_full=(fr["city"] + " " + fr["emd"]).map(lambda x: normalize_emd(x)))
+        return fr
+
+    def nationality_table(self, emd: str) -> pd.DataFrame:
+        """날짜 × 국적 외국인 방문인구 표(한 읍면동). 수집되지 않은 날은 행이 없다(NaN)."""
+        fr = self._foreign
+        if fr.empty:
+            raise ToolError("외국인 유동인구(589)가 수집되지 않았습니다")
+        d = fr[fr["emd_full"] == emd]
+        if d.empty:
+            raise ToolError(f"no foreign visitor data for emd={emd!r}")
+        dates = pd.to_datetime(d["baseDate"].astype(str), format="%Y%m%d")
+        t = pd.to_numeric(d["visitPop"], errors="coerce").groupby([dates, d["nationality"]]).sum(min_count=1).unstack()
+        all_dates = pd.to_datetime(fr["baseDate"].astype(str), format="%Y%m%d")
+        return t.reindex(pd.date_range(all_dates.min(), all_dates.max(), freq="D")).rename_axis(index=None, columns=None)
 
     def _map_bus(self, bus: pd.DataFrame) -> pd.DataFrame:
         """버스 이용(613) → 읍면동. 613과 정류소 정보(612)의 정류소ID 체계가 달라(7자리 vs 9자리) ID가 겹치지 않는다.

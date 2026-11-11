@@ -14,6 +14,7 @@ SIGNAL_SOURCES = {
     "유동인구": "제주데이터허브 읍면동 단위 내국인 유동인구(583), 방문인구(visitPop) 합계",
     "와이파이": "제주데이터허브 와이파이 AP그룹별 일일 사용량(593), 이용자수 합계(AP→읍면동 매핑)",
     "버스": "제주데이터허브 일일 정류소별 버스 이용자 정보(613), 승차·일반·카드 합계(정류소→읍면동 매핑)",
+    "외국인": "제주데이터허브 읍면동 단위 외국인 단기체류 유동인구(589), 국적별 방문인구(visitPop) 합계",
 }
 
 
@@ -40,11 +41,18 @@ class DataStore(Protocol):
 
 class MemoryStore:
     def __init__(self, series: dict[tuple[str, str], pd.Series], weather=None, station_of_emd=None, events=None, visitors=None,
-                 neighbors: dict[str, list[str]] | None = None, coverage: dict | None = None):
+                 neighbors: dict[str, list[str]] | None = None, coverage: dict | None = None,
+                 nationality: dict[str, pd.DataFrame] | None = None):
         self._series = series
         self.weather, self.station_of_emd, self.events, self.visitors = weather, station_of_emd, events, visitors
         self._neighbors = neighbors or {}
         self.coverage = coverage or {}
+        self._nationality = nationality or {}
+
+    def nationality_table(self, emd: str) -> pd.DataFrame:
+        if emd not in self._nationality:
+            raise ToolError(f"no foreign visitor data for emd={emd!r}")
+        return self._nationality[emd]
 
     def neighbors(self, emd: str) -> list[str]:
         return list(self._neighbors.get(emd, []))
@@ -74,7 +82,7 @@ class Toolbox:
         self.store, self.index = store, index
 
     def specs(self) -> list[dict]:
-        sig = {"type": "string", "enum": ["유동인구", "와이파이", "버스"], "description": "신호 종류"}
+        sig = {"type": "string", "enum": ["유동인구", "와이파이", "버스", "외국인"], "description": "신호 종류"}
         emd = {"type": "string", "description": "읍면동, 예: '서귀포시 성산읍'"}
         date = {"type": "string", "description": "YYYY-MM-DD"}
         return [
@@ -92,6 +100,8 @@ class Toolbox:
                             "exclude_signal": {"type": "string", "description": "분석 중인 신호(자기 자신 제외)"}}, "required": ["date", "emd"]}},
             {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부, (신호를 주면) 작년 같은 시기에도 같은 방향 이상이 있었는지 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "signal": sig}, "required": ["date", "emd"]}},
+            {"name": "nationality_mix", "description": "외국인 방문인구가 크게 바뀐 날, 어느 국적이 평소(같은 요일 기준선)보다 얼마나 늘거나 줄었는지 나눠 본다.",
+             "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "top": {"type": "integer"}}, "required": ["date", "emd"]}},
             {"name": "search_docs", "description": "데이터 명세·API 문서·반출 기준·게시판 답변에서 관련 내용을 검색한다(출처 포함).",
              "parameters": {"type": "object", "properties": {"query": {"type": "string"}, "k": {"type": "integer"}}, "required": ["query"]}},
         ]
@@ -207,6 +217,29 @@ class Toolbox:
         not_covered = [k for k, (lo, hi) in cov.items() if not (lo <= day <= hi)]
         rows = [{"kind": i.kind, "detail": i.detail, **({"value": i.value} if i.value is not None else {})} for i in items]
         return {"date": date, "emd": emd, "items": rows, "not_covered": not_covered}, sorted({i.source for i in items})
+
+    def _t_nationality_mix(self, date, emd, top=3):
+        """국적별 그날 값 - 기대값(같은 요일 앞뒤 4주 중앙값). 변화량이 큰 국적 순, 전체 변화 중 비중(%)."""
+        from app.analytics.detect import _expected_seasonal
+        t = self.store.nationality_table(emd).astype(float)
+        day = pd.Timestamp(date)
+        if day not in t.index:
+            raise ToolError(f"no foreign visitor data on {date}")
+        rows = []
+        for nat in t.columns:
+            exp = _expected_seasonal(t[nat]).get(day)
+            val = t.at[day, nat]
+            if pd.isna(exp) and pd.isna(val):
+                continue
+            val, exp = (0.0 if pd.isna(val) else float(val)), (0.0 if pd.isna(exp) else float(exp))
+            rows.append({"nationality": nat, "value": round(val, 1), "expected": round(exp, 1), "diff": round(val - exp, 1)})
+        total = sum(r["diff"] for r in rows)
+        same = [r for r in rows if total and (r["diff"] > 0) == (total > 0)]
+        for r in rows:
+            r["share_of_change"] = round(r["diff"] / total * 100, 1) if total else None
+        same.sort(key=lambda r: -abs(r["diff"]))
+        return ({"date": date, "emd": emd, "total_diff": round(total, 1), "nationalities": len(rows), "top": same[:int(top)]},
+                [SIGNAL_SOURCES["외국인"]])
 
     def _t_search_docs(self, query, k=5):
         hits = self.index.search(query, k=int(k))
