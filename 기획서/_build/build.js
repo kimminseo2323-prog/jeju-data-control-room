@@ -1,4 +1,4 @@
-// 기획서 v0.2 생성기. 실행: NODE_PATH=<docx 모듈 폴더> node 기획서/_build/build.js <출력.docx>
+// 기획서 v0.3 생성기. 실행: NODE_PATH=<docx 모듈 폴더> node 기획서/_build/build.js <출력.docx>
 // v0.1(계획 단계)은 git 기록과 기획서/숨비소리_AI_Agent_기획서_v0.1.docx 에 남아 있다.
 // 모든 수치는 eval/results/*.json, data/cache, 노트북 01~05 출력에서 옮겼다(2026-11-11).
 const fs = require("fs");
@@ -73,7 +73,7 @@ function callout(lines, fill = SAND) {
 const c = [];
 
 // 표지·요약
-c.push(new Paragraph({ children: [t("제주 AI·빅데이터 활용 AI Agent 개발 챌린지 · AI Agent 기획서 v0.2", { size: 18, color: GRAY })], spacing: { after: 200 } }));
+c.push(new Paragraph({ children: [t("제주 AI·빅데이터 활용 AI Agent 개발 챌린지 · AI Agent 기획서 v0.3", { size: 18, color: GRAY })], spacing: { after: 200 } }));
 c.push(new Paragraph({ children: [t("제주 데이터 관제실", { size: 44, bold: true, color: NAVY })], spacing: { after: 80 } }));
 c.push(new Paragraph({ children: [t("관광·교통 이상 신호 탐지·원인 설명 AI Agent", { size: 28, color: TEAL, bold: true })], spacing: { after: 160 } }));
 c.push(new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: NAVY, space: 4 } }, children: [t("팀 숨비소리  |  팀장 nnin (Data Scientist) · 팀원 hjshin93 (Data Analyst)  |  2026.11", { size: 18, color: GRAY })], spacing: { after: 220 } }));
@@ -95,8 +95,7 @@ c.push(table([2300, 4038, 3300], ["평가", "결과(2026-11-11)", "읽는 법"],
   ["이상 탐지", "가짜 이상 480건 주입, 유동인구 ±80% 변화의 **88~89%** 탐지\n평소 경보 100일당 2.8일", "±20% 같은 작은 변화는 11~23%만 탐지(한계)"],
   ["숫자 검증기", "오류 없는 브리핑 60건 **100% 통과**\n숫자 변경 94.3%·지어낸 숫자 100% 차단", "검증을 통과한 문장만 화면에 표시"],
   ["질문 분류", "처음 보는 질문 12개 중 10개(**83%**)", "키워드 규칙만 쓰면 33%"],
-  ["원인 판정", "정답을 정한 10건 **10/10**
-6코어 CPU에서 원인 질문 1건 약 14초", "실제 사례로 대규모 정답 평가는 못 함, 센터 PC 실측 아님"],
+  ["원인 판정", "정답을 정한 10건 **10/10**\n6코어 CPU에서 원인 질문 1건 약 14초", "실제 사례로 대규모 정답 평가는 못 함, 센터 PC 실측 아님"],
 ], { firstColShade: true }));
 c.push(BR());
 
@@ -107,7 +106,7 @@ c.push(P("제주의 관광·교통 현장은 날씨, 연휴, 축제, 성수기�
 c.push(H2("1.2 분석 주제"));
 c.push(P("**제주 관광·교통 일 단위 신호의 이상 탐지와 원인 후보 설명.** 읍면동 유동인구, 장소별 공공와이파이 이용, 정류소별 버스 이용을 43개 읍면동 단위로 맞춰 하나의 \"관제판\"으로 묶고, 같은 요일 기준선에서 크게 벗어난 날과 지역을 찾습니다. 찾은 이상마다 같은 날 같은 지역의 다른 신호, 제주 전체(해당 읍면동 제외)의 움직임, 기상, 공휴일, 축제, 월별 입도객을 대조해 원인 후보를 근거와 함께 제시합니다."));
 c.push(H2("1.3 목표와 달성 현황"));
-c.push(table([2000, 3300, 4338], ["목표", "v0.1 계획(11/10)", "v0.2 결과(11/11)"], [
+c.push(table([2000, 3300, 4338], ["목표", "v0.1 계획(11/10)", "결과(11/11)"], [
   ["탐색 자동화", "자연어 질문으로 데이터·지역·기간 선택과 계산까지", "**달성** — 질문 분류(tev1)+조건 추출(규칙)+정해진 도구 순서. 관제판 클릭만으로도 같은 분석"],
   ["이상 탐지", "2방법 비교 후 기본값 결정, 재현율 0.8", "**부분 달성** — 큰 변화(±80%)는 0.88~0.89, 전체 평균 0.55. 2방법 차이가 작아 설명하기 쉬운 방법을 기본값으로"],
   ["원인 설명", "원인 후보를 확신도와 함께, 단정 금지", "**달성** — 7가지 원인 후보의 확률을 tev1이 산출, 문장은 \"후보\"로만 표현하고 인과 아님을 고정 문구로 표시"],
@@ -265,8 +264,8 @@ c.push(H2("6.3 로컬 모델 — 질문 분류와 원인 판정"));
 c.push(table([2600, 3600, 3438], ["평가", "결과", "조건"], [
   ["질문 분류(intent_probe)", "처음 보는 질문 12개: tev1:4b 83%, 0.8b 58%, 키워드 규칙 33%\n설계에 쓴 질문 24개: 모델+규칙 결합 96%", "처음 보는 질문은 결합 방식 설계 전에 적어 두고 평가에만 사용"],
   ["원인 판정(tev1_probe)", "정답을 정한 10건: 4B 10/10, 0.8B 5~6/10", "기상·연휴·축제·관광 수요·데이터 오류·판단 불가, 손수 만든 사례"],
-  ["처리 시간(speed_probe)", "질문 → 검증된 답변, 중앙값. **6코어 CPU: 원인 질문 13.7초, 지역 훑기 4.8초, 문서·범위 밖 4~5초**
-GPU 0.6초 이하, 모델 서버 없음(규칙 기반) 2.5초 이하", "개발 PC(i7-13700K)를 센터 PC와 같은 6코어로 묶어 측정. 센터 PC는 코어당 성능이 낮아 더 느릴 수 있음(미확인)"],
+  ["문서 검색(rag_probe)", "답이 있는 문서가 상위 3개 안: 설계 질문 7/10 → 9/10, 따로 둔 질문 6/6", "제목 가중·우리 문서 추가·문서당 조각 하나로 개선"],
+  ["처리 시간(speed_probe)", "질문 → 검증된 답변, 중앙값. **6코어 CPU: 원인 질문 13.7초, 지역 훑기 4.8초, 문서·범위 밖 4~5초**\nGPU 0.6초 이하, 모델 서버 없음(규칙 기반) 2.5초 이하", "개발 PC(i7-13700K)를 센터 PC와 같은 6코어로 묶어 측정. 센터 PC는 코어당 성능이 낮아 더 느릴 수 있음(미확인)"],
 ]));
 c.push(H2("6.4 실제 데이터에서 확인한 사례"));
 c.push(table([2600, 3900, 3138], ["사례", "데이터가 보여 준 것", "Agent 판정"], [
@@ -282,7 +281,7 @@ c.push(B("**섬 전체 비교에 해당 지역이 섞임**: 한 곳의 큰 급�
 c.push(B("**반대 방향 맥락**: 급증한 날 '비수기'를 원인 후보로 적던 문장 → 방향이 맞지 않으면 참고로만 표시"));
 c.push(B("**검증기 허점**: 지명 속 숫자('용담1동'의 1)를 근거 숫자로 인정 → 글자에 붙은 숫자는 제외(근거 바꿔치기 차단 76.9% → 92.3%)"));
 c.push(B("**지역 훑기 속도**: 기준선을 날짜마다 따로 계산 → 한 번에 계산(실제 시계열 127개 결과 동일, 6코어 CPU에서 9.2초 → 4.8초)"));
-c.push(P("각 수정마다 문제를 재현하는 자동 테스트를 먼저 만들고 고쳤습니다(전체 141개).", { size: 18 }));
+c.push(P("각 수정마다 문제를 재현하는 자동 테스트를 먼저 만들고 고쳤습니다(전체 147개).", { size: 18 }));
 c.push(gap(160));
 
 // 7. 개발·탑재 계획
@@ -298,7 +297,7 @@ c.push(table([2300, 7338], ["항목", "내용"], [
   ["라이브러리(버전 고정)", "pandas 3.1.1, numpy 2.5.4, pyarrow 26.0.1, statsmodels 0.15.0, holidays 0.108, rank-bm25 0.2.2, plotly 7.1.0, streamlit 1.67.0, requests 2.34.2, python-dotenv 1.2.4, openpyxl 3.1.5"],
   ["판단 모델", "Ollama + tev1:4b (127.0.0.1:11434, 설치 시 자동 내려받기)"],
   ["데이터 저장", "parquet 캐시(9MB, 결과물 포함), 상태·로그는 data/state"],
-  ["품질 관리", "pytest 자동 테스트 141개, 화면 스모크 테스트(Streamlit AppTest), 깨끗한 폴더 설치 재현"],
+  ["품질 관리", "pytest 자동 테스트 147개, 화면 스모크 테스트(Streamlit AppTest), 깨끗한 폴더 설치 재현"],
 ], { firstColShade: true }));
 c.push(H2("7.3 UI 구성"));
 c.push(img("shots/04_ask_c.png", 500));
@@ -349,7 +348,7 @@ c.push(P("제주데이터허브(jejudatahub.net) 데이터 상세 페이지·API
 // ---------- document ----------
 const doc = new Document({
   creator: "숨비소리",
-  title: "제주 데이터 관제실 AI Agent 기획서 v0.2",
+  title: "제주 데이터 관제실 AI Agent 기획서 v0.3",
   styles: {
     default: { document: { run: { font: FONT, size: 19 } } },
     paragraphStyles: [
@@ -367,7 +366,7 @@ const doc = new Document({
   sections: [{
     properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } } },
     footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [
-      new TextRun({ text: "숨비소리 · 제주 데이터 관제실 기획서 v0.2  |  ", font: FONT, size: 16, color: GRAY }),
+      new TextRun({ text: "숨비소리 · 제주 데이터 관제실 기획서 v0.3  |  ", font: FONT, size: 16, color: GRAY }),
       new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, color: GRAY }) ] })] }) },
     children: c,
   }],
