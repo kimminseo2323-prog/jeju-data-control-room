@@ -166,3 +166,13 @@ def test_evidence_text_says_unknown_not_absent_outside_source_period():
                        "co_movements": [], "context": [], "not_covered": ["weather", "event"]})
     assert "기상 특이사항 없음" not in t and "지역이 확인된 행사 없음" not in t
     assert "자료 제공 기간 밖" in t and "공휴일 없음" in t
+
+
+def test_evidence_text_names_the_kind_of_each_context():
+    """맥락 줄마다 어떤 종류의 근거인지(날씨·공휴일·축제·행사) 밝혀 보기(원인)와 연결하기 쉽게 한다."""
+    from app.llm.judge import evidence_text
+    t = evidence_text({"anomaly": {"emd": "제주시 아라동", "signal": "유동인구", "date": "2025-02-08", "pct": -32.5},
+                       "co_movements": [], "context": [{"kind": "weather", "detail": "제주 관측소 일강수량 45mm"},
+                                                        {"kind": "holiday", "detail": "설날 (당일, 2025-01-29)"}]})
+    assert "맥락(날씨·강한 비바람): 제주 관측소 일강수량 45mm." in t
+    assert "맥락(공휴일): 설날 (당일, 2025-01-29)." in t

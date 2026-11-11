@@ -1,0 +1,9081 @@
+{
+ "summary": {
+  "host": "http://127.0.0.1:11500",
+  "threshold": 3.5,
+  "episodes": 398,
+  "backend": {
+   "tev1:4b": 398
+  },
+  "labeled": 189,
+  "agree": [
+   0.952,
+   189
+  ],
+  "ablation_not_chosen": [
+   1.0,
+   189
+  ],
+  "rule_agree": [
+   0.931,
+   189
+  ],
+  "by_label": {
+   "holiday": {
+    "agree": [
+     0.978,
+     182
+    ],
+    "ablation_not_chosen": [
+     1.0,
+     182
+    ],
+    "rule_agree": [
+     0.929,
+     182
+    ]
+   },
+   "event": {
+    "agree": [
+     1.0,
+     2
+    ],
+    "ablation_not_chosen": [
+     1.0,
+     2
+    ],
+    "rule_agree": [
+     1.0,
+     2
+    ]
+   },
+   "weather": {
+    "agree": [
+     0.538,
+     13
+    ],
+    "ablation_not_chosen": [
+     1.0,
+     13
+    ],
+    "rule_agree": [
+     1.0,
+     13
+    ]
+   }
+  },
+  "unlabeled_in_coverage": 161,
+  "unlabeled_choices": {
+   "tourism_demand": 111,
+   "unknown": 49,
+   "weather": 1
+  },
+  "outside_coverage": 48,
+  "outside_coverage_choices": {
+   "tourism_demand": 46,
+   "weather": 1,
+   "unknown": 1
+  },
+  "seconds": 157.3,
+  "note": "정답은 판정 근거와 같은 자료에서 나온 약한 정답(근거를 제대로 읽는가를 재는 시험). 실제 원인을 현장에서 확인한 정답 아님."
+ },
+ "rows": [
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼도1동",
+   "date": "2025-03-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 170.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.608,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 와이파이",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 249.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.888,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 243.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.864,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 93.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.846,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이호동",
+   "date": "2024-07-28",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 103.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.665,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼양동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 103.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.836,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 화북동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 75.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.81,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼양동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 87.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.863,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도2동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 71.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.873,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 서홍동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 85.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.889,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼도1동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 62.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.841,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 서홍동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 79.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.861,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 남원읍",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 225.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.895,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 남원읍",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 224.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.882,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 동홍동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 104.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.858,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 화북동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 58.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.895,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담1동",
+   "date": "2025-03-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 45.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.617,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대정읍",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 175.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.774,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 외도동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 71.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.713,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담1동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 45.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.825,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대정읍",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 153.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.883,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 132.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.849,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 102.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.848,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 동홍동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 82.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.89,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2024-09-16",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 148.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.82,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 건입동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 64.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.909,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-08-01",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 98.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.846,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한경면",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 176.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.859,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 34.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.823,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2024-12-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 54.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.828,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 구좌읍",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 140.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.845,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한경면",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 150.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.831,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2024-05-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 54.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.959,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 98.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.869,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 노형동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 46.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.735,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼도1동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 40.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.885,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 75.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.57,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 노형동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 45.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.872,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 175.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.903,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 송산동",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 88.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.681,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 163.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.885,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 131.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.869,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 건입동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 53.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.853,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 송산동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 90.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.911,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼도1동",
+   "date": "2024-05-20",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 38.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.957,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 조천읍",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 91.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.552,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 외도동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 54.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.89,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 구좌읍",
+   "date": "2024-07-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 101.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.503,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2024-09-16",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 32.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.841,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 표선면",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 137.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.884,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 구좌읍",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 165.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.762,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 조천읍",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 96.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.905,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이호동",
+   "date": "2024-08-02",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 48.0,
+   "in_coverage": true,
+   "labels": [
+    "event"
+   ],
+   "choice": "event",
+   "prob": 0.546,
+   "backend": "tev1:4b",
+   "rule_choice": "event",
+   "context_kinds": [
+    "event",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한경면",
+   "date": "2024-08-01",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 116.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.913,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 영천동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 96.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.907,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중문동",
+   "date": "2024-09-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 114.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.894,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-09-17",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 73.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.891,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 94.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.854,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 안덕면",
+   "date": "2024-09-16",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 97.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.843,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담2동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 54.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.894,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 외도동",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 48.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.618,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담1동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 29.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.887,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 송산동",
+   "date": "2024-08-01",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 74.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.884,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대정읍",
+   "date": "2024-12-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 81.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.964,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2024-07-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 67.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.515,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담2동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 53.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.907,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 조천읍",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 107.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.859,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 서홍동",
+   "date": "2025-02-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 37.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.743,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 표선면",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 141.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.914,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2024-08-02",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 93.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.83,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 송산동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 72.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.893,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼양동",
+   "date": "2024-07-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 33.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.53,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 영천동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 83.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.865,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2024-06-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 43.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.844,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 추자면",
+   "date": "2024-08-02",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 279.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.921,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 추자면",
+   "date": "2024-09-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 249.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.804,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼양동",
+   "date": "2025-01-01",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 37.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.742,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중앙동",
+   "date": "2024-09-15",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.844,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-07-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 60.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.549,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대륜동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 92.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.927,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 안덕면",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 77.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.557,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 건입동",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 37.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.497,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이호동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 46.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.903,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2024-05-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.889,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도1동",
+   "date": "2024-05-06",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 30.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.856,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 62.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.856,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 우도면",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 155.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.84,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-05-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.89,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 안덕면",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 98.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.898,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중문동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 96.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.869,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 남원읍",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 102.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.534,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2024-10-03",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 33.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.836,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이호동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.789,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중문동",
+   "date": "2024-07-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 76.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.513,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대정읍",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 79.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.538,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 아라동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 35.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.851,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대정읍",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 71.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.852,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2024-10-23",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 70.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.806,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중앙동",
+   "date": "2025-01-27",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 27.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.898,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 안덕면",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 67.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.856,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 76.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.836,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 노형동",
+   "date": "2024-08-01",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 27.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.893,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼도2동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 37.9,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.62,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2024-12-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 20.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.841,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 52.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.902,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담2동",
+   "date": "2024-05-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 37.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.847,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 우도면",
+   "date": "2024-08-01",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 195.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.918,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도1동",
+   "date": "2024-12-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 28.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.848,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2024-10-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 69.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.895,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 76.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.544,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 오라동",
+   "date": "2024-12-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 26.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.962,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 구좌읍",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 119.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.888,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 예래동",
+   "date": "2024-07-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 67.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.515,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-07-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 50.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.928,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "weather"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-08-15",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 52.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.702,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 47.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.839,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 아라동",
+   "date": "2024-05-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 30.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.966,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 아라동",
+   "date": "2025-02-08",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -32.5,
+   "in_coverage": true,
+   "labels": [
+    "weather"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.717,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2024-06-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 17.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.964,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 조천읍",
+   "date": "2024-08-15",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 58.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.7,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 예래동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 88.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.883,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 우도면",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 170.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.872,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 송산동",
+   "date": "2024-08-15",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 52.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.859,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중앙동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 25.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.921,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 구좌읍",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 70.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.839,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 오라동",
+   "date": "2024-07-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 23.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.511,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 79.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.906,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 안덕면",
+   "date": "2024-12-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 85.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.816,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2024-05-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 45.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.823,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 표선면",
+   "date": "2024-07-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 79.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.495,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 건입동",
+   "date": "2024-05-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.897,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2024-10-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.883,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼양동",
+   "date": "2024-12-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 28.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.839,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 아라동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -27.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.549,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도2동",
+   "date": "2024-05-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 23.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.909,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 성산읍",
+   "date": "2024-05-05",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.848,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 봉개동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 74.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.913,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2025-02-08",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -15.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.736,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 18.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.882,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2024-08-15",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 40.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.839,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 서홍동",
+   "date": "2024-08-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 25.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.937,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 오라동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 24.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.912,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도2동",
+   "date": "2024-07-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 22.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.622,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 오라동",
+   "date": "2024-09-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 17.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.966,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 예래동",
+   "date": "2024-09-17",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 68.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.895,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 연동",
+   "date": "2024-07-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 22.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.497,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 오라동",
+   "date": "2025-02-08",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -19.8,
+   "in_coverage": true,
+   "labels": [
+    "weather"
+   ],
+   "choice": "unknown",
+   "prob": 0.668,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담2동",
+   "date": "2025-02-07",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -34.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.771,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 44.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.693,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 화북동",
+   "date": "2025-01-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 21.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.786,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 동홍동",
+   "date": "2024-05-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 32.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.66,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 아라동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -28.4,
+   "in_coverage": true,
+   "labels": [
+    "weather"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.577,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 중앙동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 23.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.932,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼도2동",
+   "date": "2024-07-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 28.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.594,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 애월읍",
+   "date": "2024-06-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 39.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.834,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 우도면",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 150.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.521,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 화북동",
+   "date": "2024-09-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 22.3,
+   "in_coverage": true,
+   "labels": [
+    "event"
+   ],
+   "choice": "event",
+   "prob": 0.983,
+   "backend": "tev1:4b",
+   "rule_choice": "event",
+   "context_kinds": [
+    "event"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이도2동",
+   "date": "2025-02-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 17.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.928,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2024-09-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 25.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.88,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 안덕면",
+   "date": "2024-05-05",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 46.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.755,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 삼양동",
+   "date": "2024-07-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 19.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.618,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 정방동",
+   "date": "2024-09-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 67.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.893,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 아라동",
+   "date": "2025-01-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 29.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.816,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 천지동",
+   "date": "2024-09-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 54.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.905,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 남원읍",
+   "date": "2024-08-15",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 75.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.873,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 외도동",
+   "date": "2024-08-06",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 30.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.907,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2024-05-29",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -25.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.904,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-05-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 38.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.743,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2024-07-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 66.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.533,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 53.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.553,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 건입동",
+   "date": "2025-03-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 26.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.691,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 오라동",
+   "date": "2024-10-08",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 19.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.686,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도1동",
+   "date": "2025-01-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 29.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.827,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 효돈동",
+   "date": "2024-05-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 30.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.722,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 동홍동",
+   "date": "2024-07-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.502,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 이호동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 39.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.877,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 구좌읍",
+   "date": "2024-08-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 51.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.56,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 용담1동",
+   "date": "2025-02-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 18.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.927,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 48.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.753,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 연동",
+   "date": "2024-09-16",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 23.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.849,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 한림읍",
+   "date": "2024-08-08",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 44.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.886,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 대천동",
+   "date": "2024-08-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.882,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "인근 읍면동 유동인구"
+   ]
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 건입동",
+   "date": "2025-02-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 26.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.749,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "제주시 일도2동",
+   "date": "2025-03-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 19.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.622,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "유동인구",
+   "emd": "서귀포시 송산동",
+   "date": "2024-06-30",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -35.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.938,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2025-03-29",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 130.9,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.602,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2024-12-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 316.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.761,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 중앙동",
+   "date": "2024-10-19",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 178.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.982,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2024-12-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 204.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.644,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도2동",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 189.6,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.685,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 천지동",
+   "date": "2024-10-19",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 127.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.98,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2024-12-31",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 143.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.834,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2024-12-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 164.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.642,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-03-25",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 50.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.557,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2024-12-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 238.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.676,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 65.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.641,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-01-19",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 176.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.614,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도1동",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 149.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.675,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-01-10",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -60.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.466,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 우도면",
+   "date": "2024-10-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 742.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.583,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -59.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.626,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 82.0,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.504,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 연동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 115.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.821,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-10",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -63.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.472,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-03-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 39.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.626,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 139.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.834,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 83.6,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.687,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 건입동",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 148.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.662,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 중문동",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 103.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.642,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2024-12-30",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 121.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.607,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-03-28",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 71.6,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.574,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 건입동",
+   "date": "2025-03-12",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 119.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.713,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-03-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 45.3,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.687,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도1동",
+   "date": "2025-03-12",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 119.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.733,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2025-01-10",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -68.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.588,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 51.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.655,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-01-10",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -60.3,
+   "in_coverage": true,
+   "labels": [
+    "weather"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.518,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 71.8,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.633,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대천동",
+   "date": "2024-10-19",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 127.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.989,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2025-03-25",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 50.5,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.421,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-19",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 126.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.702,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 봉개동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 80.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.469,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-01-19",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 124.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.805,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2025-01-03",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 109.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.512,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -49.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.607,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 46.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.566,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 구좌읍",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 117.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.59,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -50.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.669,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-01-09",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -64.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.575,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 연동",
+   "date": "2025-01-10",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -55.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.533,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 성산읍",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 125.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.854,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 도두동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 152.7,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.688,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 조천읍",
+   "date": "2025-03-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 86.8,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.648,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 우도면",
+   "date": "2024-10-11",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 544.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.834,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 오라동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 84.5,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.624,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2025-01-20",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 47.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.683,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-01-28",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -37.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.641,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 영천동",
+   "date": "2025-01-09",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -81.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.591,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도2동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 81.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.843,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -58.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.686,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -58.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.699,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 중앙동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 109.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.906,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도2동",
+   "date": "2025-03-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 95.5,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.693,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 구좌읍",
+   "date": "2025-03-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 89.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.646,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-01-28",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -39.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.617,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 오라동",
+   "date": "2025-01-10",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -72.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.471,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도1동",
+   "date": "2024-10-03",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 113.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.796,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대륜동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -58.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.629,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 애월읍",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -68.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.592,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 도두동",
+   "date": "2024-11-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 96.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.804,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 94.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.891,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 우도면",
+   "date": "2024-10-08",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 377.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.596,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대륜동",
+   "date": "2025-03-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 62.0,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.577,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-01-21",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 53.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.825,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2024-12-23",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -61.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.741,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 성산읍",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 72.8,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.585,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-02-21",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -23.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.495,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대륜동",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.629,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-03-21",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 51.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.569,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-25",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 46.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.58,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-16",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -35.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.76,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.5,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 연동",
+   "date": "2025-01-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 65.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.751,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 35.5,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.469,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도2동",
+   "date": "2025-03-13",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 89.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.728,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2025-03-20",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -30.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.737,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2025-01-21",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 75.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.637,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 서홍동",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 56.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.517,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도2동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 45.0,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.63,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담1동",
+   "date": "2024-12-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 88.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.604,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 중문동",
+   "date": "2025-03-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 58.6,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "weather",
+   "prob": 0.529,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대륜동",
+   "date": "2024-10-19",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 62.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.983,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 우도면",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 229.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.578,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 조천읍",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 72.0,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.657,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-01-06",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -45.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.781,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 중문동",
+   "date": "2025-03-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 59.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.641,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 봉개동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 133.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.839,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼양동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 52.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.615,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담1동",
+   "date": "2025-03-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 62.9,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.63,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 동홍동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 64.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.891,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 영천동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -73.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.632,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담1동",
+   "date": "2025-03-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 67.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.662,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -57.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.576,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2025-03-11",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -30.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.749,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 남원읍",
+   "date": "2025-01-09",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -61.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.671,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 봉개동",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 76.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.608,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼도1동",
+   "date": "2025-03-16",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -37.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.784,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 연동",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -45.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.622,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 성산읍",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 83.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.552,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 중앙동",
+   "date": "2025-03-22",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.603,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 봉개동",
+   "date": "2025-03-29",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 68.5,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.612,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 아라동",
+   "date": "2025-01-28",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -45.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.569,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 건입동",
+   "date": "2025-01-21",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 105.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.798,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 노형동",
+   "date": "2025-03-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 30.7,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.645,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 대륜동",
+   "date": "2025-03-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 49.0,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.629,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-01-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.566,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 삼양동",
+   "date": "2024-12-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 84.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.8,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 한림읍",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.409,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 연동",
+   "date": "2025-01-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.687,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 애월읍",
+   "date": "2025-01-13",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -62.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.613,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-01-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 77.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.577,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도2동",
+   "date": "2025-03-12",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 28.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.67,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "서귀포시 동홍동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 41.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.615,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 추자면",
+   "date": "2024-11-12",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 180.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.819,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 봉개동",
+   "date": "2025-01-02",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 122.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.742,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 와이파이"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담2동",
+   "date": "2025-01-06",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -53.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.746,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 33.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.612,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "버스",
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 일도1동",
+   "date": "2024-12-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 120.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.632,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 화북동",
+   "date": "2025-01-30",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -26.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.609,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "버스",
+    "제주 전체 유동인구",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 연동",
+   "date": "2025-03-25",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 38.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.614,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "와이파이",
+   "emd": "제주시 용담1동",
+   "date": "2025-03-23",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 68.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.623,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "인근 읍면동 와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 77.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.618,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도2동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -67.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.737,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 서홍동",
+   "date": "2025-02-04",
+   "kind": "지속 변화",
+   "direction": "up",
+   "pct": 120.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.563,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-01-28",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -72.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.692,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.587,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 60.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.607,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 61.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.653,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -56.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.595,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 유동인구",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-01-28",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -53.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.666,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 53.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.572,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 서홍동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 97.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.697,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-01-28",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -55.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.709,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -54.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.755,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-02-07",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -60.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.722,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -55.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.669,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 51.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.709,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -50.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.635,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -48.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.696,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -53.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.687,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도2동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 48.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.566,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 48.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.591,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 천지동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -51.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.679,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 외도동",
+   "date": "2025-02-13",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 59.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.692,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 51.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.656,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 45.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.556,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 노형동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -52.6,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.515,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 외도동",
+   "date": "2025-02-27",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 58.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.653,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-30",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 81.9,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.595,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도2동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -46.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.801,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -48.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.799,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 51.2,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.525,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -49.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.684,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 노형동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 50.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.57,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 외도동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -57.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.534,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 아라동",
+   "date": "2025-01-29",
+   "kind": "지속 변화",
+   "direction": "down",
+   "pct": -69.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.727,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 44.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.558,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도2동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -44.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.63,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-02-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 43.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.534,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 오라동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 57.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.465,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -48.5,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.627,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 구좌읍",
+   "date": "2025-02-13",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 86.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.569,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 아라동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 69.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.533,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -44.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.711,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 오라동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -52.9,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.462,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 연동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 52.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.582,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -46.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.682,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 한림읍",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 46.8,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.566,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 38.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.63,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 노형동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 45.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.484,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼도1동",
+   "date": "2025-03-31",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 104.0,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.609,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -41.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.804,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-02-09",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -64.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.759,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -44.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.708,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 노형동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -44.4,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "tourism_demand",
+   "prob": 0.518,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 남원읍",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 49.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.586,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 남원읍",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -49.2,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.424,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 건입동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 81.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.609,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 봉개동",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 106.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.591,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 대륜동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -51.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.693,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 영천동",
+   "date": "2025-01-07",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 56.1,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.745,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 연동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 48.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.629,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 화북동",
+   "date": "2025-02-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.659,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도1동",
+   "date": "2025-03-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 40.1,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.584,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 삼양동",
+   "date": "2025-03-15",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -39.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.756,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 동홍동",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -49.7,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.716,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 조천읍",
+   "date": "2025-02-13",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 50.6,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.614,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 일도2동",
+   "date": "2025-02-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.1,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.705,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 용담1동",
+   "date": "2025-01-30",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -45.3,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.639,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 노형동",
+   "date": "2025-02-28",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 39.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.678,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 동홍동",
+   "date": "2025-01-29",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -46.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.738,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "제주 전체 유동인구",
+    "제주 전체 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도2동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 34.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.59,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 오라동",
+   "date": "2025-02-13",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 42.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.639,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 대천동",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 48.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.484,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 아라동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 55.3,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.57,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 아라동",
+   "date": "2025-01-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -55.0,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.829,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 유동인구",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 한림읍",
+   "date": "2025-03-26",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 38.4,
+   "in_coverage": false,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.502,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "와이파이",
+    "제주 전체 와이파이"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 예래동",
+   "date": "2025-02-11",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 108.0,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "unknown",
+   "prob": 0.911,
+   "backend": "tev1:4b",
+   "rule_choice": "unknown",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": []
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 건입동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 65.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.633,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 한림읍",
+   "date": "2025-03-01",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 53.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday"
+   ],
+   "choice": "holiday",
+   "prob": 0.627,
+   "backend": "tev1:4b",
+   "rule_choice": "holiday",
+   "context_kinds": [
+    "holiday",
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 성산읍",
+   "date": "2025-02-13",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 70.2,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.612,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 외도동",
+   "date": "2025-02-01",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -47.2,
+   "in_coverage": true,
+   "labels": [
+    "weather"
+   ],
+   "choice": "unknown",
+   "prob": 0.322,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구"
+   ],
+   "ablated_choice": "unknown"
+  },
+  {
+   "signal": "버스",
+   "emd": "서귀포시 표선면",
+   "date": "2025-02-04",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 53.7,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "weather",
+   "prob": 0.559,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 노형동",
+   "date": "2025-01-10",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 35.9,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.517,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "유동인구",
+    "와이파이",
+    "제주 전체 와이파이",
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 한림읍",
+   "date": "2025-03-03",
+   "kind": "일시 급변",
+   "direction": "down",
+   "pct": -40.8,
+   "in_coverage": true,
+   "labels": [
+    "holiday",
+    "weather"
+   ],
+   "choice": "holiday",
+   "prob": 0.453,
+   "backend": "tev1:4b",
+   "rule_choice": "weather",
+   "context_kinds": [
+    "holiday",
+    "visitors",
+    "weather"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ],
+   "ablated_choice": "tourism_demand"
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 애월읍",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 52.5,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.608,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이호동",
+   "date": "2025-02-14",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 71.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.629,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  },
+  {
+   "signal": "버스",
+   "emd": "제주시 이도2동",
+   "date": "2025-02-27",
+   "kind": "일시 급변",
+   "direction": "up",
+   "pct": 32.4,
+   "in_coverage": true,
+   "labels": [],
+   "choice": "tourism_demand",
+   "prob": 0.602,
+   "backend": "tev1:4b",
+   "rule_choice": "tourism_demand",
+   "context_kinds": [
+    "visitors"
+   ],
+   "co_signals": [
+    "제주 전체 버스",
+    "인근 읍면동 버스"
+   ]
+  }
+ ]
+}

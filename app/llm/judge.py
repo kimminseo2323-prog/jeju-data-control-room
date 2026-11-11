@@ -72,6 +72,9 @@ def _season_agrees(evidence: dict) -> bool:
 
 _MISSING = {"weather": "기상 특이사항 없음", "holiday": "공휴일 없음", "event": "지역이 확인된 행사 없음"}
 NOT_COVERED_KO = {"weather": "기상", "event": "축제·행사", "visitors": "입도객"}
+# 맥락 줄 앞에 근거 종류를 밝혀 보기(원인)와 연결하기 쉽게 한다(2026-11-11 대규모 평가에서 날씨 근거를 놓치는 경우가 많아 추가)
+CONTEXT_KO = {"weather": "날씨·강한 비바람", "holiday": "공휴일", "event": "축제·행사", "visitors": "입도객 성수기·비수기",
+              "recurrence": "작년 같은 시기"}
 
 
 def evidence_text(evidence: dict) -> str:
@@ -94,7 +97,8 @@ def evidence_text(evidence: dict) -> str:
         lines.append("동반 변화 없음: 확인한 다른 신호와 제주 전체 합계는 평소 수준이었다.")
     ctx = evidence.get("context", [])
     for c in ctx:
-        lines.append(f"맥락: {c['detail']}.")
+        label = CONTEXT_KO.get(c.get("kind"))
+        lines.append(f"맥락({label}): {c['detail']}." if label else f"맥락: {c['detail']}.")
     kinds = {c.get("kind") for c in ctx}
     not_covered = set(evidence.get("not_covered", []))
     missing = [v for k, v in _MISSING.items() if k not in kinds and k not in not_covered]
