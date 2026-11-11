@@ -117,3 +117,24 @@ def test_co_movements_can_exclude_the_analysed_signal():
     tb, day = make_toolbox()
     data = tb.dispatch("find_co_movements", {"date": str(day.date()), "emd": "서귀포시 성산읍", "exclude_signal": "유동인구"}, "R1").data
     assert "유동인구" not in data["checked"]
+
+
+def test_check_context_tool_passes_visitor_value_through():
+    idx = pd.date_range("2024-04-01", "2025-03-01", freq="MS")
+    v = pd.Series(1_000_000.0, index=idx)
+    v[pd.Timestamp("2024-08-01")] = 1_300_000.0
+    tb = Toolbox(MemoryStore(series={}, visitors=v), index=None)
+    r = tb.dispatch("check_context", {"date": "2024-08-10", "emd": "제주시 이호동"}, "R1")
+    vis = [i for i in r.data["items"] if i["kind"] == "visitors"]
+    assert len(vis) == 1 and vis[0]["value"] > 0 and any("580" in s for s in r.sources)
+
+
+def test_co_movements_include_island_wide_total():
+    a, b = weekly_series(seed=1), weekly_series(seed=2)
+    day = a.index[70]
+    a[day] += 400
+    b[day] += 400   # 두 읍면동이 함께 늘면 제주 전체 합계도 튄다
+    tb = Toolbox(MemoryStore(series={("유동인구", "제주시 이호동"): a, ("유동인구", "제주시 연동"): b}), index=None)
+    r = tb.dispatch("find_co_movements", {"date": str(day.date()), "emd": "제주시 이호동", "exclude_signal": "유동인구"}, "R1")
+    assert [m["signal"] for m in r.data["co_movements"]] == ["제주 전체 유동인구"]
+    assert "제주 전체 유동인구" in r.data["checked"]

@@ -13,6 +13,7 @@ from app.analytics.detect import score_series
 
 RAIN_MM = 30.0     # 일강수량 기준(본 서비스 임의 기준, 기상특보 기준 아님)
 WIND_MS = 14.0     # 최대풍속 기준(본 서비스 임의 기준)
+SEASON_PCT = 5.0   # 월 입도객이 주변 12개월 평균보다 ±5% 이상이면 성수기/비수기로 표시(본 서비스 임의 기준)
 KR_HOLIDAYS = holidays.country_holidays("KR", years=range(2015, 2031), language="ko")
 
 
@@ -29,6 +30,7 @@ class ContextItem:
     kind: str     # weather | holiday | event | visitors
     detail: str
     source: str
+    value: float | None = None   # visitors: 주변 12개월 평균 대비 %(+ 성수기, - 비수기)
 
 
 def find_co_movements(day: pd.Timestamp, signals: dict[str, pd.Series], threshold: float = 3.0,
@@ -47,8 +49,20 @@ def find_co_movements(day: pd.Timestamp, signals: dict[str, pd.Series], threshol
     return out
 
 
+def season_index(visitors: pd.Series, month: pd.Timestamp) -> float | None:
+    """해당 월 입도객이 주변 12개월(앞 6개월~뒤 5개월, 있는 달만) 평균보다 몇 % 많은지."""
+    month = pd.Timestamp(month).to_period("M").to_timestamp()
+    if month not in visitors.index or pd.isna(visitors[month]):
+        return None
+    win = visitors[(visitors.index >= month - pd.DateOffset(months=6)) & (visitors.index <= month + pd.DateOffset(months=5))].dropna()
+    if len(win) < 6:
+        return None
+    return float(visitors[month] / win.mean() * 100 - 100)
+
+
 def check_context(day: pd.Timestamp, emd: str, weather: pd.DataFrame | None = None,
-                  station_of_emd: dict | None = None, events: pd.DataFrame | None = None) -> list[ContextItem]:
+                  station_of_emd: dict | None = None, events: pd.DataFrame | None = None,
+                  visitors: pd.Series | None = None) -> list[ContextItem]:
     items: list[ContextItem] = []
     day = pd.Timestamp(day).normalize()
 
@@ -77,4 +91,12 @@ def check_context(day: pd.Timestamp, emd: str, weather: pd.DataFrame | None = No
         for _, r in ev.iterrows():
             items.append(ContextItem("event", f"{r['name']} ({r['start']:%Y-%m-%d}~{r['end']:%Y-%m-%d})",
                                      "VISIT JEJU 축제행사콘텐츠(761), 지역은 수작업 지정"))
+
+    if visitors is not None and len(visitors):
+        si = season_index(visitors, day)
+        if si is not None and abs(si) >= SEASON_PCT:
+            m = day.to_period("M").to_timestamp()
+            label = "성수기" if si > 0 else "비수기"
+            items.append(ContextItem("visitors", f"{m:%Y-%m} 입도객 {visitors[m] / 10000:.1f}만 명, 주변 12개월 평균 대비 {si:+.1f}%({label})",
+                                     "제주데이터허브 방문목적별 입도객 현황(580), 월 합계", round(si, 1)))
     return items

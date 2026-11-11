@@ -73,6 +73,15 @@ class CacheStore:
                              "rain_mm": pd.to_numeric(w["dailyRainfall"], errors="coerce"),
                              "wind_max": pd.to_numeric(w["maximumWindSpeed"], errors="coerce")})
 
+    @cached_property
+    def visitors(self) -> pd.Series:
+        """월별 입도객 합계(방문목적별 입도객 현황 580의 목적 합). 인덱스 = 월 첫날."""
+        v = self._read("visitors_purpose")
+        if v.empty:
+            return pd.Series(dtype=float)
+        m = pd.to_datetime(v["dtYearMonth"].astype(str), format="%Y%m")
+        return pd.to_numeric(v["visitorCnt"], errors="coerce").groupby(m).sum().sort_index()
+
     # ---- 신호 ----
     @cached_property
     def _frames(self) -> dict[str, pd.DataFrame]:
@@ -93,6 +102,13 @@ class CacheStore:
     def regions(self, signal: str) -> list[str]:
         df, _ = self._frames.get(signal, (pd.DataFrame(), None))
         return sorted(df["emd_full"].dropna().unique()) if not df.empty else []
+
+    def island_series(self, signal: str) -> pd.Series:
+        """읍면동에 매핑된 전체 합계(제주 전체). 매핑 실패분은 빠진다."""
+        df, col = self._frames.get(signal, (pd.DataFrame(), None))
+        if df.empty:
+            return pd.Series(dtype=float)
+        return to_daily(df[df["emd_full"].notna()], "baseDate", col)
 
     def series(self, signal: str, emd: str) -> pd.Series:
         df, col = self._frames.get(signal, (pd.DataFrame(), None))

@@ -39,9 +39,9 @@ class DataStore(Protocol):
 
 
 class MemoryStore:
-    def __init__(self, series: dict[tuple[str, str], pd.Series], weather=None, station_of_emd=None, events=None):
+    def __init__(self, series: dict[tuple[str, str], pd.Series], weather=None, station_of_emd=None, events=None, visitors=None):
         self._series = series
-        self.weather, self.station_of_emd, self.events = weather, station_of_emd, events
+        self.weather, self.station_of_emd, self.events, self.visitors = weather, station_of_emd, events, visitors
 
     def signals(self) -> list[str]:
         return sorted({k[0] for k in self._series})
@@ -50,6 +50,10 @@ class MemoryStore:
         if (signal, emd) not in self._series:
             raise ToolError(f"no data for signal={signal!r} emd={emd!r}; available signals={self.signals()}")
         return self._series[(signal, emd)]
+
+    def island_series(self, signal: str) -> pd.Series:
+        parts = [s for (sig, _), s in self._series.items() if sig == signal]
+        return pd.concat(parts, axis=1).sum(axis=1, min_count=1) if parts else pd.Series(dtype=float)
 
 
 def _period(s: pd.Series, start: str | None, end: str | None) -> pd.Series:
@@ -70,10 +74,10 @@ class Toolbox:
             {"name": "detect_anomalies", "description": "평소(요일 패턴 기준선)와 크게 다른 날을 찾는다.",
              "parameters": {"type": "object", "properties": {"signal": sig, "emd": emd, "start": date, "end": date,
                             "method": {"type": "string", "enum": ["seasonal_z", "robust_resid"]}, "threshold": {"type": "number"}}, "required": ["signal", "emd"]}},
-            {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호도 함께 크게 움직였는지 확인한다.",
+            {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호와 제주 전체 합계도 함께 크게 움직였는지 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "window": {"type": "integer"},
                             "exclude_signal": {"type": "string", "description": "분석 중인 신호(자기 자신 제외)"}}, "required": ["date", "emd"]}},
-            {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사 정보를 확인한다.",
+            {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부를 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd}, "required": ["date", "emd"]}},
             {"name": "search_docs", "description": "데이터 명세·API 문서·반출 기준·게시판 답변에서 관련 내용을 검색한다(출처 포함).",
              "parameters": {"type": "object", "properties": {"query": {"type": "string"}, "k": {"type": "integer"}}, "required": ["query"]}},
@@ -123,14 +127,22 @@ class Toolbox:
                 sigs[name] = self.store.series(name, emd)
             except ToolError:
                 continue
+        # 제주 전체 합계: 이 지역만의 변화인지, 섬 전체 흐름(성수기·연휴 등)인지 가르는 근거
+        if hasattr(self.store, "island_series"):
+            for name in self.store.signals():
+                tot = self.store.island_series(name)
+                if len(tot.dropna()):
+                    sigs[f"제주 전체 {name}"] = tot
         moves = find_co_movements(pd.Timestamp(date), sigs, threshold=3.0, window=int(window))
         rows = [{"signal": m.signal, "date": str(m.date.date()), "z": round(m.z, 2), "direction": m.direction} for m in moves]
-        return {"date": date, "emd": emd, "checked": sorted(sigs), "co_movements": rows}, [SIGNAL_SOURCES[k] for k in sorted(sigs) if k in SIGNAL_SOURCES]
+        return {"date": date, "emd": emd, "checked": sorted(sigs), "co_movements": rows}, sorted({SIGNAL_SOURCES[k.removeprefix("제주 전체 ")] for k in sigs if k.removeprefix("제주 전체 ") in SIGNAL_SOURCES})
 
     def _t_check_context(self, date, emd):
         items = check_context(pd.Timestamp(date), emd, weather=getattr(self.store, "weather", None),
-                              station_of_emd=getattr(self.store, "station_of_emd", None), events=getattr(self.store, "events", None))
-        return {"date": date, "emd": emd, "items": [{"kind": i.kind, "detail": i.detail} for i in items]}, sorted({i.source for i in items})
+                              station_of_emd=getattr(self.store, "station_of_emd", None), events=getattr(self.store, "events", None),
+                              visitors=getattr(self.store, "visitors", None))
+        rows = [{"kind": i.kind, "detail": i.detail, **({"value": i.value} if i.value is not None else {})} for i in items]
+        return {"date": date, "emd": emd, "items": rows}, sorted({i.source for i in items})
 
     def _t_search_docs(self, query, k=5):
         hits = self.index.search(query, k=int(k))

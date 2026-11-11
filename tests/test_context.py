@@ -52,3 +52,30 @@ def test_event_overlap_reported_only_for_matching_region():
 def test_quiet_day_has_no_context():
     assert check_context(pd.Timestamp("2024-07-11"), "서귀포시 성산읍", weather=_weather(),
                          station_of_emd={"서귀포시 성산읍": "성산"}) == []
+
+
+def _monthly(peak_month="2024-08", peak=1.2, low_month="2025-02", low=0.8):
+    idx = pd.date_range("2024-04-01", "2025-03-01", freq="MS")
+    v = pd.Series(1_000_000.0, index=idx)
+    v[pd.Timestamp(peak_month + "-01")] *= peak
+    v[pd.Timestamp(low_month + "-01")] *= low
+    return v
+
+
+def test_peak_month_visitors_reported_as_high_season():
+    items = check_context(pd.Timestamp("2024-08-15"), "제주시 이호동", visitors=_monthly())
+    v = [i for i in items if i.kind == "visitors"]
+    assert len(v) == 1 and v[0].value > 0 and "성수기" in v[0].detail and "2024-08" in v[0].detail and v[0].source
+
+
+def test_low_month_visitors_reported_as_low_season():
+    v = [i for i in check_context(pd.Timestamp("2025-02-10"), "제주시 이호동", visitors=_monthly()) if i.kind == "visitors"]
+    assert len(v) == 1 and v[0].value < 0 and "비수기" in v[0].detail
+
+
+def test_ordinary_month_visitors_not_reported():
+    assert [i for i in check_context(pd.Timestamp("2024-05-10"), "제주시 이호동", visitors=_monthly()) if i.kind == "visitors"] == []
+
+
+def test_month_without_visitor_data_not_reported():
+    assert [i for i in check_context(pd.Timestamp("2026-01-10"), "제주시 이호동", visitors=_monthly()) if i.kind == "visitors"] == []

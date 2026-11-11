@@ -60,3 +60,14 @@ def test_template_with_episodes_passes_verifier():
     text = template_text(r)
     assert "지속 변화" in text and "2025-01-28~2025-01-30" in text and "설날" in text
     assert verify(text, r).ok, verify(text, r).errors
+
+
+def test_template_mentions_co_movements_with_citation():
+    res = {**RESULTS, "R3": ToolResult("R3", "find_co_movements", {"date": "2025-01-29", "emd": "서귀포시 성산읍"},
+                                       {"date": "2025-01-29", "emd": "서귀포시 성산읍", "checked": ["제주 전체 유동인구"],
+                                        "co_movements": [{"signal": "제주 전체 유동인구", "date": "2025-01-30", "z": 5.21, "direction": "up"}]},
+                                       ["제주데이터허브 읍면동 단위 내국인 유동인구(583)"])}
+    text = template_text(res)
+    line = [l for l in text.splitlines() if "제주 전체 유동인구" in l]
+    assert len(line) == 1 and "5.21" in line[0] and "[R3]" in line[0]
+    assert verify(text, res).ok, verify(text, res).errors

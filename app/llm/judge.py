@@ -5,7 +5,6 @@
 """
 from __future__ import annotations
 
-import json
 import os
 from dataclasses import dataclass, field
 
@@ -52,20 +51,52 @@ def rule_judge(evidence: dict) -> Judgment:
         choice = "event"
     elif len(co) >= 1:
         choice = "tourism_demand"
-    elif evidence.get("anomaly", {}).get("kind") == "지속 변화":
+    elif evidence.get("anomaly", {}).get("kind") == "지속 변화" and _season_agrees(evidence):
         choice = "season"
     else:
         choice = "unknown"
     probs = {k: (0.75 if k == choice else 0.25 / (len(CAUSES) - 1)) for k in CAUSES}
-    return Judgment(choice, probs, 0.5, "rule", "규칙: 기상 > 공휴일 > 행사 > 동반 변화 > 지속 변화면 계절 전환 > 판단 불가")
+    return Judgment(choice, probs, 0.5, "rule", "규칙: 기상 > 공휴일 > 행사 > 동반 변화 > 지속 변화가 성수기·비수기 방향과 같으면 계절 전환 > 판단 불가")
 
 
-def _state_text(evidence: dict) -> str:
-    return json.dumps(evidence, ensure_ascii=False)
+def _season_agrees(evidence: dict) -> bool:
+    """지속 변화 방향(증가/감소)이 그 달 입도객 성수기(+)/비수기(-) 방향과 같은지."""
+    pct = evidence.get("anomaly", {}).get("pct") or 0
+    vals = [c.get("value") for c in evidence.get("context", []) if c.get("kind") == "visitors" and c.get("value") is not None]
+    return any(v * pct > 0 for v in vals)
+
+
+_MISSING = {"weather": "기상 특이사항 없음", "holiday": "공휴일 없음", "event": "등록된 행사 없음"}
+
+
+def evidence_text(evidence: dict) -> str:
+    """판정 모델에 넘길 근거 문장. JSON을 그대로 넘기면 '제주 전체' 같은 근거의 뜻을 놓쳐(사전 실험) 문장으로 풀어 쓴다.
+    숫자는 입력에 있는 값만 옮긴다."""
+    a = evidence.get("anomaly", {})
+    lines = [f"이상 신호: {a.get('emd', '')} {a.get('signal', '')} — {a.get('date', '')} 기준 {a.get('kind', '')}"
+             f"({a.get('days', 1)}일), 평소(같은 요일 기준선) 대비 {float(a.get('pct', 0)):+.1f}%."]
+    co = evidence.get("co_movements", [])
+    if co:
+        for c in co:
+            word = "증가" if c.get("direction") == "up" else "감소"
+            line = f"동반 변화: {c['signal']}도 {c['date']}에 평소보다 크게 움직였다(점수 {c['z']}, {word})."
+            if str(c["signal"]).startswith("제주 전체"):
+                line += " 즉 이 지역만의 변화가 아니라 섬 전체에서 함께 움직였다."
+            lines.append(line)
+    else:
+        lines.append("동반 변화 없음: 확인한 다른 신호와 제주 전체 합계는 평소 수준이었다.")
+    ctx = evidence.get("context", [])
+    for c in ctx:
+        lines.append(f"맥락: {c['detail']}.")
+    kinds = {c.get("kind") for c in ctx}
+    missing = [v for k, v in _MISSING.items() if k not in kinds]
+    if missing:
+        lines.append("맥락: " + ", ".join(missing) + ".")
+    return "\n".join(lines)
 
 
 def judge_cause(evidence: dict, http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL, timeout: int = 120) -> Judgment:
-    body = {"model": model, "state": _state_text(evidence), "questions": {"cause": {
+    body = {"model": model, "state": evidence_text(evidence), "questions": {"cause": {
         "type": "choice",
         "instructions": "Which listed cause best explains this anomaly in Jeju tourism/transport data? Judge only from the given evidence.",
         "criteria": CAUSES}}}

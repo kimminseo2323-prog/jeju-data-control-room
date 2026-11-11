@@ -57,3 +57,15 @@ def test_data_quality_report_counts_mapping(cache_dir):
     q = CacheStore(cache_dir).quality()
     assert q["wifi_ap_groups"]["mapped"] == 2 and q["bus_stations"]["mapped"] == 2
     assert q["as_of"]["유동인구"] == "2025-01-02"
+
+
+def test_visitors_monthly_total_sums_purposes(cache_dir):
+    pd.DataFrame({"dtYearMonth": ["202407", "202407", "202408"], "visitPurpose": ["개별여행", "패키지", "개별여행"],
+                  "visitorCnt": ["100", "50", "200"]}).to_parquet(cache_dir / "visitors_purpose.parquet")
+    v = CacheStore(cache_dir).visitors
+    assert v[pd.Timestamp("2024-07-01")] == 150 and v[pd.Timestamp("2024-08-01")] == 200
+
+
+def test_island_series_sums_all_mapped_regions(cache_dir):
+    s = CacheStore(cache_dir).island_series("와이파이")
+    assert s["2025-01-01"] == 39

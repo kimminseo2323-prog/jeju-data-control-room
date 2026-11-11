@@ -17,7 +17,7 @@ from app.agent.loop import AgentRun
 from app.agent.tools import Toolbox
 from app.agent.verify import verify
 from app.analytics.detect import group_episodes, score_series, detect_anomalies
-from app.llm.judge import CAUSE_KO, DEFAULT_HOST, DEFAULT_MODEL, judge_cause
+from app.llm.judge import CAUSE_KO, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
 from app.report.briefing import ResultStore, render_briefing, template_text
@@ -139,8 +139,8 @@ with tab_detail:
         with left:
             st.markdown("#### 같은 날 맥락")
             items = res["R3"].data["items"]
-            st.write("\n".join(f"- {it['detail']}" for it in items) if items else "- 기상·공휴일·행사 기록 없음")
-            st.markdown("#### 다른 신호 동반 변화")
+            st.write("\n".join(f"- {it['detail']}" for it in items) if items else "- 기상·공휴일·행사·성수기 기록 없음")
+            st.markdown("#### 다른 신호·제주 전체 동반 변화")
             co = res["R2"].data["co_movements"]
             st.write("\n".join(f"- {c['signal']} {c['date']} 점수 {c['z']}" for c in co) if co else
                      f"- 확인한 신호({', '.join(res['R2'].data['checked'])}) 중 동반 변화 없음")
@@ -149,6 +149,8 @@ with tab_detail:
             evidence = {"anomaly": {"emd": emd, "signal": signal, "date": str(day.date()), "pct": float(row["기대 대비(%)"]),
                                     "kind": row["유형"], "days": int(row["일수"])},
                         "context": items, "co_movements": co}
+            with st.expander("판정 모델에 넘긴 근거(이 내용만 보고 판단)"):
+                st.text(evidence_text(evidence))
             if st.button("원인 판정 실행", type="primary"):
                 with st.spinner("판정 중…"):
                     st.session_state["judge"] = (labels[pick], judge_cause(evidence))

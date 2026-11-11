@@ -18,6 +18,7 @@ def template_text(results: dict) -> str:
     """LLM을 쓸 수 없을 때: 도구 결과만으로 만든 문장(모든 문장에 근거 id)."""
     lines = []
     ctx = {(r.data.get("date"), r.data.get("emd")): (rid, r) for rid, r in results.items() if r.tool == "check_context"}
+    cos = {(r.data.get("date"), r.data.get("emd")): (rid, r) for rid, r in results.items() if r.tool == "find_co_movements"}
     for rid, r in results.items():
         if r.tool != "detect_anomalies":
             continue
@@ -32,21 +33,29 @@ def template_text(results: dict) -> str:
                 span = e["start"] if e["start"] == e["end"] else f"{e['start']}~{e['end']}"
                 lines.append(f"{span}({e['kind']}): 가장 큰 날 {e['peak_date']} 값은 {e['peak_value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 "
                              f"기대값 {e['peak_expected']:,}보다 {abs(e['peak_pct'])}% {word}습니다 [{rid}].")
-                hit = ctx.get((e["peak_date"], d["emd"]))
-                if hit and hit[1].data["items"]:
-                    details = ", ".join(i["detail"] for i in hit[1].data["items"])
-                    lines.append(f"같은 날 확인된 맥락은 {details}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+                lines += _evidence_lines(e["peak_date"], d["emd"], ctx, cos)
             continue
         lines.append(f"{d['emd']} {d['signal']}에서 이상 신호 {d['count']}건이 확인됐습니다 [{rid}].")
         for a in d["anomalies"][:5]:
             word = "많았" if a["direction"] == "up" else "적었"
             lines.append(f"{a['date']} 값은 {a['value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 기대값 {a['expected']:,}보다 "
                          f"{abs(a['pct'])}% {word}습니다 [{rid}].")
-            hit = ctx.get((a["date"], d["emd"]))
-            if hit and hit[1].data["items"]:
-                details = ", ".join(i["detail"] for i in hit[1].data["items"])
-                lines.append(f"같은 날 확인된 맥락은 {details}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+            lines += _evidence_lines(a["date"], d["emd"], ctx, cos)
     return "\n".join(lines)
+
+
+def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict) -> list[str]:
+    out = []
+    hit = ctx.get((day, emd))
+    if hit and hit[1].data["items"]:
+        details = ", ".join(i["detail"] for i in hit[1].data["items"])
+        out.append(f"같은 날 확인된 맥락은 {details}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+    hit = cos.get((day, emd))
+    if hit:
+        for c in hit[1].data["co_movements"]:
+            word = "많았" if c["direction"] == "up" else "적었"
+            out.append(f"같은 시기 {c['signal']}도 {c['date']}에 평소보다 {word}습니다(점수 {c['z']}) [{hit[0]}].")
+    return out
 
 
 def _table(data) -> str:
