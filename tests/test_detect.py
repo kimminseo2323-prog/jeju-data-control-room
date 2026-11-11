@@ -75,3 +75,35 @@ def test_direction_change_splits_episode():
     d = pd.Timestamp("2024-05-05")
     a = [Anomaly(d, 150, 100, 4, "up"), Anomaly(d + pd.Timedelta(days=1), 50, 100, -4, "down")]
     assert len(group_episodes(a)) == 2
+
+
+def _expected_seasonal_reference(s, weeks=4, min_obs=3):
+    """최초 구현(날짜마다 반복). 빠른 구현이 같은 값을 내는지 대조하는 기준."""
+    out = pd.Series(np.nan, index=s.index)
+    for t in s.index:
+        vals = s.reindex([t + pd.Timedelta(weeks=k) for k in range(-weeks, weeks + 1) if k != 0]).dropna()
+        if len(vals) >= min_obs:
+            out[t] = float(vals.median())
+    return out
+
+
+def test_seasonal_baseline_matches_reference_with_gaps():
+    from app.analytics.detect import _expected_seasonal
+    rng = np.random.default_rng(7)
+    idx = pd.date_range("2024-01-01", periods=400, freq="D")
+    s = pd.Series(rng.normal(1000, 80, len(idx)), index=idx)
+    s.iloc[rng.choice(400, 60, replace=False)] = np.nan   # 흩어진 결측
+    s.iloc[100:130] = np.nan                               # 긴 결측(이웃이 3개 미만인 날 생김)
+    got, ref = _expected_seasonal(s), _expected_seasonal_reference(s)
+    pd.testing.assert_series_equal(got, ref, check_names=False, check_freq=False)
+    assert ref.isna().sum() > 0   # 기준값이 없는 날도 대조됨
+
+
+def test_seasonal_baseline_is_fast_enough_for_43_regions():
+    """질문하기 '어디서 이상했나'는 43개 읍면동을 훑는다. 2년치 1개 지역 기준선이 0.05초 안이어야 센터 PC에서도 수 초 안."""
+    import time
+    from app.analytics.detect import _expected_seasonal
+    s = pd.Series(np.arange(730, dtype=float), index=pd.date_range("2024-01-01", periods=730, freq="D"))
+    t0 = time.perf_counter()
+    _expected_seasonal(s)
+    assert time.perf_counter() - t0 < 0.05

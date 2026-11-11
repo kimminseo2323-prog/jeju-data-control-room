@@ -1,0 +1,249 @@
+{
+ "summary": {
+  "tag": "cpu6",
+  "host": "http://127.0.0.1:11502",
+  "note": "개발 PC(i7-13700K), GPU 끔. Ollama와 이 파이썬 프로세스를 모두 P코어 6개(논리 CPU 0,2,4,6,8,10)에 고정 — 센터 i7-8700(6코어) 근사, 센터 실측 아님",
+  "pin": "0x555",
+  "machine": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "setup_s": 5.35,
+  "first_question_s": 17.73,
+  "median_total_s_by_kind": {
+   "explain": 13.7,
+   "scan": 4.76,
+   "docs": 5.02,
+   "other": 4.36
+  },
+  "max_total_s_warm": 14.6,
+  "all_model_backed": true
+ },
+ "rows": [
+  {
+   "round": 1,
+   "kind": "explain",
+   "question": "이호동 7월 28일에 왜 사람이 많았어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 17.73,
+   "model_s": 14.91,
+   "other_s": 2.82,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 7.1
+    },
+    {
+     "what": "cause",
+     "s": 7.82
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "kind": "explain",
+   "question": "성산읍 추석 연휴에 유동인구가 왜 늘었어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 13.7,
+   "model_s": 13.35,
+   "other_s": 0.35,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.38
+    },
+    {
+     "what": "cause",
+     "s": 8.98
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "kind": "explain",
+   "question": "삼도1동 2025년 3월 29일에 사람이 왜 많았어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 14.45,
+   "model_s": 14.09,
+   "other_s": 0.36,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.62
+    },
+    {
+     "what": "cause",
+     "s": 9.47
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "kind": "scan",
+   "question": "7월에 유동인구가 이상하게 많았던 곳 알려줘",
+   "intent": "scan",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 4.74,
+   "model_s": 4.51,
+   "other_s": 0.23,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.51
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "kind": "docs",
+   "question": "버스 데이터는 어디서 가져온 거야?",
+   "intent": "docs",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 4.5,
+   "model_s": 4.3,
+   "other_s": 0.19,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.3
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "kind": "other",
+   "question": "오늘 점심 메뉴 추천해줘",
+   "intent": "other",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 4.27,
+   "model_s": 4.06,
+   "other_s": 0.2,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.06
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "kind": "explain",
+   "question": "이호동 7월 28일에 왜 사람이 많았어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 12.26,
+   "model_s": 11.76,
+   "other_s": 0.5,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.35
+    },
+    {
+     "what": "cause",
+     "s": 7.42
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "kind": "explain",
+   "question": "성산읍 추석 연휴에 유동인구가 왜 늘었어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 13.0,
+   "model_s": 12.66,
+   "other_s": 0.34,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.57
+    },
+    {
+     "what": "cause",
+     "s": 8.08
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "kind": "explain",
+   "question": "삼도1동 2025년 3월 29일에 사람이 왜 많았어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 14.6,
+   "model_s": 14.26,
+   "other_s": 0.34,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.5
+    },
+    {
+     "what": "cause",
+     "s": 9.76
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "kind": "scan",
+   "question": "7월에 유동인구가 이상하게 많았던 곳 알려줘",
+   "intent": "scan",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 4.76,
+   "model_s": 4.38,
+   "other_s": 0.39,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.38
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "kind": "docs",
+   "question": "버스 데이터는 어디서 가져온 거야?",
+   "intent": "docs",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 5.02,
+   "model_s": 4.85,
+   "other_s": 0.17,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.85
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "kind": "other",
+   "question": "오늘 점심 메뉴 추천해줘",
+   "intent": "other",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 4.36,
+   "model_s": 4.08,
+   "other_s": 0.27,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 4.08
+    }
+   ]
+  }
+ ]
+}

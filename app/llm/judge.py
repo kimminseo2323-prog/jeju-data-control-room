@@ -26,6 +26,7 @@ from app import config
 config.load_env()
 DEFAULT_HOST = os.getenv("JUDGE_HOST", "http://127.0.0.1:11434")   # Ollama 표준 포트. 다른 포트면 .env의 JUDGE_HOST
 DEFAULT_MODEL = os.getenv("JUDGE_MODEL", "tev1:4b")
+CONNECT_TIMEOUT = 1.0   # 서버가 없을 때 연결 거부를 기다리는 시간(초). 응답(판정) 대기 시간과 별개
 
 
 @dataclass
@@ -117,7 +118,7 @@ def judge_cause(evidence: dict, http=requests, host: str = DEFAULT_HOST, model: 
         "instructions": "Which listed cause best explains this anomaly in Jeju tourism/transport data? Judge only from the given evidence.",
         "criteria": CAUSES}}}
     try:
-        r = http.post(f"{host}/v1/systemone", json=body, timeout=timeout)
+        r = http.post(f"{host}/v1/systemone", json=body, timeout=(CONNECT_TIMEOUT, timeout))
         r.raise_for_status()
         ans = r.json().get("answers", {}).get("cause", {})
         if ans.get("choice") not in CAUSES:

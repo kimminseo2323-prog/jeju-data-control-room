@@ -127,3 +127,25 @@ def test_model_status_requires_the_model_to_be_installed():
     assert ok is False and "tev1:4b" in msg
     assert model_status(TagsHTTP({"version": "luna-shim-1"}), model="tev1:4b")[0] is False   # Ollama가 아닌 다른 프로그램
     assert model_status(TagsHTTP(fail=True), model="tev1:4b")[0] is False
+
+
+class _RecordTimeout:
+    def __init__(self):
+        self.timeouts = []
+
+    def post(self, url, json=None, timeout=None):
+        self.timeouts.append(timeout)
+        raise ConnectionError("refused")
+
+
+def test_model_down_is_detected_within_a_second():
+    """모델 서버가 없으면 Windows는 연결 거부까지 약 2초를 기다린다. 연결 대기는 1초 이하로, 응답 대기는 길게."""
+    from app.agent.local import route
+    from app.llm.judge import judge_cause
+    h = _RecordTimeout()
+    route("이호동 7월 28일에 왜?", http=h)
+    judge_cause({"anomaly": {"emd": "제주시 이호동", "signal": "유동인구", "date": "2024-07-28", "pct": 50.0},
+                 "context": [], "co_movements": []}, http=h)
+    assert len(h.timeouts) == 2
+    for t in h.timeouts:
+        assert isinstance(t, tuple) and t[0] <= 1 and t[1] >= 60

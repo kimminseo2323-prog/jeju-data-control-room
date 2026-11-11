@@ -16,7 +16,7 @@ from app.agent.loop import WITHHELD, AgentRun
 from app.agent.tools import ToolError, ToolResult, Toolbox
 from app.agent.verify import verify
 from app.analytics.context import KR_HOLIDAYS
-from app.llm.judge import CAUSE_KO, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause
+from app.llm.judge import CAUSE_KO, CONNECT_TIMEOUT, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause
 from app.report.briefing import template_text
 from app.store.geo import EMD_43
 
@@ -126,7 +126,7 @@ def route(q: str, http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_
         "type": "choice", "instructions": "Classify the user's question to a Jeju tourism/transport anomaly dashboard assistant.",
         "criteria": INTENTS}}}
     try:
-        r = http.post(f"{host}/v1/systemone", json=body, timeout=60)
+        r = http.post(f"{host}/v1/systemone", json=body, timeout=(CONNECT_TIMEOUT, 60))
         r.raise_for_status()
         ans = r.json()["answers"]["intent"]
         if ans.get("choice") not in INTENTS:

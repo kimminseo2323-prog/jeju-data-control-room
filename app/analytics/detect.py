@@ -5,6 +5,7 @@ robust_resid: STL(주기 7, robust) 분해 잔차를 MAD로 표준화. 결측일
 """
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Literal
 
@@ -35,13 +36,17 @@ def _robust_scale(resid: pd.Series) -> float:
 
 
 def _expected_seasonal(s: pd.Series, weeks: int = 4, min_obs: int = 3) -> pd.Series:
-    out = pd.Series(np.nan, index=s.index)
-    for t in s.index:
-        neigh = [t + pd.Timedelta(weeks=k) for k in range(-weeks, weeks + 1) if k != 0]
-        vals = s.reindex(neigh).dropna()
-        if len(vals) >= min_obs:
-            out[t] = float(vals.median())
-    return out
+    """같은 요일 앞뒤 weeks주 값(자기 자신 제외)의 중앙값. 이웃 관측이 min_obs개 미만이면 NaN.
+    날짜 기준으로 맞춰(빈 날은 NaN) 7일 간격 이동을 한 번에 계산한다 — 날짜마다 반복하던 방식과 같은 값."""
+    daily = s.reindex(pd.date_range(s.index.min(), s.index.max(), freq="D")) if len(s) else s
+    shifts = [daily.shift(-7 * k).to_numpy(dtype=float) for k in range(-weeks, weeks + 1) if k != 0]
+    m = np.column_stack(shifts) if shifts else np.empty((len(daily), 0))
+    n = np.sum(~np.isnan(m), axis=1)
+    with np.errstate(all="ignore"), warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)   # 이웃이 전부 NaN인 날의 nanmedian 경고
+        med = np.nanmedian(m, axis=1) if m.shape[1] else np.full(len(daily), np.nan)
+    out = pd.Series(np.where(n >= min_obs, med, np.nan), index=daily.index)
+    return out.reindex(s.index)
 
 
 def _expected_stl(s: pd.Series) -> pd.Series:
