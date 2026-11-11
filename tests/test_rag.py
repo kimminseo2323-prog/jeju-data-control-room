@@ -38,3 +38,20 @@ def test_chunk_text_splits_long_text_with_overlap():
     text = "가" * 1200
     chunks = chunk_text(text, size=500, overlap=50)
     assert len(chunks) == 3 and all(len(c) <= 500 for c in chunks)
+
+
+def test_title_match_outranks_boilerplate_in_many_short_docs():
+    """명세서 시트마다 '반출' 칸이 있어도, 제목이 '반출 기준'인 문서가 먼저 나와야 한다."""
+    sheets = [{"doc_id": f"spec_{i}", "title": f"명세서 — 재무정보 {i}", "locator": f"시트 {i}",
+               "text": f"설명 기간 2019년 기준 본 데이터는 가공 형태로만 반출 가능합니다 반출 데이터 반출 불가능 항목{i}"} for i in range(30)]
+    policy = {"doc_id": "policy", "title": "데이터 반출 기준", "locator": "공지 48",
+              "text": "통계 결과물은 10 미만 값을 마스킹해야 반출할 수 있습니다. 역산 가능하면 제한됩니다. " * 3}
+    hits = build_index(sheets + [policy]).search("반출 가능한 데이터 기준이 뭐야?", k=3)
+    assert hits[0].doc_id == "policy"
+
+
+def test_one_passage_per_document():
+    long = {"doc_id": "long", "title": "버스 승하차 명세", "locator": "시트", "text": "버스 승하차 카드 " * 400}
+    hits = build_index(DOCS + [long]).search("버스 승하차 카드", k=3)
+    ids = [h.doc_id for h in hits]
+    assert len(ids) == len(set(ids))

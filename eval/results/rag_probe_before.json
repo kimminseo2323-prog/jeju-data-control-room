@@ -1,0 +1,219 @@
+{
+ "design": {
+  "hit_at_3": 0.7,
+  "n": 10,
+  "rows": [
+   {
+    "question": "반출 가능한 데이터 기준이 뭐야?",
+    "gold": [
+     "src:notice48",
+     "board:3."
+    ],
+    "hit": false,
+    "top": [
+     "spec:2-06 재무정보_분기",
+     "spec:2-05 재무정보_결산",
+     "spec:2-07 재무정보_직원수"
+    ]
+   },
+   {
+    "question": "결과물 권리는 누구한테 있어?",
+    "gold": [
+     "board:5."
+    ],
+    "hit": true,
+    "top": [
+     "board:5. 권리",
+     "src:notice48_반출기준",
+     "board:3. 반출·외부 LLM 전송"
+    ]
+   },
+   {
+    "question": "버스 데이터는 어디서 가져온 거야?",
+    "gold": [
+     "md:데이터_활용_명세",
+     "src:613"
+    ],
+    "hit": false,
+    "top": [
+     "spec:3-01 버스 노선 정보",
+     "spec:3-06 버스 카드 승하차 정보",
+     "spec:3-02 버스 노선별 이용 현황"
+    ]
+   },
+   {
+    "question": "와이파이 AP 정보 API 일일 쿼터가 몇 건이야",
+    "gold": [
+     "md:데이터_활용_명세",
+     "src:618"
+    ],
+    "hit": true,
+    "top": [
+     "src:593",
+     "src:618",
+     "src:586"
+    ]
+   },
+   {
+    "question": "유동인구 visitPop 컬럼은 무슨 뜻이야",
+    "gold": [
+     "src:583",
+     "md:데이터_활용_명세"
+    ],
+    "hit": true,
+    "top": [
+     "src:583",
+     "src:589",
+     "spec:4-11 내국인 유동인구(읍면동)_v02"
+    ]
+   },
+   {
+    "question": "데이터명세서에 버스 카드 승하차 정보 항목 설명해줘",
+    "gold": [
+     "spec:3-06"
+    ],
+    "hit": true,
+    "top": [
+     "spec:3-06 버스 카드 승하차 정보",
+     "spec:3-06 버스 카드 승하차 정보",
+     "spec:3-06 버스 카드 승하차 정보"
+    ]
+   },
+   {
+    "question": "외부 LLM에 센터 데이터를 보내도 돼?",
+    "gold": [
+     "board:3.",
+     "src:notice48"
+    ],
+    "hit": true,
+    "top": [
+     "board:미답변 (11/10 기준)",
+     "board:3. 반출·외부 LLM 전송",
+     "board:4. 실행환경·평가"
+    ]
+   },
+   {
+    "question": "기상 데이터는 언제까지 있어?",
+    "gold": [
+     "md:데이터_활용_명세",
+     "src:579"
+    ],
+    "hit": false,
+    "top": [
+     "spec:5-01 날씨 관측소 정보",
+     "src:578",
+     "spec:5-01 날씨 관측소 정보"
+    ]
+   },
+   {
+    "question": "저장한 결과 파일은 언제 지워져?",
+    "gold": [
+     "md:설치_실행_매뉴얼",
+     "board:"
+    ],
+    "hit": true,
+    "top": [
+     "board:4. 실행환경·평가",
+     "src:notice48_반출기준",
+     "board:5. 권리"
+    ]
+   },
+   {
+    "question": "10 미만 값은 어떻게 처리해야 해?",
+    "gold": [
+     "src:notice48",
+     "board:3."
+    ],
+    "hit": true,
+    "top": [
+     "src:notice48_반출기준",
+     "src:notice48_반출기준",
+     "src:notice48_반출기준"
+    ]
+   }
+  ]
+ },
+ "heldout": {
+  "hit_at_3": 0.8333333333333334,
+  "n": 6,
+  "rows": [
+   {
+    "question": "센터 PC 사양이 어떻게 돼?",
+    "gold": [
+     "board:4."
+    ],
+    "hit": true,
+    "top": [
+     "board:4. 실행환경·평가",
+     "board:4. 실행환경·평가",
+     "spec:1-09 카드 이용 현황(1km격자)"
+    ]
+   },
+   {
+    "question": "축제 데이터는 어디서 왔어?",
+    "gold": [
+     "src:761",
+     "md:데이터_활용_명세"
+    ],
+    "hit": true,
+    "top": [
+     "src:761",
+     "src:761",
+     "spec:1-32 탐나는전 이용 현황"
+    ]
+   },
+   {
+    "question": "정류소 위치 정보 출처 알려줘",
+    "gold": [
+     "src:612",
+     "md:데이터_활용_명세"
+    ],
+    "hit": true,
+    "top": [
+     "spec:3-03 버스 정류소 정보",
+     "src:612",
+     "src:613"
+    ]
+   },
+   {
+    "question": "반출 신청은 어떻게 해?",
+    "gold": [
+     "board:3.",
+     "src:notice48"
+    ],
+    "hit": true,
+    "top": [
+     "src:notice48_반출기준",
+     "src:notice48_반출기준",
+     "src:notice48_반출기준"
+    ]
+   },
+   {
+    "question": "입도객 데이터 항목이 뭐야?",
+    "gold": [
+     "src:580",
+     "src:582",
+     "md:데이터_활용_명세"
+    ],
+    "hit": true,
+    "top": [
+     "src:582",
+     "src:580",
+     "src:593"
+    ]
+   },
+   {
+    "question": "판단 모델이 연결 안 됐다고 나와",
+    "gold": [
+     "md:설치_실행_매뉴얼"
+    ],
+    "hit": false,
+    "top": [
+     "board:4. 실행환경·평가",
+     "spec:3-07 도로 구간 정보",
+     "spec:3-07 도로 구간 정보"
+    ]
+   }
+  ]
+ }
+}

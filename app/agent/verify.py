@@ -85,8 +85,9 @@ def verify(text: str, results: dict[str, ToolResult]) -> VerifyResult:
             for d in DATE.finditer(body):
                 if d.group() not in dumps:
                     errors.append(f"근거에 없는 날짜 {d.group()} ({', '.join(cites)}): {sent}")
+            kdates = {(int(m[1]), int(m[2])) for m in KDATE.finditer(dumps)}   # 문서 원문은 '12월 31일'처럼 쓴다
             for d in KDATE.finditer(body):
-                if f"-{int(d[1]):02d}-{int(d[2]):02d}" not in dumps:
+                if f"-{int(d[1]):02d}-{int(d[2]):02d}" not in dumps and (int(d[1]), int(d[2])) not in kdates:
                     errors.append(f"근거에 없는 날짜 {d.group()} ({', '.join(cites)}): {sent}")
             rest = KDATE.sub(" ", DATE.sub(lambda m: f" {m[1]} ", body))   # 날짜는 위에서 확인, 연도만 숫자로 남김
             pool = [n for c in cites for n in _numbers_in(results[c].data)]

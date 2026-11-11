@@ -91,3 +91,20 @@ def test_digit_inside_place_name_is_not_evidence():
          "R3": ToolResult("R3", "check_context", {}, {"date": "2024-12-30", "emd": "제주시 용담1동", "items": []}, ["holidays"])}
     assert verify("제주시 용담1동 와이파이에서 이상 구간 1개가 확인됐습니다 [R1].", r).ok
     assert not verify("제주시 용담1동 와이파이에서 이상 구간 1개가 확인됐습니다 [R3].", r).ok
+
+
+def _doc_result(text):
+    return {"R1": ToolResult("R1", "search_docs", {"query": "q"},
+                             {"query": "q", "passages": [{"title": "명세서", "locator": "시트 A", "text": text}]}, ["시트 A"])}
+
+
+def test_korean_date_quoted_from_document_passes():
+    """문서 원문은 날짜를 '2019년 12월 31일'처럼 쓴다. 그대로 인용한 답변이 막히면 안 된다."""
+    res = _doc_result("- 기간: 2019년 12월 31일 기준 - 본 데이터는 가공 형태로만 반출 가능합니다.")
+    assert verify("명세서: 기간: 2019년 12월 31일 기준 [R1]", res).ok
+
+
+def test_korean_date_not_in_document_fails():
+    res = _doc_result("- 기간: 2019년 12월 31일 기준")
+    v = verify("명세서: 기간: 2019년 12월 30일 기준 [R1]", res)
+    assert not v.ok and "12월 30일" in v.errors[0]
