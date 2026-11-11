@@ -93,3 +93,16 @@ def test_result_store_purge_deletes_even_when_keep_on_exit(tmp_path):
     st = ResultStore(tmp_path, delete_on_exit=False)
     p = st.save("briefing", "<html></html>")
     assert st.purge() == 1 and not p.exists() and st.saved == []
+
+
+def test_opposite_season_is_not_called_a_cause_candidate():
+    # 급증인데 비수기(-15.1%)를 '원인 후보'로 쓰면 앞뒤가 맞지 않는다(삼도1동 2025-03-30)
+    r = dict(RESULTS)
+    r["R2"] = ToolResult("R2", "check_context", {}, {"date": "2025-01-29", "emd": "서귀포시 성산읍", "items": [
+        {"kind": "holiday", "detail": "설날 (당일, 2025-01-29)"},
+        {"kind": "visitors", "detail": "2025-01 입도객 100.0만 명, 주변 12개월 평균 대비 -15.1%(비수기)", "value": -15.1}]}, ["허브 580"])
+    text = template_text(r)
+    cand = [l for l in text.split("\n") if "원인 후보로 볼 수" in l]
+    assert len(cand) == 1 and "설날" in cand[0] and "비수기" not in cand[0]
+    assert any("비수기" in l and "반대" in l for l in text.split("\n"))
+    assert verify(text, r).ok, verify(text, r).errors

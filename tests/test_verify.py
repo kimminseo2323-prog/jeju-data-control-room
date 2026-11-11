@@ -83,3 +83,11 @@ def test_decimal_written_number_uses_decimal_tolerance():
     r = {"R2": ToolResult("R2", "find_co_movements", {}, {"co_movements": [{"z": 7.24}]}, ["허브"])}
     assert verify("점수 7.24입니다 [R2].", r).ok
     assert not verify("점수 7.0입니다 [R2].", r).ok
+
+
+def test_digit_inside_place_name_is_not_evidence():
+    # '용담1동'의 1은 지명이지 수치가 아니다 → 지명만 담은 결과로 '1개'를 뒷받침할 수 없다(검증기 평가에서 발견, 2026-11-11)
+    r = {"R1": ToolResult("R1", "detect_anomalies", {}, {"emd": "제주시 용담1동", "count": 1}, ["허브"]),
+         "R3": ToolResult("R3", "check_context", {}, {"date": "2024-12-30", "emd": "제주시 용담1동", "items": []}, ["holidays"])}
+    assert verify("제주시 용담1동 와이파이에서 이상 구간 1개가 확인됐습니다 [R1].", r).ok
+    assert not verify("제주시 용담1동 와이파이에서 이상 구간 1개가 확인됐습니다 [R3].", r).ok

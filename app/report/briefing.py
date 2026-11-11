@@ -34,23 +34,34 @@ def template_text(results: dict) -> str:
                 span = e["start"] if e["start"] == e["end"] else f"{e['start']}~{e['end']}"
                 lines.append(f"{span}({e['kind']}): 가장 큰 날 {e['peak_date']} 값은 {e['peak_value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 "
                              f"기대값 {e['peak_expected']:,}보다 {abs(e['peak_pct'])}% {word}습니다 [{rid}].")
-                lines += _evidence_lines(e["peak_date"], d["emd"], ctx, cos)
+                lines += _evidence_lines(e["peak_date"], d["emd"], ctx, cos, e["direction"])
             continue
         lines.append(f"{d['emd']} {d['signal']}에서 이상 신호 {d['count']}건이 확인됐습니다 [{rid}].")
         for a in d["anomalies"][:5]:
             word = "많았" if a["direction"] == "up" else "적었"
             lines.append(f"{a['date']} 값은 {a['value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 기대값 {a['expected']:,}보다 "
                          f"{abs(a['pct'])}% {word}습니다 [{rid}].")
-            lines += _evidence_lines(a["date"], d["emd"], ctx, cos)
+            lines += _evidence_lines(a["date"], d["emd"], ctx, cos, a["direction"])
     return "\n".join(lines)
 
 
-def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict) -> list[str]:
+def _opposite(item: dict, direction: str | None) -> bool:
+    """성수기·비수기 표시가 이상 방향과 반대인가(급증인데 비수기 등)."""
+    v = item.get("value")
+    return item.get("kind") == "visitors" and v is not None and direction in ("up", "down") and (v > 0) != (direction == "up")
+
+
+def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | None = None) -> list[str]:
     out = []
     hit = ctx.get((day, emd))
     if hit and hit[1].data["items"]:
-        details = ", ".join(i["detail"] for i in hit[1].data["items"])
-        out.append(f"같은 날 확인된 맥락은 {details}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+        items = hit[1].data["items"]
+        same = [i for i in items if not _opposite(i, direction)]
+        other = [i for i in items if _opposite(i, direction)]
+        if same:
+            out.append(f"같은 날 확인된 맥락은 {', '.join(i['detail'] for i in same)}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+        for i in other:
+            out.append(f"참고로 {i['detail']}는 이상 방향과 반대라 원인 후보에서 뺐습니다 [{hit[0]}].")
     hit = cos.get((day, emd))
     if hit:
         for c in hit[1].data["co_movements"]:

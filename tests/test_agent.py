@@ -154,3 +154,13 @@ def test_detect_output_records_requested_period():
     tb, day = make_toolbox()
     r = tb.dispatch("detect_anomalies", {"signal": "유동인구", "emd": "서귀포시 성산읍", "start": "2024-12-01", "end": "2024-12-20"}, "R1")
     assert r.data["start"] == "2024-12-01" and r.data["end"] == "2024-12-20"
+
+
+def test_island_total_excludes_the_region_itself():
+    # 한 읍면동만 크게 튀면 그 값이 섞인 '제주 전체'도 튄다 → 섬 전체 흐름으로 오판(삼도1동 2025-03-29, 와이파이 점수 13.7)
+    a, b = weekly_series(seed=1), weekly_series(seed=2)
+    day = a.index[70]
+    a[day] += 4000   # 이호동만 증가
+    tb = Toolbox(MemoryStore(series={("와이파이", "제주시 이호동"): a, ("와이파이", "제주시 연동"): b}), index=None)
+    r = tb.dispatch("find_co_movements", {"date": str(day.date()), "emd": "제주시 이호동"}, "R1")
+    assert [m["signal"] for m in r.data["co_movements"]] == ["와이파이"]   # 자기 신호만, 제주 전체는 아님

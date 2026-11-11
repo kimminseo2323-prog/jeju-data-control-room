@@ -81,7 +81,7 @@ class Toolbox:
              "parameters": {"type": "object", "properties": {"signal": sig, "start": date, "end": date,
                             "method": {"type": "string", "enum": ["seasonal_z", "robust_resid"]}, "threshold": {"type": "number"},
                             "top": {"type": "integer"}}, "required": ["signal"]}},
-            {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호와 제주 전체 합계도 함께 크게 움직였는지 확인한다.",
+            {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호와 제주 전체 합계(이 읍면동 제외)도 함께 크게 움직였는지 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "window": {"type": "integer"},
                             "exclude_signal": {"type": "string", "description": "분석 중인 신호(자기 자신 제외)"}}, "required": ["date", "emd"]}},
             {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부를 확인한다.",
@@ -153,12 +153,19 @@ class Toolbox:
                 sigs[name] = self.store.series(name, emd)
             except ToolError:
                 continue
-        # 제주 전체 합계: 이 지역만의 변화인지, 섬 전체 흐름(성수기·연휴 등)인지 가르는 근거
+        # 제주 전체 합계: 이 지역만의 변화인지, 섬 전체 흐름(성수기·연휴 등)인지 가르는 근거.
+        # 이 지역 값은 뺀다 — 한 곳의 큰 급증이 합계까지 끌어올려 '섬 전체가 움직였다'로 읽히는 것을 막는다
         if hasattr(self.store, "island_series"):
             for name in self.store.signals():
                 tot = self.store.island_series(name)
-                if len(tot.dropna()):
-                    sigs[f"제주 전체 {name}"] = tot
+                if not len(tot.dropna()):
+                    continue
+                try:
+                    own = self.store.series(name, emd).reindex(tot.index).fillna(0)
+                    tot = tot - own
+                except ToolError:
+                    pass
+                sigs[f"제주 전체 {name}"] = tot
         moves = find_co_movements(pd.Timestamp(date), sigs, threshold=3.0, window=int(window))
         rows = [{"signal": m.signal, "date": str(m.date.date()), "z": round(m.z, 2), "direction": m.direction} for m in moves]
         return {"date": date, "emd": emd, "checked": sorted(sigs), "co_movements": rows}, sorted({SIGNAL_SOURCES[k.removeprefix("제주 전체 ")] for k in sigs if k.removeprefix("제주 전체 ") in SIGNAL_SOURCES})
