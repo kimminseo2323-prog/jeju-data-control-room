@@ -21,7 +21,10 @@ CAUSES = {
 }
 CAUSE_KO = {"weather": "날씨", "holiday": "공휴일·연휴", "event": "축제·행사", "tourism_demand": "관광 수요 변화", "season": "계절 전환(성수기·비수기)",
             "data_issue": "데이터 오류 의심", "unknown": "판단 불가"}
-DEFAULT_HOST = os.getenv("JUDGE_HOST", "http://127.0.0.1:11500")
+from app import config
+
+config.load_env()
+DEFAULT_HOST = os.getenv("JUDGE_HOST", "http://127.0.0.1:11434")   # Ollama 표준 포트. 다른 포트면 .env의 JUDGE_HOST
 DEFAULT_MODEL = os.getenv("JUDGE_MODEL", "tev1:4b")
 
 

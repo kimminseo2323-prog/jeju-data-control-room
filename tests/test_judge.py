@@ -90,3 +90,13 @@ def test_judge_sends_sentences_not_json():
     http = FakeHTTP()
     judge_cause(EVID_HOLIDAY, http=http)
     assert http.sent[1]["state"] == evidence_text(EVID_HOLIDAY)
+
+
+def test_default_host_is_standard_ollama_port_unless_configured(monkeypatch):
+    import importlib
+    import app.llm.judge as jm
+    monkeypatch.delenv("JUDGE_HOST", raising=False)
+    monkeypatch.setattr("app.config.load_env", lambda: None)
+    assert importlib.reload(jm).DEFAULT_HOST == "http://127.0.0.1:11434"
+    monkeypatch.setenv("JUDGE_HOST", "http://127.0.0.1:11500")
+    assert importlib.reload(jm).DEFAULT_HOST == "http://127.0.0.1:11500"
