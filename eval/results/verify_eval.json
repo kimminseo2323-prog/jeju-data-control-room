@@ -4,8 +4,8 @@
  "catch_rate": [
   {
    "kind": "근거 바꿔치기",
-   "catch_rate": 0.92,
-   "n": 25
+   "catch_rate": 0.923,
+   "n": 13
   },
   {
    "kind": "근거 삭제",
@@ -19,7 +19,7 @@
   },
   {
    "kind": "숫자 변경",
-   "catch_rate": 0.868,
+   "catch_rate": 0.943,
    "n": 53
   },
   {

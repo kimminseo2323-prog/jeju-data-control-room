@@ -1,0 +1,420 @@
+{
+ "signal": "와이파이",
+ "trials": 480,
+ "regions": 43,
+ "seed": 0,
+ "alarms": [
+  {
+   "method": "seasonal_z",
+   "threshold": 2.5,
+   "alarms_per_100_days": 8.05,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 3.0,
+   "alarms_per_100_days": 4.98,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 3.5,
+   "alarms_per_100_days": 3.18,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 4.0,
+   "alarms_per_100_days": 2.02,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 4.5,
+   "alarms_per_100_days": 1.48,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 5.0,
+   "alarms_per_100_days": 1.09,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 5.5,
+   "alarms_per_100_days": 0.93,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 6.0,
+   "alarms_per_100_days": 0.68,
+   "days": 7525
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 7.0,
+   "alarms_per_100_days": 0.43,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 2.5,
+   "alarms_per_100_days": 10.62,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 3.0,
+   "alarms_per_100_days": 8.57,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 3.5,
+   "alarms_per_100_days": 7.31,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 4.0,
+   "alarms_per_100_days": 6.17,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 4.5,
+   "alarms_per_100_days": 5.01,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 5.0,
+   "alarms_per_100_days": 4.15,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 5.5,
+   "alarms_per_100_days": 3.38,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 6.0,
+   "alarms_per_100_days": 2.92,
+   "days": 7525
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 7.0,
+   "alarms_per_100_days": 2.06,
+   "days": 7525
+  }
+ ],
+ "recall_at_3_5": [
+  {
+   "method": "robust_resid",
+   "type": "일시 급변(1일)",
+   "direction": "감소",
+   "mag": 0.2,
+   "day_recall": 0.125,
+   "episode_hit": 0.125
+  },
+  {
+   "method": "robust_resid",
+   "type": "일시 급변(1일)",
+   "direction": "감소",
+   "mag": 0.4,
+   "day_recall": 0.575,
+   "episode_hit": 0.575
+  },
+  {
+   "method": "robust_resid",
+   "type": "일시 급변(1일)",
+   "direction": "감소",
+   "mag": 0.8,
+   "day_recall": 0.925,
+   "episode_hit": 0.925
+  },
+  {
+   "method": "robust_resid",
+   "type": "일시 급변(1일)",
+   "direction": "증가",
+   "mag": 0.2,
+   "day_recall": 0.025,
+   "episode_hit": 0.025
+  },
+  {
+   "method": "robust_resid",
+   "type": "일시 급변(1일)",
+   "direction": "증가",
+   "mag": 0.4,
+   "day_recall": 0.575,
+   "episode_hit": 0.575
+  },
+  {
+   "method": "robust_resid",
+   "type": "일시 급변(1일)",
+   "direction": "증가",
+   "mag": 0.8,
+   "day_recall": 0.7,
+   "episode_hit": 0.7
+  },
+  {
+   "method": "robust_resid",
+   "type": "지속 변화(4일)",
+   "direction": "감소",
+   "mag": 0.2,
+   "day_recall": 0.062,
+   "episode_hit": 0.175
+  },
+  {
+   "method": "robust_resid",
+   "type": "지속 변화(4일)",
+   "direction": "감소",
+   "mag": 0.4,
+   "day_recall": 0.562,
+   "episode_hit": 0.675
+  },
+  {
+   "method": "robust_resid",
+   "type": "지속 변화(4일)",
+   "direction": "감소",
+   "mag": 0.8,
+   "day_recall": 0.919,
+   "episode_hit": 0.925
+  },
+  {
+   "method": "robust_resid",
+   "type": "지속 변화(4일)",
+   "direction": "증가",
+   "mag": 0.2,
+   "day_recall": 0.131,
+   "episode_hit": 0.3
+  },
+  {
+   "method": "robust_resid",
+   "type": "지속 변화(4일)",
+   "direction": "증가",
+   "mag": 0.4,
+   "day_recall": 0.325,
+   "episode_hit": 0.625
+  },
+  {
+   "method": "robust_resid",
+   "type": "지속 변화(4일)",
+   "direction": "증가",
+   "mag": 0.8,
+   "day_recall": 0.938,
+   "episode_hit": 1.0
+  },
+  {
+   "method": "seasonal_z",
+   "type": "일시 급변(1일)",
+   "direction": "감소",
+   "mag": 0.2,
+   "day_recall": 0.0,
+   "episode_hit": 0.0
+  },
+  {
+   "method": "seasonal_z",
+   "type": "일시 급변(1일)",
+   "direction": "감소",
+   "mag": 0.4,
+   "day_recall": 0.025,
+   "episode_hit": 0.025
+  },
+  {
+   "method": "seasonal_z",
+   "type": "일시 급변(1일)",
+   "direction": "감소",
+   "mag": 0.8,
+   "day_recall": 0.65,
+   "episode_hit": 0.65
+  },
+  {
+   "method": "seasonal_z",
+   "type": "일시 급변(1일)",
+   "direction": "증가",
+   "mag": 0.2,
+   "day_recall": 0.025,
+   "episode_hit": 0.025
+  },
+  {
+   "method": "seasonal_z",
+   "type": "일시 급변(1일)",
+   "direction": "증가",
+   "mag": 0.4,
+   "day_recall": 0.2,
+   "episode_hit": 0.2
+  },
+  {
+   "method": "seasonal_z",
+   "type": "일시 급변(1일)",
+   "direction": "증가",
+   "mag": 0.8,
+   "day_recall": 0.425,
+   "episode_hit": 0.425
+  },
+  {
+   "method": "seasonal_z",
+   "type": "지속 변화(4일)",
+   "direction": "감소",
+   "mag": 0.2,
+   "day_recall": 0.0,
+   "episode_hit": 0.0
+  },
+  {
+   "method": "seasonal_z",
+   "type": "지속 변화(4일)",
+   "direction": "감소",
+   "mag": 0.4,
+   "day_recall": 0.069,
+   "episode_hit": 0.15
+  },
+  {
+   "method": "seasonal_z",
+   "type": "지속 변화(4일)",
+   "direction": "감소",
+   "mag": 0.8,
+   "day_recall": 0.612,
+   "episode_hit": 0.775
+  },
+  {
+   "method": "seasonal_z",
+   "type": "지속 변화(4일)",
+   "direction": "증가",
+   "mag": 0.2,
+   "day_recall": 0.019,
+   "episode_hit": 0.05
+  },
+  {
+   "method": "seasonal_z",
+   "type": "지속 변화(4일)",
+   "direction": "증가",
+   "mag": 0.4,
+   "day_recall": 0.1,
+   "episode_hit": 0.2
+  },
+  {
+   "method": "seasonal_z",
+   "type": "지속 변화(4일)",
+   "direction": "증가",
+   "mag": 0.8,
+   "day_recall": 0.644,
+   "episode_hit": 0.85
+  }
+ ],
+ "sweep": [
+  {
+   "method": "robust_resid",
+   "threshold": 2.5,
+   "day_recall": 0.589,
+   "episode_hit": 0.656
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 3.0,
+   "day_recall": 0.536,
+   "episode_hit": 0.594
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 3.5,
+   "day_recall": 0.489,
+   "episode_hit": 0.552
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 4.0,
+   "day_recall": 0.445,
+   "episode_hit": 0.504
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 4.5,
+   "day_recall": 0.393,
+   "episode_hit": 0.446
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 5.0,
+   "day_recall": 0.343,
+   "episode_hit": 0.4
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 5.5,
+   "day_recall": 0.308,
+   "episode_hit": 0.352
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 6.0,
+   "day_recall": 0.258,
+   "episode_hit": 0.306
+  },
+  {
+   "method": "robust_resid",
+   "threshold": 7.0,
+   "day_recall": 0.184,
+   "episode_hit": 0.235
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 2.5,
+   "day_recall": 0.386,
+   "episode_hit": 0.448
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 3.0,
+   "day_recall": 0.308,
+   "episode_hit": 0.365
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 3.5,
+   "day_recall": 0.231,
+   "episode_hit": 0.279
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 4.0,
+   "day_recall": 0.169,
+   "episode_hit": 0.221
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 4.5,
+   "day_recall": 0.112,
+   "episode_hit": 0.152
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 5.0,
+   "day_recall": 0.063,
+   "episode_hit": 0.092
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 5.5,
+   "day_recall": 0.036,
+   "episode_hit": 0.06
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 6.0,
+   "day_recall": 0.02,
+   "episode_hit": 0.033
+  },
+  {
+   "method": "seasonal_z",
+   "threshold": 7.0,
+   "day_recall": 0.008,
+   "episode_hit": 0.012
+  }
+ ]
+}

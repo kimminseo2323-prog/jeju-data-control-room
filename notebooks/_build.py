@@ -31,7 +31,8 @@ NOTEBOOKS["01_데이터수집"] = [
 **허브 API 규칙 (2026-11-10 확인)**
 - 호출: `open.jejudatahub.net/api/proxy/{데이터별 ID}/{프로젝트키}` — 키는 `.env`에만 저장
 - 페이지: `number`, `limit`(최대 100) → 응답 `{totCnt, hasMore, data}`
-- 일일 쿼터: **데이터별 1,000회** (프로젝트 화면에서 확인). 초과하면 서버가 **HTTP 403**
+- 일일 쿼터: **데이터별 기본 1,000회** (프로젝트 화면에서 확인). 초과하면 서버가 **HTTP 403**
+- 대용량 3종(유동인구 583·와이파이 장소별 593·정류소별 버스 613)은 증설을 신청해 **5,000회 승인**(2026-11-11 확인) → `Job.daily_quota`에 반영
 - 수집기(`app/ingest/hub_client.py`)는 쿼터를 데이터별로 세고, 멈춘 페이지부터 다음 날 이어받는다
 
 **수집 중 발견한 문제와 해결**
@@ -60,11 +61,13 @@ pd.DataFrame(rows)"""),
     ("code", """from app.ingest.jobs import JOBS
 import datetime as dt
 today = dt.date.today().strftime("%Y%m%d")
-by_api = {j.api_id: j.name for j in JOBS.values()}
+by_api = {j.api_id: j for j in JOBS.values()}
 used = []
 for f in Path("data/state").glob(f"quota_{today}_*.txt"):
     api = f.stem.split("_", 2)[2]
-    used.append({"작업": by_api.get(api, "(이전 ID)"), "오늘 호출 수": int(f.read_text() or 0), "남은 쿼터": max(0, 1000 - int(f.read_text() or 0))})
+    job, n = by_api.get(api), int(f.read_text() or 0)
+    quota = job.daily_quota if job else 1000
+    used.append({"작업": job.name if job else "(이전 ID)", "오늘 호출 수": n, "일일 쿼터": quota, "남은 쿼터": max(0, quota - n)})
 pd.DataFrame(used).sort_values("오늘 호출 수", ascending=False).reset_index(drop=True)"""),
 ]
 
@@ -94,7 +97,17 @@ cov["AP그룹"] = cov["행정동"].map(g["emd"].value_counts()).fillna(0).astype
 cov["관광지 AP그룹"] = cov["행정동"].map(g[g["category"] == "관광지"]["emd"].value_counts()).fillna(0).astype(int)
 cov["기상관측소"] = cov["행정동"].map(st.station_of_emd)
 cov"""),
-    ("md", "**해석**: 정류소나 AP그룹이 0인 행정동은 해당 신호로 이상을 볼 수 없다 → 화면과 브리핑에 '신호 없음'으로 표시한다."),
+    ("md", """## 버스 이용(613) → 읍면동 연결
+정류소별 버스 이용(613)의 정류소ID(7자리)는 정류소 기본 정보(612)의 ID(9자리)와 체계가 달라 **ID로는 하나도 겹치지 않는다**(2026-11-11 확인).
+그래서 기호·공백을 뺀 정류소 이름이 612에서 **한 읍면동에만** 있을 때 그 읍면동으로 연결하고, 같은 이름이 여러 읍면동에 있으면(터미널 등) 추측하지 않고 '모호'로 뺀다."""),
+    ("code", """bus = st._read("bus_station_daily")
+_ = st._map_bus(bus)
+m = st._bus_mapping
+print(f"정류소별 버스 이용 {len(bus):,}행, 기간 {bus['baseDate'].min()} ~ {bus['baseDate'].max()}")
+pd.DataFrame({"구분": ["ID로 연결", "이름으로 연결", "모호(같은 이름이 여러 읍면동)", "매칭 실패"],
+              "이용자 수 비중(%)": [m["by_id"], m["by_name"], m["ambiguous_name"], m["unmatched"]]})"""),
+    ("md", """**해석**: 정류소나 AP그룹이 0인 행정동은 해당 신호로 이상을 볼 수 없다 → 화면과 브리핑에 '신호 없음'으로 표시한다.
+추자도(위도 33.96)는 처음 위도 범위(33.1~33.6)를 벗어나 매칭 실패로 빠졌다 → 범위를 33.1~34.0으로 넓혀 추자면 와이파이 AP그룹을 연결했다(추자면 버스 정류소는 612에 없음)."""),
 ]
 
 NOTEBOOKS["03_로컬판단모델_tev1"] = [
@@ -122,8 +135,8 @@ pd.DataFrame([{"정답": r["gold"], "예측": r["pred"], "확신도": round(r["c
 
 
 NOTEBOOKS["04_이상탐지_실데이터"] = [
-    ("md", """# 04. 실제 데이터 이상 탐지 (수집 중간 결과)
-**데이터**: 허브 유동인구(583) 2024-04-01~07-31 — 쿼터 때문에 끝까지 받은 달만 사용(4개월, 83,935행 = 122일×688행). 나머지 기간은 수집이 끝나면 같은 코드로 다시 실행한다.
+    ("md", """# 04. 실제 데이터 이상 탐지
+**데이터**: 허브 유동인구(583) 2024-04-01~2025-03-31(12개월). 끝까지 받은 달만 쓴다(아래 첫 셀에서 기간·행 수 확인).
 
 **방법** (`app/analytics/detect.py`)
 - `seasonal_z`: 같은 요일 앞뒤 4주 값의 중앙값을 기대값으로, 잔차를 MAD로 표준화한 점수
@@ -133,6 +146,8 @@ NOTEBOOKS["04_이상탐지_실데이터"] = [
     ("code", """from app.store.cache import CacheStore
 from app.analytics.detect import detect_anomalies, group_episodes
 st = CacheStore("data/cache")
+pop = st._read("pop_domestic")
+print(f"유동인구 {len(pop):,}행, 기간 {pop['baseDate'].min()} ~ {pop['baseDate'].max()}, 날짜 {pop['baseDate'].nunique()}일")
 rows, eps = [], []
 for emd in st.regions("유동인구"):
     s = st.series("유동인구", emd)
@@ -150,7 +165,8 @@ print("두 방법이 모두 잡은 이상일:", len(both))"""),
 from app.analytics.context import KR_HOLIDAYS
 top_days["공휴일"] = top_days["날짜"].map(lambda d: KR_HOLIDAYS.get(d, ""))
 top_days"""),
-    ("code", """daily = an[an["방법"] == "seasonal_z"].groupby("날짜").size().reindex(pd.date_range("2024-04-01", "2024-07-31").date, fill_value=0)
+    ("code", """lo, hi = pd.to_datetime(pop["baseDate"].astype(str)).agg(["min", "max"])
+daily = an[an["방법"] == "seasonal_z"].groupby("날짜").size().reindex(pd.date_range(lo, hi).date, fill_value=0)
 ax = daily.plot(figsize=(10, 3), color="#1F3A5F", title="날짜별 이상 읍면동 수(seasonal_z, 점수 3.5 이상)")
 ax.set_ylabel("읍면동 수"); plt.tight_layout()"""),
     ("md", "## 점수가 큰 이상 구간 상위 10개 (seasonal_z)"),
@@ -162,11 +178,12 @@ fig, ax = plt.subplots(figsize=(10, 3.2))
 ax.plot(s.index, s.values, color="#1F3A5F", label="실제(방문인구 합)"); ax.plot(exp.index, exp.values, ":", color="#9AA5B1", label="기대값")
 hit = z[z.abs() >= 3.5].dropna(); ax.scatter(hit.index, s.reindex(hit.index), color="#B5473A", zorder=3, label="이상일")
 ax.legend(); plt.tight_layout()"""),
-    ("md", """**읽은 것**
-- 5/5~5/6(어린이날·대체공휴일)과 6/7(현충일 다음 날인 금요일)에 여러 읍면동이 동시에 증가 → '공휴일·연휴' 원인 후보
-- 7월 말 이호동·애월읍·한림읍 등 해변 지역의 여러 날 연속 증가 → '지속 변화'(여름 성수기 시작) — 하루짜리 급변과 구분해 보고
-- 두 방법이 잡는 날이 다르다 → 가짜 이상 주입 평가로 어느 쪽을 기본으로 쓸지 정한다(Task 9)
-- 한계: 4개월치라 연 단위 계절성은 반영하지 못함, 시리즈 끝(7/31)은 앞쪽 데이터만으로 기준선을 잡음"""),
+    ("md", """**읽은 것** (2024-04-01~2025-03-31, 43개 읍면동, 점수 3.5 기준)
+- 이상 읍면동이 가장 많은 날은 추석(2024-09-16·17)과 설날(2025-01-28~30) → 여러 곳이 동시에 움직인 날은 '공휴일·연휴' 원인 후보
+- 7월 말~8월 초(2024-07-31, 08-01·02)에도 20곳 이상이 함께 증가 → 공휴일이 아니므로 여름 성수기(제주 전체 동반 변화)로 본다. 이호동 07-26~29(+104%)가 대표 사례
+- 점수 1위는 삼도1동 2025-03-28~30(기대 대비 +170%). 같은 날 와이파이(점수 13.7)·버스도 함께 늘어 데이터 오류로 보기는 어렵다. 기상·공휴일·축제 자료(761)에는 맞는 사건이 없다. 삼도1동을 뺀 제주 전체 와이파이도 같은 날 늘어(점수 4.1) 판정 모델은 '관광 수요 변화'(62.5%, 판단 불가 34.5%)로 보았지만, **실제 사건은 미확인**이다
+- 같은 기준에서 STL 잔차(robust_resid)는 이상일을 약 3배 많이 낸다(1,237 vs 441). 가짜 이상 주입 평가에서 같은 경보 빈도로 맞추면 재현율 차이가 작아(유동인구 +2.1%p), 설명하기 쉬운 같은 요일 중앙값을 기본으로 둔다
+- 한계: 1년치라 '작년 같은 달' 비교는 못 함, 시리즈 끝(2025-03-31)은 앞쪽 데이터만으로 기준선을 잡음"""),
 ]
 
 
@@ -202,7 +219,9 @@ hit = z[z >= 3].dropna(); ax.scatter(hit.index, tot.reindex(hit.index) / 1e4, co
 ax.legend(); plt.tight_layout()
 pd.DataFrame({"제주 전체": tot, "기대값": ex.round(0), "점수": z.round(2)}).loc["2024-07-24":"2024-08-02"]"""),
     ("md", """**읽은 것**: 7월 말에는 섬 전체 유동인구도 크게 늘었다 → 해변 지역의 증가는 '섬 전체 관광 수요 증가'와 함께 움직인 것으로 볼 수 있다.
-→ `find_co_movements` 도구가 같은 읍면동의 다른 신호와 함께 **제주 전체 합계**도 확인하도록 바꿨다."""),
+→ `find_co_movements` 도구가 같은 읍면동의 다른 신호와 함께 **제주 전체 합계**도 확인하도록 바꿨다.
+
+**보완(2026-11-11)**: 1년치로 다시 보니 삼도1동 2025-03-29 와이파이(점수 13.7)처럼 한 곳의 큰 급증이 제주 전체 합계까지 끌어올렸다. 그래서 제주 전체 합계는 **설명하려는 읍면동을 뺀 나머지 합계**로 비교한다(`tests/test_agent.py::test_island_total_excludes_the_region_itself`)."""),
     ("md", """## 3. 판정 모델에 근거를 넘기는 형태 실험 (이호동 7월 말 사례)
 같은 근거를 ① JSON 그대로 ② 한국어 문장 ③ 영어 문장으로 넘겨 비교한다."""),
     ("code", """import json, requests
