@@ -29,3 +29,9 @@ def test_once_job_has_single_request():
 
 def test_ap_info_uses_basedate_param():
     assert expand(JOBS["wifi_ap_info"], dt.date(2025, 3, 31), dt.date(2025, 3, 31)) == [{"baseDate": "20250331"}]
+
+
+def test_daily_quota_per_job_reflects_approved_increase():
+    from app.ingest.jobs import JOBS
+    assert JOBS["bus_station_daily"].daily_quota == 5000      # 2026-11-11 허브 프로젝트 화면에서 '승인' 확인
+    assert JOBS["pop_domestic"].daily_quota == 1000

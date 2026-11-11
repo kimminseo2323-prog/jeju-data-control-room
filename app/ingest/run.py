@@ -49,7 +49,7 @@ def run(job_name: str, start: dt.date, end: dt.date) -> bool:
     if not key or key.startswith("여기에"):
         sys.exit("JEJU_HUB_PROJECT_KEY가 .env에 없습니다 (.env.example 참고)")
     job = JOBS[job_name]
-    client = HubClient(key, state_dir=STATE)
+    client = HubClient(key, state_dir=STATE, max_calls_per_day=job.daily_quota)
     reqs = expand(job, start, end)
     frames = []
     for i, params in enumerate(reqs, 1):

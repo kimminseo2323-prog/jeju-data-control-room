@@ -21,6 +21,7 @@ class Job:
     mode: str
     extra: dict = field(default_factory=dict)
     date_param: str = "searchDate"   # daily 모드의 날짜 파라미터 이름
+    daily_quota: int = 1000          # 허브 프로젝트 화면의 데이터별 일쿼터량(증설 승인 시 변경)
 
 
 JOBS: dict[str, Job] = {j.name: j for j in [
@@ -31,7 +32,7 @@ JOBS: dict[str, Job] = {j.name: j for j in [
     Job("wifi_ap_info", 618, "Dtb18ta1btbD1Da1a81aaDttab6tDabb", "제주 공공와이파이 AP 정보", "daily",
         date_param="baseDate"),
     Job("bus_station_daily", 613, "1b1ta1a1ba6t6a1ttt3bD6b1tb1t1D3t", "일일 정류소별 버스 이용자 정보", "range",
-        {"moveType": "승차", "priceType": "일반", "payType": "카드"}),
+        {"moveType": "승차", "priceType": "일반", "payType": "카드"}, daily_quota=5000),   # 2026-11-11 증설 승인 확인
     Job("bus_total_daily", 617, "617bt7b7ttb1Datab7a7ttD6tbt7611t", "버스 일일 승객수 데이터", "range"),
     Job("bus_stations", 612, "DD11ab6a6t11D16baaa1a2tD26ata161", "버스 정류소 기본 정보", "once"),
     Job("bus_routes", 611, "aaatD6D1atta1611at1t6a1b6at1b11a", "버스 노선 기본 정보", "once"),
