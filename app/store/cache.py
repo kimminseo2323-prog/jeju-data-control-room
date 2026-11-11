@@ -9,15 +9,18 @@ import pandas as pd
 
 from app.agent.tools import ToolError
 from app.analytics.series import to_daily
+from app.store.events import load_events
 from app.store.geo import assign_emd, haversine_m, normalize_emd
 
 SIGNALS = ["유동인구", "와이파이", "버스"]
+EVENTS_CSV = "제주특별자치도주요행사정보.csv"   # 허브 761 파일 데이터, data/manual에 둔다
 
 
 class CacheStore:
     def __init__(self, cache_dir: Path | str, events: pd.DataFrame | None = None):
         self.dir = Path(cache_dir)
-        self.events = events
+        # 행사: 직접 주지 않으면 캐시 옆 data/manual의 761 CSV에서 '행사명에 지명이 명시된' 단기 행사만 읽는다
+        self.events = events if events is not None else load_events(self.dir.parent / "manual" / EVENTS_CSV)
 
     def _read(self, name: str) -> pd.DataFrame:
         p = self.dir / f"{name}.parquet"

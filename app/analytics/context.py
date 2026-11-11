@@ -90,7 +90,7 @@ def check_context(day: pd.Timestamp, emd: str, weather: pd.DataFrame | None = No
         ev = events[(events["start"] <= day) & (events["end"] >= day) & ((events["emd"] == emd) | events["emd"].isna())]
         for _, r in ev.iterrows():
             items.append(ContextItem("event", f"{r['name']} ({r['start']:%Y-%m-%d}~{r['end']:%Y-%m-%d})",
-                                     "VISIT JEJU 축제행사콘텐츠(761), 지역은 수작업 지정"))
+                                     "제주관광공사 VISIT JEJU 축제행사콘텐츠(허브 761), 지역은 행사명 속 지명으로 연결"))
 
     if visitors is not None and len(visitors):
         si = season_index(visitors, day)

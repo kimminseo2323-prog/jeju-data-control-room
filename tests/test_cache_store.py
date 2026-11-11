@@ -69,3 +69,16 @@ def test_visitors_monthly_total_sums_purposes(cache_dir):
 def test_island_series_sums_all_mapped_regions(cache_dir):
     s = CacheStore(cache_dir).island_series("와이파이")
     assert s["2025-01-01"] == 39
+
+
+def test_events_loaded_from_manual_folder_next_to_cache(cache_dir):
+    manual = cache_dir.parent / "manual"
+    manual.mkdir()
+    pd.DataFrame({"콘텐츠명": ["이호테우축제"], "시작일": ["2024-08-02"], "종료일": ["2024-08-04"]}).to_csv(
+        manual / "제주특별자치도주요행사정보.csv", index=False, encoding="cp949")
+    st = CacheStore(cache_dir)
+    assert st.events["emd"].tolist() == ["제주시 이호동"]
+
+
+def test_no_event_file_means_empty_events(cache_dir):
+    assert CacheStore(cache_dir).events.empty

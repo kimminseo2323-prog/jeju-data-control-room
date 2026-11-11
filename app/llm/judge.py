@@ -69,7 +69,7 @@ def _season_agrees(evidence: dict) -> bool:
     return any(v * pct > 0 for v in vals)
 
 
-_MISSING = {"weather": "기상 특이사항 없음", "holiday": "공휴일 없음", "event": "등록된 행사 없음"}
+_MISSING = {"weather": "기상 특이사항 없음", "holiday": "공휴일 없음", "event": "지역이 확인된 행사 없음"}
 
 
 def evidence_text(evidence: dict) -> str:
