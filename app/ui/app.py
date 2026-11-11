@@ -236,4 +236,11 @@ with tab_quality:
     st.markdown("#### 위치 매핑")
     st.table(pd.DataFrame([{"대상": "버스 정류소", **q["bus_stations"]}, {"대상": "와이파이 AP그룹", **q["wifi_ap_groups"]}])
              .rename(columns={"mapped": "매핑", "unmatched": "매칭 실패"}))
+    if q.get("bus_usage"):
+        st.markdown("#### 버스 이용 데이터 → 읍면동 연결 (이용자 수 기준 %)")
+        bu = q["bus_usage"]
+        st.table(pd.DataFrame([{"정류소ID 일치": bu["by_id"], "정류소 이름 일치": bu["by_name"],
+                                "같은 이름이 여러 읍면동(제외)": bu["ambiguous_name"], "매칭 실패(제외)": bu["unmatched"]}]))
+        st.caption("이용 데이터(613)와 정류소 정보(612)의 정류소ID 체계가 달라, 기호를 뺀 정류소 이름이 한 읍면동에만 있을 때 연결합니다. "
+                   "여러 읍면동에 같은 이름이 있는 정류소(터미널 등)는 추측하지 않고 제외합니다.")
     st.caption("수집이 끝나지 않은 신호는 끝까지 받은 기간만 표시합니다. 원인 판정은 상관에 기반한 후보이며 인과가 아닙니다.")

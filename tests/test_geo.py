@@ -42,3 +42,11 @@ def test_assign_uses_address_then_nearest_reference_and_reports_failures():
     assert dict(zip(res.assigned["name"], res.assigned["method"])) == {"주소로 매칭": "address", "좌표로 매칭": "nearest"}
     assert list(res.unmatched["name"]) == ["멀리 떨어짐"]
     assert list(res.out_of_range["name"]) == ["제주 밖"]
+
+
+def test_chuja_island_coordinates_are_in_range():
+    # 추자도(위도 약 33.96)는 제주 범위 안이다 — 이전 범위(33.1~33.6)는 추자면 AP를 '범위 밖'으로 버렸다
+    pts = pd.DataFrame({"lat": [33.962], "lon": [126.300], "addr": ["제주특별자치도 제주시 추자면 대서리"]})
+    ref = pd.DataFrame({"lat": [33.51], "lon": [126.53], "emd": ["제주시 일도1동"]})
+    res = assign_emd(pts, ref, address_col="addr")
+    assert res.assigned["emd"].tolist() == ["제주시 추자면"] and res.out_of_range.empty

@@ -82,3 +82,28 @@ def test_events_loaded_from_manual_folder_next_to_cache(cache_dir):
 
 def test_no_event_file_means_empty_events(cache_dir):
     assert CacheStore(cache_dir).events.empty
+
+
+def test_region_without_bus_stops_uses_wifi_ap_location_for_weather(cache_dir):
+    # 이도2동에는 정류소가 없고 AP만 있다(우도면과 같은 경우) → AP 좌표로 가장 가까운 관측소를 정한다
+    st = CacheStore(cache_dir)
+    assert "제주시 이도2동" not in set(st.stations["emd"])
+    assert st.station_of_emd["제주시 이도2동"] == "제주"
+    assert st.station_of_emd["서귀포시 성산읍"] == "성산"
+
+
+def test_bus_usage_ids_differ_so_map_by_unambiguous_station_name(cache_dir):
+    # 실제 허브 데이터: 이용자(613) 정류소ID는 7자리, 정류소 정보(612)는 9자리라 ID가 겹치지 않는다 → 이름으로 연결
+    pd.DataFrame({"stationId": ["405000001", "405000002", "405000003", "405000004"],
+                  "stationName": ["성산항", "한국병원", "시민회관", "시민회관"],
+                  "stationAddress": ["서귀포시 성산읍", "제주시 삼도1동", "제주시 이도1동", "제주시 삼도2동"],
+                  "longitude": ["126.93", "126.518", "126.53", "126.52"], "latitude": ["33.47", "33.500", "33.51", "33.51"]}
+                 ).to_parquet(cache_dir / "bus_stations.parquet")
+    pd.DataFrame({"baseDate": ["20250101"] * 4, "stationId": ["6115001", "6115002", "6115003", "6115004"],
+                  "stationName": ["성산 항", "한국병원", "시민회관", "없는정류소"], "userCount": [10, 30, 50, 10]}
+                 ).to_parquet(cache_dir / "bus_station_daily.parquet")
+    st = CacheStore(cache_dir)
+    assert st.series("버스", "서귀포시 성산읍")["2025-01-01"] == 10     # 공백 차이는 정규화로 연결
+    assert st.series("버스", "제주시 삼도1동")["2025-01-01"] == 30
+    q = st.quality()["bus_usage"]   # 이용자 수 기준 비율(%)
+    assert q == {"by_id": 0.0, "by_name": 40.0, "ambiguous_name": 50.0, "unmatched": 10.0}

@@ -1,6 +1,7 @@
 """수집 캐시(data/cache/*.parquet) → 읍면동별 일 단위 신호, 기상, 행사, 데이터 품질 지표."""
 from __future__ import annotations
 
+import re
 from functools import cached_property
 from pathlib import Path
 
@@ -13,6 +14,11 @@ from app.store.events import load_events
 from app.store.geo import assign_emd, haversine_m, normalize_emd
 
 SIGNALS = ["유동인구", "와이파이", "버스"]
+
+
+def _norm_name(x) -> str:
+    """정류소 이름 비교용: 한글·영문·숫자만 남긴다('제주도청(신제주로터리)' = '제주도청신제주로터리')."""
+    return re.sub(r"[^가-힣A-Za-z0-9]", "", str(x))
 EVENTS_CSV = "제주특별자치도주요행사정보.csv"   # 허브 761 파일 데이터, data/manual에 둔다
 
 
@@ -49,6 +55,7 @@ class CacheStore:
         ap = ap.rename(columns={"latitude": "lat", "longitude": "lon"})
         res = assign_emd(ap, self.stations[["lat", "lon", "emd"]], address_col="addressDong")
         self._ap_unmatched_groups = set(res.unmatched["apGroupName"]) | set(res.out_of_range["apGroupName"])
+        self._ap_points = res.assigned.assign(lat=res.assigned["lat"].astype(float), lon=res.assigned["lon"].astype(float))[["lat", "lon", "emd"]]
         g = res.assigned.groupby("apGroupName").agg(emd=("emd", lambda s: s.mode().iat[0]),
                                                     category=("category", lambda s: s.mode().iat[0]))
         return g.reset_index()
@@ -60,6 +67,11 @@ class CacheStore:
             return {}
         ws = ws.assign(lat=ws["latitude"].astype(float), lon=ws["longitude"].astype(float))
         cent = self.stations.groupby("emd")[["lat", "lon"]].mean()
+        # 정류소가 없는 읍면동(우도면 등)은 와이파이 AP 좌표 중심으로 대신한다
+        self.ap_groups
+        ap = getattr(self, "_ap_points", pd.DataFrame(columns=["lat", "lon", "emd"]))
+        extra = ap[~ap["emd"].isin(cent.index)].groupby("emd")[["lat", "lon"]].mean()
+        cent = pd.concat([cent, extra])
         out = {}
         for emd, r in cent.iterrows():
             d = haversine_m(r["lat"], r["lon"], ws["lat"].to_numpy(), ws["lon"].to_numpy())
@@ -96,8 +108,28 @@ class CacheStore:
             wifi = wifi.merge(self.ap_groups[["apGroupName", "emd"]], on="apGroupName", how="inner").rename(columns={"emd": "emd_full"})
         bus = self._read("bus_station_daily")
         if not bus.empty:
-            bus = bus.merge(self.stations[["stationId", "emd"]], on="stationId", how="inner").rename(columns={"emd": "emd_full"})
+            bus = self._map_bus(bus)
         return {"유동인구": (pop, "visitPop"), "와이파이": (wifi, "userCount"), "버스": (bus, "userCount")}
+
+    def _map_bus(self, bus: pd.DataFrame) -> pd.DataFrame:
+        """버스 이용(613) → 읍면동. 613과 정류소 정보(612)의 정류소ID 체계가 달라(7자리 vs 9자리) ID가 겹치지 않는다.
+        ① ID가 같으면 ID로 ② 아니면 정규화한 정류소 이름이 '한 읍면동에만' 있을 때 이름으로 연결
+        ③ 같은 이름이 여러 읍면동에 있으면(경계의 큰 정류소 등) 추측하지 않고 '모호'로, 나머지는 '매칭 실패'로 집계."""
+        st = self.stations
+        by_id = dict(zip(st["stationId"].astype(str), st["emd"]))
+        names = st.assign(n=st["stationName"].map(_norm_name)).groupby("n")["emd"].agg(lambda s: set(s.dropna()))
+        unique = {k: next(iter(v)) for k, v in names.items() if len(v) == 1}
+        ambiguous = {k for k, v in names.items() if len(v) > 1}
+        n = bus["stationName"].map(_norm_name) if "stationName" in bus else pd.Series("", index=bus.index)
+        e_id = bus["stationId"].astype(str).map(by_id)
+        e_name = n.map(unique)
+        users = pd.to_numeric(bus["userCount"], errors="coerce").fillna(0)
+        total = users.sum() or 1
+        share = lambda m: round(float(users[m].sum() / total * 100), 1)
+        self._bus_mapping = {"by_id": share(e_id.notna()), "by_name": share(e_id.isna() & e_name.notna()),
+                             "ambiguous_name": share(e_id.isna() & e_name.isna() & n.isin(ambiguous)),
+                             "unmatched": share(e_id.isna() & e_name.isna() & ~n.isin(ambiguous))}
+        return bus.assign(emd_full=e_id.fillna(e_name)).dropna(subset=["emd_full"])
 
     def signals(self) -> list[str]:
         return [k for k, (df, _) in self._frames.items() if not df.empty]
@@ -143,5 +175,6 @@ class CacheStore:
                 as_of[k] = str(pd.to_datetime(df["baseDate"].astype(str), format="%Y%m%d").max().date())
         _ = self.ap_groups
         return {"bus_stations": {"mapped": int(len(self.stations)), "unmatched": int(getattr(self, "_station_unmatched", 0))},
+                "bus_usage": getattr(self, "_bus_mapping", {}),
                 "wifi_ap_groups": {"mapped": int(len(self.ap_groups)), "unmatched": len(getattr(self, "_ap_unmatched_groups", set()))},
                 "as_of": as_of}
