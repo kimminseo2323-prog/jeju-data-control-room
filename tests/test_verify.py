@@ -48,3 +48,38 @@ def test_numbers_inside_place_names_are_ignored():
 def test_comma_grouped_number_inside_cited_text_matches():
     r = {"R1": ToolResult("R1", "search_docs", {}, {"passages": [{"text": "일일 쿼터 1,000건"}]}, ["허브"])}
     assert verify("문서에 따르면 일일 쿼터는 1,000건입니다 [R1].", r).ok
+
+
+def test_decrease_written_as_magnitude_passes():
+    r = {"R1": ToolResult("R1", "detect_anomalies", {}, {"anomalies": [{"date": "2025-01-14", "value": 492.0, "expected": 950.0, "pct": -48.2}]}, ["허브"])}
+    v = verify("2025-01-14 값은 492.0명으로 기대값 950.0보다 48.2% 적었습니다 [R1].", r)
+    assert v.ok, v.errors
+
+
+def test_changed_date_fails_even_if_parts_exist_elsewhere():
+    r = {"R1": ToolResult("R1", "detect_anomalies", {}, {"anomalies": [{"date": "2024-10-03", "value": 5.0}, {"date": "2024-12-01", "value": 7.0}]}, ["허브"])}
+    assert verify("2024-10-03 값은 5.0명이었습니다 [R1].", r).ok
+    assert not verify("2024-12-03 값은 5.0명이었습니다 [R1].", r).ok
+
+
+def test_small_count_cannot_hide_in_date_parts():
+    r = {"R1": ToolResult("R1", "detect_anomalies", {}, {"count": 4, "anomalies": [{"date": "2024-10-19"}]}, ["허브"])}
+    assert verify("이상일은 4일입니다 [R1].", r).ok
+    assert not verify("이상일은 19일입니다 [R1].", r).ok
+
+
+def test_korean_month_day_checked_as_date():
+    assert verify("1월 29일 방문인구는 1,353.5명이었습니다 [R1].", R).ok
+    assert not verify("1월 28일 방문인구는 1,353.5명이었습니다 [R1].", R).ok
+
+
+def test_integer_tolerance_is_rounding_only():
+    r = {"R1": ToolResult("R1", "detect_anomalies", {}, {"threshold": 3.5, "count": 1}, ["허브"])}
+    assert verify("이상 구간은 1개입니다 [R1].", r).ok
+    assert not verify("이상 구간은 3개입니다 [R1].", r).ok
+
+
+def test_decimal_written_number_uses_decimal_tolerance():
+    r = {"R2": ToolResult("R2", "find_co_movements", {}, {"co_movements": [{"z": 7.24}]}, ["허브"])}
+    assert verify("점수 7.24입니다 [R2].", r).ok
+    assert not verify("점수 7.0입니다 [R2].", r).ok

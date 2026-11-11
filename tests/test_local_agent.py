@@ -118,3 +118,13 @@ def test_snippet_drops_markdown_table_syntax():
     from app.agent.local import _snippet
     s = _snippet("| 질문 | 공식 답변 | |---|---| | 원본을 외부 LLM에 | **불가** (10/30) |")
     assert "|" not in s and "---" not in s and "**" not in s and "불가 (10/30)" in s
+
+
+def test_rule_rescues_in_scope_question_model_called_other():
+    intent, _, backend = route("버스 데이터 출처가 어디야", http=FakeHTTP("other"))
+    assert intent == "docs" and backend.endswith("+rule")
+
+
+def test_model_other_kept_when_rule_agrees():
+    intent, prob, backend = route("점심 메뉴 추천해줘", http=FakeHTTP("other"))
+    assert (intent, backend) == ("other", "tev1:4b") and prob == 0.9

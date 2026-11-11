@@ -78,3 +78,12 @@ def test_no_anomaly_sentence_states_checked_period():
                                                            "count": 0, "anomalies": [], "episodes": [], "episode_count": 0}, ["허브 583"])}
     text = template_text(res)
     assert "2024-04-21~2024-05-19" in text and verify(text, res).ok
+
+
+def test_template_for_decrease_passes_verifier():
+    res = {"R1": ToolResult("R1", "detect_anomalies", {}, {"signal": "와이파이", "emd": "제주시 연동", "start": None, "end": None, "count": 1,
+                                                           "episode_count": 1, "anomalies": [{"date": "2025-01-14", "value": 492.0, "expected": 950.0, "pct": -48.2, "score": -4.1, "direction": "down"}],
+                                                           "episodes": [{"start": "2025-01-14", "end": "2025-01-14", "days": 1, "kind": "일시 급변", "direction": "down",
+                                                                         "peak_date": "2025-01-14", "peak_pct": -48.2, "peak_value": 492.0, "peak_expected": 950.0, "peak_score": -4.1}]}, ["허브"])}
+    text = template_text(res)
+    assert "적었" in text and verify(text, res).ok, verify(text, res).errors
