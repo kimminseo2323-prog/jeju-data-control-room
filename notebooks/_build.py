@@ -170,6 +170,102 @@ ax.legend(); plt.tight_layout()"""),
 ]
 
 
+NOTEBOOKS["05_원인근거_로컬에이전트"] = [
+    ("md", """# 05. 원인 근거 보강과 로컬 에이전트(질문하기)
+**목적**
+1. '판단 불가'가 많던 여러 날 연속 증가(지속 변화)에 쓸 **근거**를 데이터에서 찾는다
+2. 판정 모델(tev1)에 근거를 **어떤 형태로** 넘겨야 하는지 실험한다
+3. 외부 LLM 없이 질문에 답하는 **로컬 에이전트**를 만들고, 질문 분류 성능을 평가한다
+
+모든 계산은 `app/` 모듈을 그대로 부른다. 판정 모델은 이 PC의 Ollama(`127.0.0.1:11500`)에서 돈다."""),
+    ("code", SETUP + """
+from app.store.cache import CacheStore
+from app.agent.tools import Toolbox
+st = CacheStore("data/cache"); tb = Toolbox(st, None)
+print("유동인구 기간:", st.island_series("유동인구").dropna().index.min().date(), "~", st.island_series("유동인구").dropna().index.max().date())"""),
+    ("md", """## 1. 근거 후보 ① 월별 입도객 — 성수기·비수기 표시
+방문목적별 입도객(허브 580)을 월 합계로 만들고, 주변 12개월 평균보다 ±5% 이상이면 성수기/비수기로 표시한다(본 서비스 임의 기준)."""),
+    ("code", """from app.analytics.context import season_index, SEASON_PCT
+v = st.visitors
+tbl = pd.DataFrame({"입도객(만 명)": (v / 1e4).round(1), "주변 12개월 평균 대비(%)": [None if season_index(v, m) is None else round(season_index(v, m), 1) for m in v.index]})
+tbl["표시"] = tbl["주변 12개월 평균 대비(%)"].map(lambda x: "" if x is None or pd.isna(x) or abs(x) < SEASON_PCT else ("성수기" if x > 0 else "비수기"))
+tbl.index = tbl.index.strftime("%Y-%m"); tbl"""),
+    ("md", """**읽은 것**: 2024년 7월은 +1.7%로 성수기 기준에 못 미친다. 7월 말 급증은 **한 달 안에서** 일어난 변화라 월 합계로는 보이지 않는다.
+허브 데이터 목록에서 일별 입도객을 찾아봤지만 없었다(2026-11-11 확인) → 다른 일 단위 근거가 필요하다."""),
+    ("md", """## 2. 근거 후보 ② 제주 전체 합계 — 이 지역만의 변화인가, 섬 전체의 흐름인가
+43개 읍면동을 더한 '제주 전체' 시계열에도 같은 탐지 방법을 적용한다."""),
+    ("code", """from app.analytics.detect import score_series
+tot = st.island_series("유동인구"); _, ex, z = score_series(tot, "seasonal_z")
+fig, ax = plt.subplots(figsize=(10, 3.2))
+ax.plot(tot.index, tot / 1e4, color="#1F3A5F", label="제주 전체 유동인구(만 명)"); ax.plot(ex.index, ex / 1e4, ":", color="#9AA5B1", label="기대값")
+hit = z[z >= 3].dropna(); ax.scatter(hit.index, tot.reindex(hit.index) / 1e4, color="#B5473A", zorder=3, label="점수 3 이상")
+ax.legend(); plt.tight_layout()
+pd.DataFrame({"제주 전체": tot, "기대값": ex.round(0), "점수": z.round(2)}).loc["2024-07-24":"2024-08-02"]"""),
+    ("md", """**읽은 것**: 7월 말에는 섬 전체 유동인구도 크게 늘었다 → 해변 지역의 증가는 '섬 전체 관광 수요 증가'와 함께 움직인 것으로 볼 수 있다.
+→ `find_co_movements` 도구가 같은 읍면동의 다른 신호와 함께 **제주 전체 합계**도 확인하도록 바꿨다."""),
+    ("md", """## 3. 판정 모델에 근거를 넘기는 형태 실험 (이호동 7월 말 사례)
+같은 근거를 ① JSON 그대로 ② 한국어 문장 ③ 영어 문장으로 넘겨 비교한다."""),
+    ("code", """import json, requests
+from app.llm.judge import CAUSES, CAUSE_KO, evidence_text
+ev = {"anomaly": {"emd": "제주시 이호동", "signal": "유동인구", "date": "2024-07-28", "pct": 103.8, "kind": "지속 변화", "days": 4},
+      "context": [], "co_movements": [{"signal": "제주 전체 유동인구", "date": "2024-07-29", "z": 4.83, "direction": "up"}]}
+en = ("Anomaly: domestic visitor population in Iho-dong (Jeju City) was above its normal same-weekday level for 4 consecutive days, "
+      "peaking at +103.8% vs expected.\\nEvidence 1 (co-movement): the island-wide total visitor population of Jeju also rose sharply (z=4.83, up); "
+      "this is not local.\\nEvidence 2 (context): no severe weather, no public holiday, no registered event.")
+def ask(state):
+    body = {"model": "tev1:4b", "state": state, "questions": {"cause": {"type": "choice",
+            "instructions": "Which listed cause best explains this anomaly in Jeju tourism/transport data? Judge only from the given evidence.", "criteria": CAUSES}}}
+    a = requests.post("http://127.0.0.1:11500/v1/systemone", json=body, timeout=120).json()["answers"]["cause"]
+    return CAUSE_KO[a["choice"]], round(a["probabilities"][a["choice"]], 2), round(a["probabilities"].get("tourism_demand", 0), 2)
+print(evidence_text(ev))
+pd.DataFrame([("① JSON", *ask(json.dumps(ev, ensure_ascii=False))), ("② 한국어 문장(채택)", *ask(evidence_text(ev))), ("③ 영어 문장", *ask(en))],
+             columns=["입력 형태", "판정", "판정 확률", "'관광 수요 변화' 확률"])"""),
+    ("md", """**읽은 것**: JSON을 그대로 넘기면 '제주 전체'라는 근거의 뜻을 놓치고 '판단 불가'로 답한다. 문장으로 풀어 주면 '관광 수요 변화'로 판정한다.
+사전 실험(노트북 03)은 처음부터 문장형으로 했으므로, **실제 판정 경로도 문장형(`evidence_text`)으로 맞췄다**. 영어가 약간 더 높지만 근거 원문(기상·행사 이름)이 한국어라 한국어 문장을 채택했다."""),
+    ("md", "## 4. 실제 이상 구간 상위 15개: 규칙 기반 vs tev1 판정"),
+    ("code", """from app.analytics.detect import detect_anomalies, group_episodes
+from app.llm.judge import judge_cause, rule_judge
+eps = sorted(((abs(e.peak.score), emd, e) for emd in st.regions("유동인구")
+              for e in group_episodes(detect_anomalies(st.series("유동인구", emd), threshold=3.5))), key=lambda x: -x[0])[:15]
+rows = []
+for _, emd, e in eps:
+    day = str(e.peak.date.date())
+    co = tb.dispatch("find_co_movements", {"date": day, "emd": emd, "window": 1, "exclude_signal": "유동인구"}, "R2").data["co_movements"]
+    cx = tb.dispatch("check_context", {"date": day, "emd": emd}, "R3").data["items"]
+    evd = {"anomaly": {"emd": emd, "signal": "유동인구", "date": day, "pct": round(e.peak.pct * 100, 1), "kind": e.kind, "days": e.days}, "context": cx, "co_movements": co}
+    j = judge_cause(evd)
+    rows.append({"읍면동": emd, "구간": f"{e.start.date()}~{e.end.date()}", "유형": e.kind, "기대 대비(%)": round(e.peak.pct * 100), "맥락": ", ".join(c["kind"] for c in cx),
+                 "동반 변화": ", ".join(c["signal"] for c in co), "규칙": CAUSE_KO[rule_judge(evd).choice], "tev1:4b": CAUSE_KO[j.choice], "확률": round(j.probabilities.get(j.choice, 0), 2)})
+cmp = pd.DataFrame(rows); print("규칙과 tev1 일치:", (cmp["규칙"] == cmp["tev1:4b"]).sum(), "/", len(cmp)); cmp"""),
+    ("md", """**읽은 것**
+- 추석 연휴(2024-09-14~18) 구간은 공휴일 근거가 있어 '공휴일·연휴', 7월 말 해변 지역은 제주 전체 동반 증가 근거로 '관광 수요 변화'로 판정된다
+- 근거가 없는 하루짜리 급변(일도1동 5/31)은 '판단 불가'(약 0.95) — 근거 없이 원인을 지어내지 않는다
+- 이 표에서는 규칙과 tev1이 모두 같았다. 둘이 갈리는 사례와 정답 기준 평가는 가짜 이상 주입 평가(노트북 06 예정)에서 다룬다"""),
+    ("md", """## 5. 로컬 에이전트(질문하기 탭)
+질문 분류는 tev1, 지역·날짜·신호는 규칙으로 추출, 계산은 정해진 도구 흐름, 답변 숫자는 검증기를 통과해야만 표시된다(외부 LLM 없음)."""),
+    ("code", """from app.agent.local import answer, INTENT_KO
+from app.rag.corpus import load_corpus
+from app.rag.index import build_index
+tba = Toolbox(st, build_index(load_corpus(ROOT)))
+for q in ["7월에 유동인구가 이상하게 많았던 곳 알려줘", "이호동 7월 28일에 사람이 왜 이렇게 많았어?", "반출 가능한 결과물 기준이 뭐야?", "오늘 점심 메뉴 추천해줘"]:
+    r = answer(q, tba)
+    print(f"Q. {q}\\n   분류={INTENT_KO[r.intent]} ({r.router}) · 검증={'통과' if r.verified else '미통과'} · 도구 {[x.tool for x in r.results.values()]}")
+    print("   " + r.final_text.replace("\\n", "\\n   ")[:700], "\\n")"""),
+    ("md", """## 6. 질문 분류 평가 (`python -m eval.intent_probe`)
+- 설계용 24문항: 결합 방식을 정할 때 본 질문
+- **평가 전용 12문항**: 결합 방식을 정하기 *전에* 따로 적어 커밋해 둔 질문(설계에 쓰지 않음)"""),
+    ("code", """res = {m: json.load(open(f"eval/results/intent_probe_{m.replace(':', '_')}.json", encoding="utf-8")) for m in ["tev1:4b", "tev1:0.8b"]}
+pd.DataFrame([{"모델": m, "세트": k, "문항": r["summary"][k]["n"], "키워드 규칙": r["summary"][k]["rule_accuracy"],
+               "모델 단독": r["summary"][k]["model_accuracy"], "모델+규칙 보완": r["summary"][k]["hybrid_accuracy"], "응답(초, 중앙값)": r["summary"][k]["sec_median"]}
+              for m, r in res.items() for k in ["design", "heldout"]])"""),
+    ("md", """**읽은 것**
+- 키워드 규칙은 설계용 질문에서 92%였지만 **처음 보는 질문에서 33%** — 내가 쓴 질문에 맞춰진 규칙은 일반화되지 않는다
+- **tev1:4b는 처음 보는 질문에서도 83%** (0.8b는 58%) → 질문 분류는 4B 모델에 맡기고, 연결이 안 될 때만 규칙을 쓴다
+- 모델+규칙 보완은 평가 전용 세트에서 모델 단독과 같았다(이득·손해 없음)
+- 한계: 문항 수가 적고(36개) 질문을 내가 썼다 → 실제 사용자 질문으로 재평가 필요"""),
+]
+
+
 def build(name: str, cells: list[tuple[str, str]]) -> Path:
     nb = nbformat.v4.new_notebook()
     nb.metadata["kernelspec"] = {"name": "jeju-venv", "display_name": "Python (jeju venv)", "language": "python"}
