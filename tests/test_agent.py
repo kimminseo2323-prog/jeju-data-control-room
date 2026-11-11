@@ -164,3 +164,61 @@ def test_island_total_excludes_the_region_itself():
     tb = Toolbox(MemoryStore(series={("와이파이", "제주시 이호동"): a, ("와이파이", "제주시 연동"): b}), index=None)
     r = tb.dispatch("find_co_movements", {"date": str(day.date()), "emd": "제주시 이호동"}, "R1")
     assert [m["signal"] for m in r.data["co_movements"]] == ["와이파이"]   # 자기 신호만, 제주 전체는 아님
+
+
+def test_neighbors_moving_together_are_reported():
+    """주변 읍면동도 같은 날 함께 늘면 '인근 읍면동' 동반 변화로 보고한다(국지 행사 vs 광역 흐름 구분 근거)."""
+    a, b, c, far = (weekly_series(seed=k) for k in (1, 2, 3, 4))
+    day = a.index[70]
+    for s in (a, b, c):
+        s[day] += 400
+    store = MemoryStore(series={("유동인구", "제주시 이호동"): a, ("유동인구", "제주시 도두동"): b,
+                                ("유동인구", "제주시 외도동"): c, ("유동인구", "서귀포시 성산읍"): far},
+                        neighbors={"제주시 이호동": ["제주시 도두동", "제주시 외도동"]})
+    r = Toolbox(store, index=None).dispatch("find_co_movements", {"date": str(day.date()), "emd": "제주시 이호동",
+                                                                  "exclude_signal": "유동인구"}, "R1")
+    sigs = [m["signal"] for m in r.data["co_movements"]]
+    assert "인근 읍면동 유동인구" in sigs
+    assert r.data["neighbors"] == ["제주시 도두동", "제주시 외도동"]
+
+
+def test_neighbors_quiet_when_only_the_region_moves():
+    a, b, c = (weekly_series(seed=k) for k in (1, 2, 3))
+    day = a.index[70]
+    a[day] += 400
+    store = MemoryStore(series={("유동인구", "제주시 이호동"): a, ("유동인구", "제주시 도두동"): b, ("유동인구", "제주시 외도동"): c},
+                        neighbors={"제주시 이호동": ["제주시 도두동", "제주시 외도동"]})
+    r = Toolbox(store, index=None).dispatch("find_co_movements", {"date": str(day.date()), "emd": "제주시 이호동",
+                                                                  "exclude_signal": "유동인구"}, "R1")
+    assert "인근 읍면동 유동인구" not in [m["signal"] for m in r.data["co_movements"]]
+
+
+def test_same_week_last_year_anomaly_is_context():
+    """작년 같은 주(52주 전 ±3일)에도 같은 방향 이상이 있었으면 '매년 반복' 맥락으로 알려 준다."""
+    idx = pd.date_range("2024-01-01", periods=600, freq="D")
+    s = weekly_series(days=600, seed=3)
+    s.index = idx
+    last, now = pd.Timestamp("2024-07-28"), pd.Timestamp("2025-07-27")   # 364일 차이(같은 요일)
+    s[last] += 600
+    s[now] += 600
+    tb = Toolbox(MemoryStore(series={("유동인구", "제주시 이호동"): s}), index=None)
+    r = tb.dispatch("check_context", {"date": "2025-07-27", "emd": "제주시 이호동", "signal": "유동인구"}, "R1")
+    rec = [i for i in r.data["items"] if i["kind"] == "recurrence"]
+    assert rec and "2024-07-28" in rec[0]["detail"] and "작년" in rec[0]["detail"]
+
+
+def test_no_recurrence_item_without_last_year_data():
+    tb, day = make_toolbox()   # 데이터가 1년 미만
+    r = tb.dispatch("check_context", {"date": str(day.date()), "emd": "서귀포시 성산읍", "signal": "유동인구"}, "R1")
+    assert not [i for i in r.data["items"] if i["kind"] == "recurrence"]
+
+
+def test_context_outside_source_period_is_marked_not_covered():
+    """기상 자료가 끝난 뒤의 날짜는 '기상 특이사항 없음'이 아니라 '확인 불가'여야 한다(허브 기상은 2025-03까지)."""
+    store = MemoryStore(series={}, coverage={"weather": (pd.Timestamp("2024-04-01"), pd.Timestamp("2025-03-30")),
+                                             "event": (pd.Timestamp("2012-07-18"), pd.Timestamp("2025-03-22"))})
+    tb = Toolbox(store, index=None)
+    late = tb.dispatch("check_context", {"date": "2025-08-02", "emd": "제주시 이호동"}, "R1")
+    early = tb.dispatch("check_context", {"date": "2024-08-02", "emd": "제주시 이호동"}, "R2")
+    assert late.data["not_covered"] == ["weather", "event"]
+    assert early.data["not_covered"] == []

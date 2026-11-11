@@ -18,7 +18,7 @@ from app.agent.loop import AgentRun
 from app.agent.tools import Toolbox
 from app.agent.verify import verify
 from app.analytics.detect import group_episodes, score_series, detect_anomalies
-from app.llm.judge import CAUSE_KO, evidence_text, judge_cause, model_status
+from app.llm.judge import CAUSE_KO, NOT_COVERED_KO, evidence_text, judge_cause, model_status
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
 from app.report.briefing import ResultStore, markdown_safe, render_briefing, template_text
@@ -150,7 +150,7 @@ with tab_detail:
             ("detect_anomalies", {"signal": signal, "emd": emd, "method": method, "threshold": threshold,
                                   "start": str((day - pd.Timedelta(days=14)).date()), "end": str((day + pd.Timedelta(days=14)).date())}),
             ("find_co_movements", {"date": str(day.date()), "emd": emd, "window": 1, "exclude_signal": signal}),
-            ("check_context", {"date": str(day.date()), "emd": emd}),
+            ("check_context", {"date": str(day.date()), "emd": emd, "signal": signal}),
         ], 1):
             res[f"R{i}"] = tb.dispatch(name, args, f"R{i}")
 
@@ -158,8 +158,12 @@ with tab_detail:
         with left:
             st.markdown("#### 같은 날 맥락")
             items = res["R3"].data["items"]
-            st.write("\n".join(f"- {it['detail']}" for it in items) if items else "- 기상·공휴일·행사·성수기 기록 없음")
-            st.markdown("#### 다른 신호·제주 전체 동반 변화")
+            not_covered = res["R3"].data.get("not_covered", [])
+            lines = [f"- {it['detail']}" for it in items] or ["- 기상·공휴일·행사·성수기 기록 없음"]
+            if not_covered:
+                lines.append(f"- {'·'.join(NOT_COVERED_KO.get(k, k) for k in not_covered)}: 이 날짜는 자료 제공 기간 밖이라 확인하지 못함")
+            st.write("\n".join(lines))
+            st.markdown("#### 다른 신호·제주 전체·인근 읍면동 동반 변화")
             co = res["R2"].data["co_movements"]
             st.write("\n".join(f"- {c['signal']} {c['date']} 점수 {c['z']}" for c in co) if co else
                      f"- 확인한 신호({', '.join(res['R2'].data['checked'])}) 중 동반 변화 없음")
@@ -167,7 +171,7 @@ with tab_detail:
             st.markdown("#### 원인 후보 판정")
             evidence = {"anomaly": {"emd": emd, "signal": signal, "date": str(day.date()), "pct": float(row["기대 대비(%)"]),
                                     "kind": row["유형"], "days": int(row["일수"])},
-                        "context": items, "co_movements": co}
+                        "context": items, "co_movements": co, "not_covered": not_covered}
             with st.expander("판정 모델에 넘긴 근거(이 내용만 보고 판단)"):
                 st.text(evidence_text(evidence))
             if st.button("원인 판정 실행", type="primary"):

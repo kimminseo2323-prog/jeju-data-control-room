@@ -114,3 +114,15 @@ def test_markdown_safe_keeps_date_ranges_from_strikethrough():
     out = markdown_safe("2024-07-26~2024-07-29(지속 변화) [R1].\n2024-07-31~2024-08-02(지속 변화) [R1].")
     assert "~" not in out.replace("\~", "")
     assert out.count("  \n") == 1   # 줄바꿈 유지
+
+
+def test_template_says_context_not_checked_outside_source_period():
+    from app.agent.tools import ToolResult
+    from app.agent.verify import verify
+    from app.report.briefing import template_text
+    res = {"R1": ToolResult("R1", "detect_anomalies", {}, {"signal": "유동인구", "emd": "제주시 이호동", "count": 1, "anomalies": [
+               {"date": "2025-08-02", "value": 150.0, "expected": 100.0, "pct": 50.0, "score": 5.0, "direction": "up"}]}),
+           "R2": ToolResult("R2", "check_context", {}, {"date": "2025-08-02", "emd": "제주시 이호동", "items": [], "not_covered": ["weather", "event"]})}
+    text = template_text(res)
+    assert "기상·축제·행사 자료 제공 기간 밖이라 확인하지 못했습니다 [R2]" in text
+    assert verify(text, res).ok

@@ -149,3 +149,20 @@ def test_model_down_is_detected_within_a_second():
     assert len(h.timeouts) == 2
     for t in h.timeouts:
         assert isinstance(t, tuple) and t[0] <= 1 and t[1] >= 60
+
+
+def test_evidence_text_explains_neighbor_and_recurrence():
+    from app.llm.judge import evidence_text
+    t = evidence_text({"anomaly": {"emd": "제주시 이호동", "signal": "유동인구", "date": "2025-07-27", "pct": 80.0},
+                       "co_movements": [{"signal": "인근 읍면동 유동인구", "date": "2025-07-27", "z": 5.1, "direction": "up"}],
+                       "context": [{"kind": "recurrence", "detail": "작년 같은 시기(2024-07-28)에도 평소보다 많았음(점수 6.0)"}]})
+    assert "주변 지역도 함께" in t
+    assert "작년 같은 시기" in t
+
+
+def test_evidence_text_says_unknown_not_absent_outside_source_period():
+    from app.llm.judge import evidence_text
+    t = evidence_text({"anomaly": {"emd": "제주시 이호동", "signal": "유동인구", "date": "2025-08-02", "pct": 50.0},
+                       "co_movements": [], "context": [], "not_covered": ["weather", "event"]})
+    assert "기상 특이사항 없음" not in t and "지역이 확인된 행사 없음" not in t
+    assert "자료 제공 기간 밖" in t and "공휴일 없음" in t

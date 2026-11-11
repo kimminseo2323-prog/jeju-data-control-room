@@ -7,7 +7,7 @@ from typing import Any, Protocol
 
 import pandas as pd
 
-from app.analytics.context import check_context, find_co_movements
+from app.analytics.context import check_context, find_co_movements, recurrence
 from app.analytics.detect import detect_anomalies, group_episodes
 
 SIGNAL_SOURCES = {
@@ -39,9 +39,15 @@ class DataStore(Protocol):
 
 
 class MemoryStore:
-    def __init__(self, series: dict[tuple[str, str], pd.Series], weather=None, station_of_emd=None, events=None, visitors=None):
+    def __init__(self, series: dict[tuple[str, str], pd.Series], weather=None, station_of_emd=None, events=None, visitors=None,
+                 neighbors: dict[str, list[str]] | None = None, coverage: dict | None = None):
         self._series = series
         self.weather, self.station_of_emd, self.events, self.visitors = weather, station_of_emd, events, visitors
+        self._neighbors = neighbors or {}
+        self.coverage = coverage or {}
+
+    def neighbors(self, emd: str) -> list[str]:
+        return list(self._neighbors.get(emd, []))
 
     def signals(self) -> list[str]:
         return sorted({k[0] for k in self._series})
@@ -81,11 +87,11 @@ class Toolbox:
              "parameters": {"type": "object", "properties": {"signal": sig, "start": date, "end": date,
                             "method": {"type": "string", "enum": ["seasonal_z", "robust_resid"]}, "threshold": {"type": "number"},
                             "top": {"type": "integer"}}, "required": ["signal"]}},
-            {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호와 제주 전체 합계(이 읍면동 제외)도 함께 크게 움직였는지 확인한다.",
+            {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호, 제주 전체 합계(이 읍면동 제외), 인근 읍면동 합계(분석 중인 신호)도 함께 크게 움직였는지 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "window": {"type": "integer"},
                             "exclude_signal": {"type": "string", "description": "분석 중인 신호(자기 자신 제외)"}}, "required": ["date", "emd"]}},
-            {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부를 확인한다.",
-             "parameters": {"type": "object", "properties": {"date": date, "emd": emd}, "required": ["date", "emd"]}},
+            {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부, (신호를 주면) 작년 같은 시기에도 같은 방향 이상이 있었는지 확인한다.",
+             "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "signal": sig}, "required": ["date", "emd"]}},
             {"name": "search_docs", "description": "데이터 명세·API 문서·반출 기준·게시판 답변에서 관련 내용을 검색한다(출처 포함).",
              "parameters": {"type": "object", "properties": {"query": {"type": "string"}, "k": {"type": "integer"}}, "required": ["query"]}},
         ]
@@ -166,16 +172,41 @@ class Toolbox:
                 except ToolError:
                     pass
                 sigs[f"제주 전체 {name}"] = tot
+        # 인근 읍면동(가까운 곳) 합계: 분석 중인 신호가 주변에서도 함께 움직였는지 — 국지적 행사인지 광역 흐름인지 가르는 근거
+        nb = []
+        if exclude_signal and hasattr(self.store, "neighbors"):
+            parts = []
+            for other in self.store.neighbors(emd):
+                try:
+                    parts.append(self.store.series(exclude_signal, other))
+                    nb.append(other)
+                except ToolError:
+                    continue
+            if parts:
+                sigs[f"인근 읍면동 {exclude_signal}"] = pd.concat(parts, axis=1).sum(axis=1, min_count=1)
         moves = find_co_movements(pd.Timestamp(date), sigs, threshold=3.0, window=int(window))
         rows = [{"signal": m.signal, "date": str(m.date.date()), "z": round(m.z, 2), "direction": m.direction} for m in moves]
-        return {"date": date, "emd": emd, "checked": sorted(sigs), "co_movements": rows}, sorted({SIGNAL_SOURCES[k.removeprefix("제주 전체 ")] for k in sigs if k.removeprefix("제주 전체 ") in SIGNAL_SOURCES})
+        base = lambda k: k.removeprefix("제주 전체 ").removeprefix("인근 읍면동 ")
+        return ({"date": date, "emd": emd, "checked": sorted(sigs), "neighbors": nb, "co_movements": rows},
+                sorted({SIGNAL_SOURCES[base(k)] for k in sigs if base(k) in SIGNAL_SOURCES}))
 
-    def _t_check_context(self, date, emd):
+    def _t_check_context(self, date, emd, signal=None):
         items = check_context(pd.Timestamp(date), emd, weather=getattr(self.store, "weather", None),
                               station_of_emd=getattr(self.store, "station_of_emd", None), events=getattr(self.store, "events", None),
                               visitors=getattr(self.store, "visitors", None))
+        if signal:   # 작년 같은 시기에도 같은 방향 이상이 있었는가(매년 반복되는 변화인지)
+            try:
+                rec = recurrence(self.store.series(signal, emd), pd.Timestamp(date), signal)
+            except ToolError:
+                rec = None
+            if rec:
+                items.append(rec)
+        # 근거 자료의 제공 기간 밖이면 '없음'이 아니라 '확인 불가'(예: 허브 기상은 2025-03까지)
+        day = pd.Timestamp(date)
+        cov = getattr(self.store, "coverage", {}) or {}
+        not_covered = [k for k, (lo, hi) in cov.items() if not (lo <= day <= hi)]
         rows = [{"kind": i.kind, "detail": i.detail, **({"value": i.value} if i.value is not None else {})} for i in items]
-        return {"date": date, "emd": emd, "items": rows}, sorted({i.source for i in items})
+        return {"date": date, "emd": emd, "items": rows, "not_covered": not_covered}, sorted({i.source for i in items})
 
     def _t_search_docs(self, query, k=5):
         hits = self.index.search(query, k=int(k))

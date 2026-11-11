@@ -10,7 +10,7 @@ import pandas as pd
 
 from app.agent.tools import ToolError
 from app.analytics.series import to_daily
-from app.store.events import load_events
+from app.store.events import events_period, load_events
 from app.store.geo import assign_emd, haversine_m, normalize_emd
 
 SIGNALS = ["유동인구", "와이파이", "버스"]
@@ -27,6 +27,21 @@ class CacheStore:
         self.dir = Path(cache_dir)
         # 행사: 직접 주지 않으면 캐시 옆 data/manual의 761 CSV에서 '행사명에 지명이 명시된' 단기 행사만 읽는다
         self.events = events if events is not None else load_events(self.dir.parent / "manual" / EVENTS_CSV)
+        self._events_period = None if events is not None else events_period(self.dir.parent / "manual" / EVENTS_CSV)
+
+    @cached_property
+    def coverage(self) -> dict[str, tuple[pd.Timestamp, pd.Timestamp]]:
+        """맥락 근거 자료별 제공 기간. 이 기간 밖의 날짜는 '없음'이 아니라 '확인 불가'로 다룬다."""
+        out = {}
+        w = self.weather
+        if len(w):
+            out["weather"] = (w["date"].min(), w["date"].max())
+        if self._events_period:
+            out["event"] = self._events_period
+        v = self.visitors.dropna()
+        if len(v):
+            out["visitors"] = (v.index.min(), v.index.max() + pd.offsets.MonthEnd(0))
+        return out
 
     def _read(self, name: str) -> pd.DataFrame:
         p = self.dir / f"{name}.parquet"
@@ -61,17 +76,34 @@ class CacheStore:
         return g.reset_index()
 
     @cached_property
+    def centroids(self) -> pd.DataFrame:
+        """읍면동 대표 좌표 = 정류소 좌표 평균. 정류소가 없는 읍면동(우도면 등)은 와이파이 AP 좌표 평균으로 대신한다."""
+        if self.stations.empty:
+            return pd.DataFrame(columns=["lat", "lon"])
+        cent = self.stations.groupby("emd")[["lat", "lon"]].mean()
+        self.ap_groups
+        ap = getattr(self, "_ap_points", pd.DataFrame(columns=["lat", "lon", "emd"]))
+        extra = ap[~ap["emd"].isin(cent.index)].groupby("emd")[["lat", "lon"]].mean()
+        return pd.concat([cent, extra])
+
+    NEIGHBOR_K, NEIGHBOR_KM = 3, 15.0   # 가까운 3곳, 대표 좌표 사이 15km 이내(본 서비스 임의 기준, 읍면 지역이 넓어서)
+
+    def neighbors(self, emd: str) -> list[str]:
+        """대표 좌표가 가까운 읍면동(최대 NEIGHBOR_K곳, NEIGHBOR_KM 이내). 섬(우도·추자)처럼 멀면 빈 목록."""
+        cent = self.centroids
+        if emd not in cent.index:
+            return []
+        r = cent.loc[emd]
+        d = pd.Series(haversine_m(r["lat"], r["lon"], cent["lat"].to_numpy(float), cent["lon"].to_numpy(float)), index=cent.index).drop(emd)
+        return list(d[d <= self.NEIGHBOR_KM * 1000].nsmallest(self.NEIGHBOR_K).index)
+
+    @cached_property
     def station_of_emd(self) -> dict:
         ws = self._read("weather_stations")
         if ws.empty or self.stations.empty:
             return {}
         ws = ws.assign(lat=ws["latitude"].astype(float), lon=ws["longitude"].astype(float))
-        cent = self.stations.groupby("emd")[["lat", "lon"]].mean()
-        # 정류소가 없는 읍면동(우도면 등)은 와이파이 AP 좌표 중심으로 대신한다
-        self.ap_groups
-        ap = getattr(self, "_ap_points", pd.DataFrame(columns=["lat", "lon", "emd"]))
-        extra = ap[~ap["emd"].isin(cent.index)].groupby("emd")[["lat", "lon"]].mean()
-        cent = pd.concat([cent, extra])
+        cent = self.centroids
         out = {}
         for emd, r in cent.iterrows():
             d = haversine_m(r["lat"], r["lon"], ws["lat"].to_numpy(), ws["lon"].to_numpy())

@@ -48,3 +48,12 @@ def load_events(csv_path: Path | str) -> pd.DataFrame:
     ev = ev[(ev["end"] - ev["start"]).dt.days + 1 <= EVENT_MAX_DAYS]
     ev = ev.assign(emd=ev["name"].map(place_of)).dropna(subset=["emd"])
     return ev[COLUMNS].reset_index(drop=True)
+
+
+def events_period(csv_path: Path | str) -> tuple[pd.Timestamp, pd.Timestamp] | None:
+    """행사 파일이 다루는 기간(올라온 행사의 첫 시작일 ~ 마지막 시작일). 이 기간 밖은 '행사 없음'이 아니라 '확인 불가'."""
+    p = Path(csv_path)
+    if not p.exists():
+        return None
+    s = pd.to_datetime(pd.read_csv(p, encoding="cp949")["시작일"], errors="coerce").dropna()
+    return (s.min().normalize(), s.max().normalize()) if len(s) else None

@@ -107,3 +107,24 @@ def test_bus_usage_ids_differ_so_map_by_unambiguous_station_name(cache_dir):
     assert st.series("버스", "제주시 삼도1동")["2025-01-01"] == 30
     q = st.quality()["bus_usage"]   # 이용자 수 기준 비율(%)
     assert q == {"by_id": 0.0, "by_name": 40.0, "ambiguous_name": 50.0, "unmatched": 10.0}
+
+
+def test_neighbors_are_nearest_regions_within_distance(cache_dir):
+    """정류소·AP 좌표 중심이 가까운 읍면동. 너무 먼 곳(성산읍 ↔ 삼도1동 약 38km)은 이웃이 아니다."""
+    st = CacheStore(cache_dir)
+    assert st.neighbors("제주시 삼도1동") == ["제주시 이도2동"]
+    assert st.neighbors("서귀포시 성산읍") == []
+
+
+def test_coverage_periods_of_context_sources(cache_dir):
+    cov = CacheStore(cache_dir).coverage
+    assert cov["weather"] == (pd.Timestamp("2025-01-01"), pd.Timestamp("2025-01-01"))
+    assert "event" not in cov   # 행사 파일이 없으면 기간을 모른다(확인 불가로 표시하지 않음)
+
+
+def test_event_coverage_is_period_of_listed_events(cache_dir):
+    m = cache_dir.parent / "manual"
+    m.mkdir()
+    pd.DataFrame({"콘텐츠명": ["이호테우축제", "탐라문화제"], "시작일": ["2024-08-02", "2024-10-09"], "종료일": ["2024-08-04", "2024-10-13"],
+                  "시작시간": "", "종료시간": "", "요금": "", "주관": "", "주최": "", "후원": ""}).to_csv(m / "제주특별자치도주요행사정보.csv", index=False, encoding="cp949")
+    assert CacheStore(cache_dir).coverage["event"] == (pd.Timestamp("2024-08-02"), pd.Timestamp("2024-10-09"))

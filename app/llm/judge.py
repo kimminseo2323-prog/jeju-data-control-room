@@ -71,6 +71,7 @@ def _season_agrees(evidence: dict) -> bool:
 
 
 _MISSING = {"weather": "기상 특이사항 없음", "holiday": "공휴일 없음", "event": "지역이 확인된 행사 없음"}
+NOT_COVERED_KO = {"weather": "기상", "event": "축제·행사", "visitors": "입도객"}
 
 
 def evidence_text(evidence: dict) -> str:
@@ -86,6 +87,8 @@ def evidence_text(evidence: dict) -> str:
             line = f"동반 변화: {c['signal']}도 {c['date']}에 평소보다 크게 움직였다(점수 {c['z']}, {word})."
             if str(c["signal"]).startswith("제주 전체"):
                 line += " 즉 이 지역만의 변화가 아니라 섬 전체에서 함께 움직였다."
+            elif str(c["signal"]).startswith("인근 읍면동"):
+                line += " 즉 주변 지역도 함께 움직였다."
             lines.append(line)
     else:
         lines.append("동반 변화 없음: 확인한 다른 신호와 제주 전체 합계는 평소 수준이었다.")
@@ -93,9 +96,13 @@ def evidence_text(evidence: dict) -> str:
     for c in ctx:
         lines.append(f"맥락: {c['detail']}.")
     kinds = {c.get("kind") for c in ctx}
-    missing = [v for k, v in _MISSING.items() if k not in kinds]
+    not_covered = set(evidence.get("not_covered", []))
+    missing = [v for k, v in _MISSING.items() if k not in kinds and k not in not_covered]
     if missing:
         lines.append("맥락: " + ", ".join(missing) + ".")
+    unchecked = [NOT_COVERED_KO[k] for k in evidence.get("not_covered", []) if k in NOT_COVERED_KO]
+    if unchecked:
+        lines.append(f"확인 불가: 이 날짜는 {'·'.join(unchecked)} 자료 제공 기간 밖이라 확인하지 못했다(없다는 뜻이 아니다).")
     return "\n".join(lines)
 
 

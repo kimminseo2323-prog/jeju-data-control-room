@@ -183,9 +183,9 @@ def _explain(q, s: Slots, tb: Toolbox, judge, method, threshold) -> tuple[str, d
     ep = max(eps, key=lambda e: abs(e["peak_score"]))
     day = ep["peak_date"]
     r2, co = call("find_co_movements", {"date": day, "emd": s.emd, "window": 1, "exclude_signal": s.signal})
-    r3, cx = call("check_context", {"date": day, "emd": s.emd})
+    r3, cx = call("check_context", {"date": day, "emd": s.emd, "signal": s.signal})
     evidence = {"anomaly": {"emd": s.emd, "signal": s.signal, "date": day, "pct": ep["peak_pct"], "kind": ep["kind"], "days": ep["days"]},
-                "context": cx.data["items"], "co_movements": co.data["co_movements"]}
+                "context": cx.data["items"], "co_movements": co.data["co_movements"], "not_covered": cx.data.get("not_covered", [])}
     j = judge(evidence)
     r4 = f"R{len(call.results) + 1}"
     prob = round(j.probabilities.get(j.choice, 0) * 100, 1)

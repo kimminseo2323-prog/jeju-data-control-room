@@ -27,10 +27,35 @@ class CoMove:
 
 @dataclass(frozen=True)
 class ContextItem:
-    kind: str     # weather | holiday | event | visitors
+    kind: str     # weather | holiday | event | visitors | recurrence
     detail: str
     source: str
-    value: float | None = None   # visitors: 주변 12개월 평균 대비 %(+ 성수기, - 비수기)
+    value: float | None = None   # visitors: 주변 12개월 평균 대비 %(+ 성수기, - 비수기), recurrence: 작년 점수
+
+
+RECUR_DAYS, RECUR_WINDOW, RECUR_Z = 364, 3, 3.0   # 52주 전(같은 요일) ±3일, 점수 3 이상이면 '작년에도 이상'
+
+
+def recurrence(s: pd.Series, day: pd.Timestamp, signal: str = "", method: str = "seasonal_z") -> ContextItem | None:
+    """작년 같은 시기(52주 전 ±3일)에도 같은 방향의 이상이 있었는지. 매년 반복되는 행사·연휴·계절 변화의 근거.
+    올해 그날이 이상이 아니거나, 작년 자료가 없으면 None."""
+    scored = score_series(s, method)
+    if scored is None:
+        return None
+    _, _, z = scored
+    day = pd.Timestamp(day).normalize()
+    now = z.get(day)
+    if now is None or pd.isna(now) or abs(now) < RECUR_Z:
+        return None
+    centre = day - pd.Timedelta(days=RECUR_DAYS)
+    win = z.loc[centre - pd.Timedelta(days=RECUR_WINDOW): centre + pd.Timedelta(days=RECUR_WINDOW)].dropna()
+    same = win[(win.abs() >= RECUR_Z) & ((win > 0) == (now > 0))]
+    if same.empty:
+        return None
+    d = same.abs().idxmax()
+    word = "많았음" if now > 0 else "적었음"
+    return ContextItem("recurrence", f"작년 같은 시기({d:%Y-%m-%d})에도 {signal} 평소보다 {word}(점수 {float(same[d]):.2f}), 매년 반복되는 변화일 수 있음".replace("  ", " "),
+                       "같은 데이터의 1년 전 값(52주 전 같은 요일 ±3일)", round(float(same[d]), 2))
 
 
 def find_co_movements(day: pd.Timestamp, signals: dict[str, pd.Series], threshold: float = 3.0,
