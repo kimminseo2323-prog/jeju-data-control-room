@@ -71,3 +71,10 @@ def test_template_mentions_co_movements_with_citation():
     line = [l for l in text.splitlines() if "제주 전체 유동인구" in l]
     assert len(line) == 1 and "5.21" in line[0] and "[R3]" in line[0]
     assert verify(text, res).ok, verify(text, res).errors
+
+
+def test_no_anomaly_sentence_states_checked_period():
+    res = {"R1": ToolResult("R1", "detect_anomalies", {}, {"signal": "유동인구", "emd": "제주시 연동", "start": "2024-04-21", "end": "2024-05-19",
+                                                           "count": 0, "anomalies": [], "episodes": [], "episode_count": 0}, ["허브 583"])}
+    text = template_text(res)
+    assert "2024-04-21~2024-05-19" in text and verify(text, res).ok

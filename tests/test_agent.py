@@ -75,7 +75,7 @@ def test_max_steps_stops_loop():
 def test_tool_specs_cover_all_dispatchable_tools():
     tb, _ = make_toolbox()
     names = {t["name"] for t in tb.specs()}
-    assert names == {"get_series", "detect_anomalies", "find_co_movements", "check_context", "search_docs"}
+    assert names == {"get_series", "detect_anomalies", "scan_regions", "find_co_movements", "check_context", "search_docs"}
 
 
 def test_failed_verification_is_sent_back_and_revised():
@@ -138,3 +138,19 @@ def test_co_movements_include_island_wide_total():
     r = tb.dispatch("find_co_movements", {"date": str(day.date()), "emd": "제주시 이호동", "exclude_signal": "유동인구"}, "R1")
     assert [m["signal"] for m in r.data["co_movements"]] == ["제주 전체 유동인구"]
     assert "제주 전체 유동인구" in r.data["checked"]
+
+
+def test_scan_regions_ranks_episodes_across_regions():
+    a, b = weekly_series(seed=1), weekly_series(seed=2)
+    a[a.index[70]] += 600
+    b[b.index[90]] += 300
+    tb = Toolbox(MemoryStore(series={("유동인구", "제주시 이호동"): a, ("유동인구", "제주시 연동"): b}), index=None)
+    r = tb.dispatch("scan_regions", {"signal": "유동인구", "threshold": 3.5}, "R1")
+    assert r.data["checked"] == 2 and r.data["with_anomalies"] == 2
+    assert [e["emd"] for e in r.data["episodes"]][:2] == ["제주시 이호동", "제주시 연동"]
+
+
+def test_detect_output_records_requested_period():
+    tb, day = make_toolbox()
+    r = tb.dispatch("detect_anomalies", {"signal": "유동인구", "emd": "서귀포시 성산읍", "start": "2024-12-01", "end": "2024-12-20"}, "R1")
+    assert r.data["start"] == "2024-12-01" and r.data["end"] == "2024-12-20"

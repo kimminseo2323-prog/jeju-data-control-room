@@ -110,15 +110,28 @@ class CacheStore:
             return pd.Series(dtype=float)
         return to_daily(df[df["emd_full"].notna()], "baseDate", col)
 
+    @cached_property
+    def _daily(self) -> dict[str, pd.DataFrame]:
+        """신호별 날짜 × 읍면동 일 합계 표(한 번만 계산). 수집되지 않은 날은 NaN."""
+        out = {}
+        for sig, (df, col) in self._frames.items():
+            if df.empty:
+                continue
+            d = df[df["emd_full"].notna()]
+            dates = pd.to_datetime(d["baseDate"].astype(str), format="%Y%m%d")
+            vals = pd.to_numeric(d[col], errors="coerce")
+            wide = vals.groupby([dates, d["emd_full"]]).sum(min_count=1).unstack()
+            all_dates = pd.to_datetime(df["baseDate"].astype(str), format="%Y%m%d")
+            out[sig] = wide.reindex(pd.date_range(all_dates.min(), all_dates.max(), freq="D"))
+        return out
+
     def series(self, signal: str, emd: str) -> pd.Series:
-        df, col = self._frames.get(signal, (pd.DataFrame(), None))
-        if df.empty:
+        if signal not in self._daily:
             raise ToolError(f"no collected data for signal={signal!r}; available={self.signals()}")
-        if emd not in set(df["emd_full"].dropna()):
+        wide = self._daily[signal]
+        if emd not in wide.columns:
             raise ToolError(f"no data for signal={signal!r} emd={emd!r}")
-        dates = pd.to_datetime(df["baseDate"].astype(str), format="%Y%m%d")
-        return to_daily(df, "baseDate", col, filters={"emd_full": emd},
-                        start=str(dates.min().date()), end=str(dates.max().date()))
+        return wide[emd].astype(float).rename(None).rename_axis(None)
 
     def quality(self) -> dict:
         as_of = {}

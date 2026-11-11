@@ -43,3 +43,8 @@ def test_assertive_cause_wording_warns():
 
 def test_numbers_inside_place_names_are_ignored():
     assert verify("제주시 일도1동은 이상 신호가 없었습니다.", R).ok
+
+
+def test_comma_grouped_number_inside_cited_text_matches():
+    r = {"R1": ToolResult("R1", "search_docs", {}, {"passages": [{"text": "일일 쿼터 1,000건"}]}, ["허브"])}
+    assert verify("문서에 따르면 일일 쿼터는 1,000건입니다 [R1].", r).ok

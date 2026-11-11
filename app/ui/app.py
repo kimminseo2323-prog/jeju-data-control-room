@@ -13,6 +13,7 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
+from app.agent.local import INTENT_KO, answer
 from app.agent.loop import AgentRun
 from app.agent.tools import Toolbox
 from app.agent.verify import verify
@@ -35,6 +36,11 @@ def get_store() -> CacheStore:
 @st.cache_resource
 def get_index():
     return build_index(load_corpus(ROOT))
+
+
+@st.cache_resource
+def get_toolbox() -> Toolbox:
+    return Toolbox(get_store(), get_index())
 
 
 @st.cache_data(show_spinner="이상 신호 계산 중…")
@@ -89,7 +95,7 @@ c2.metric("읍면동", f"{len(z)}곳")
 c3.metric("이상 구간", f"{len(episodes)}개")
 c4.metric("지속 변화 구간", f"{int((episodes['유형'] == '지속 변화').sum()) if not episodes.empty else 0}개")
 
-tab_board, tab_detail, tab_quality = st.tabs(["관제판", "상세 분석·브리핑", "데이터 품질"])
+tab_board, tab_detail, tab_ask, tab_quality = st.tabs(["관제판", "상세 분석·브리핑", "질문하기", "데이터 품질"])
 
 with tab_board:
     if z.empty:
@@ -125,7 +131,7 @@ with tab_detail:
         fig.update_layout(height=320, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h"))
         st.plotly_chart(fig, use_container_width=True)
 
-        tb = Toolbox(store, get_index())
+        tb = get_toolbox()
         res = {}
         for i, (name, args) in enumerate([
             ("detect_anomalies", {"signal": signal, "emd": emd, "method": method, "threshold": threshold,
@@ -171,6 +177,39 @@ with tab_detail:
         st.text(text)
         html = render_briefing(run, generated_at=pd.Timestamp.now(), data_as_of=q["as_of"])
         st.download_button("브리핑 HTML 저장", html, file_name=f"briefing_{emd}_{row['최대일']}.html", mime="text/html")
+
+EXAMPLES = ["7월에 유동인구가 이상하게 많았던 곳 알려줘", "이호동 7월 28일에 사람이 왜 이렇게 많았어?",
+            "버스 데이터는 어디서 가져온 거야?", "반출 가능한 결과물 기준이 뭐야?"]
+
+with tab_ask:
+    st.markdown("#### 질문하기 — 외부 LLM 없이 이 PC 안에서 답합니다")
+    st.caption("질문 분류는 로컬 판단 모델(tev1), 지역·날짜 추출과 계산은 규칙·도구, 답변 숫자는 모두 계산 결과와 대조해 통과한 것만 보여 줍니다.")
+    cols = st.columns(len(EXAMPLES))
+    for c, ex in zip(cols, EXAMPLES):
+        if c.button(ex, use_container_width=True):
+            st.session_state["ask_q"] = ex
+    with st.form("ask"):
+        q_text = st.text_input("질문", key="ask_q", placeholder="예: 성산읍 1월 버스 이용이 왜 줄었어?")
+        sent = st.form_submit_button("질문 보내기", type="primary")
+    if sent and q_text.strip():
+        with st.spinner("도구 실행·검증 중…"):
+            st.session_state.setdefault("ask_hist", []).insert(0, answer(q_text.strip(), get_toolbox(), method=method, threshold=threshold))
+    for i, run in enumerate(st.session_state.get("ask_hist", [])[:5]):
+        with st.container(border=True):
+            s = run.slots
+            when = str(s.date.date()) if s.date is not None else (f"{s.start.date()}~{s.end.date()}" if s.start is not None else "전체 기간")
+            st.markdown(f"**Q. {run.question}**")
+            st.caption(f"질문 분류: {INTENT_KO[run.intent]} ({run.router}{f' {run.intent_prob:.0%}' if run.router != 'rule' else ''}) · "
+                       f"읍면동: {s.emd or '-'} · 신호: {s.signal} · 날짜/기간: {when}")
+            st.markdown(("✅ 검증 통과" if run.verified else "⚠️ 검증 미통과(답변 보류)"))
+            st.markdown(run.final_text.replace("\n", "  \n"))
+            if run.results:
+                with st.expander(f"근거: 도구 호출 {len(run.results)}건과 결과", expanded=False):
+                    for rid, r in run.results.items():
+                        st.markdown(f"**[{rid}] {r.tool}** · 출처: {', '.join(r.sources) or '-'}")
+                        st.json(r.data, expanded=False)
+            if run.verify_errors:
+                st.caption("검증 메시지: " + " / ".join(run.verify_errors[:3]))
 
 with tab_quality:
     st.markdown("#### 데이터 기준일")

@@ -36,9 +36,10 @@ def _sentences(text: str) -> list[str]:
 def _numbers_in(obj) -> list[float]:
     s = json.dumps(obj, ensure_ascii=False, default=str)
     out = []
-    for m in re.findall(r"(?<!\d)-?\d+(?:\.\d+)?", s):  # 날짜 2025-01-29 → 2025, 01, 29
+    # 날짜 2025-01-29 → 2025, 01, 29 / 문서 속 '1,000' 같은 천 단위 구분 숫자는 1000으로도 읽는다
+    for m in re.findall(r"(?<!\d)-?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?!\d)|(?<!\d)-?\d+(?:\.\d+)?", s):
         try:
-            out.append(float(m))
+            out.append(float(m.replace(",", "")))
         except ValueError:
             pass
     return out

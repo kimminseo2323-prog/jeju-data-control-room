@@ -24,7 +24,8 @@ def template_text(results: dict) -> str:
             continue
         d = r.data
         if not d["anomalies"]:
-            lines.append(f"{d['emd']} {d['signal']}에서 기준을 넘는 이상 신호는 없었습니다 [{rid}].")
+            period = f"{d['start']}~{d['end']} 동안 " if d.get("start") and d.get("end") else ""
+            lines.append(f"{d['emd']} {d['signal']}에서 {period}기준을 넘는 이상 신호는 없었습니다 [{rid}].")
             continue
         if d.get("episodes"):
             lines.append(f"{d['emd']} {d['signal']}에서 이상 구간 {d['episode_count']}개(이상일 {d['count']}일)가 확인됐습니다 [{rid}].")
