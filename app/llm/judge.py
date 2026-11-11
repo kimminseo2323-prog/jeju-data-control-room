@@ -98,6 +98,19 @@ def evidence_text(evidence: dict) -> str:
     return "\n".join(lines)
 
 
+def model_status(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL) -> tuple[bool, str]:
+    """판단 모델을 실제로 쓸 수 있는지: 그 주소가 Ollama이고 모델이 설치되어 있어야 '연결됨'."""
+    try:
+        r = http.get(f"{host}/api/tags", timeout=2)
+        r.raise_for_status()
+        names = {m.get("name") for m in r.json().get("models", [])}
+    except Exception:
+        return False, "연결 안 됨 → 규칙 기반 판정"
+    if model in names:
+        return True, f"연결됨 · {model} (로컬)"
+    return False, f"{model} 모델이 설치되지 않음(ollama pull {model}) → 규칙 기반 판정"
+
+
 def judge_cause(evidence: dict, http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL, timeout: int = 120) -> Judgment:
     body = {"model": model, "state": evidence_text(evidence), "questions": {"cause": {
         "type": "choice",

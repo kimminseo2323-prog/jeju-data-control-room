@@ -100,3 +100,30 @@ def test_default_host_is_standard_ollama_port_unless_configured(monkeypatch):
     assert importlib.reload(jm).DEFAULT_HOST == "http://127.0.0.1:11434"
     monkeypatch.setenv("JUDGE_HOST", "http://127.0.0.1:11500")
     assert importlib.reload(jm).DEFAULT_HOST == "http://127.0.0.1:11500"
+
+
+class TagsHTTP:
+    def __init__(self, payload=None, fail=False):
+        self.payload, self.fail = payload, fail
+
+    def get(self, url, timeout=None):
+        if self.fail:
+            raise ConnectionError("down")
+        payload = self.payload
+
+        class R:
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return payload
+        return R()
+
+
+def test_model_status_requires_the_model_to_be_installed():
+    from app.llm.judge import model_status
+    assert model_status(TagsHTTP({"models": [{"name": "tev1:4b"}, {"name": "qwen:7b"}]}), model="tev1:4b")[0] is True
+    ok, msg = model_status(TagsHTTP({"models": [{"name": "qwen:7b"}]}), model="tev1:4b")
+    assert ok is False and "tev1:4b" in msg
+    assert model_status(TagsHTTP({"version": "luna-shim-1"}), model="tev1:4b")[0] is False   # Ollama가 아닌 다른 프로그램
+    assert model_status(TagsHTTP(fail=True), model="tev1:4b")[0] is False

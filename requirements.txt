@@ -1,12 +1,13 @@
-# 실행에 필요한 패키지 (Python 3.12, 2026-11-11 이 PC에서 검증한 버전)
+# Runtime packages (Python 3.12). Versions verified on 2026-11-11.
+# Keep this file ASCII-only: pip reads it with the system code page (cp949 on Korean Windows).
 pandas==3.1.1
 numpy==2.5.4
-pyarrow==26.0.1          # 수집 데이터(parquet) 읽기
-openpyxl==3.1.5          # 데이터명세서(xlsx) 읽기 — 문서 검색용
-requests==2.34.2         # 허브 API, 로컬 판단 모델(Ollama) 호출
-python-dotenv==1.2.4     # .env 설정 읽기
-statsmodels==0.15.0      # STL 분해(탐지)
-holidays==0.108          # 대한민국 공휴일
-rank-bm25==0.2.2         # 문서 검색(BM25)
-plotly==7.1.0            # 화면 그래프
-streamlit==1.67.0        # 화면
+pyarrow==26.0.1          # parquet cache
+openpyxl==3.1.5          # data spec xlsx (document search)
+requests==2.34.2         # hub API, local judge model (Ollama)
+python-dotenv==1.2.4     # .env settings
+statsmodels==0.15.0      # STL decomposition (detection)
+holidays==0.108          # Korean public holidays
+rank-bm25==0.2.2         # document search (BM25)
+plotly==7.1.0            # charts
+streamlit==1.67.0        # web UI

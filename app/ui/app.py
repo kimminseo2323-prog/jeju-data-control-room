@@ -11,7 +11,6 @@ sys.path.insert(0, str(ROOT))
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import requests
 import streamlit as st
 
 from app.agent.local import INTENT_KO, answer
@@ -19,7 +18,7 @@ from app.agent.loop import AgentRun
 from app.agent.tools import Toolbox
 from app.agent.verify import verify
 from app.analytics.detect import group_episodes, score_series, detect_anomalies
-from app.llm.judge import CAUSE_KO, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause
+from app.llm.judge import CAUSE_KO, evidence_text, judge_cause, model_status
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
 from app.report.briefing import ResultStore, render_briefing, template_text
@@ -75,11 +74,7 @@ def scan(signal: str, method: str, threshold: float) -> tuple[pd.DataFrame, pd.D
 
 
 def judge_status() -> str:
-    try:
-        v = requests.get(f"{DEFAULT_HOST}/api/version", timeout=2).json()["version"]
-        return f"연결됨 · {DEFAULT_MODEL} (Ollama {v})"
-    except Exception:
-        return "연결 안 됨 → 규칙 기반 판정"
+    return model_status()[1]
 
 
 # ---------------- sidebar ----------------
@@ -123,10 +118,10 @@ with tab_board:
         fig = px.imshow(zc, aspect="auto", color_continuous_scale=[[0, "#2166AC"], [0.5, "#F7F7F7"], [1, "#B2182B"]],
                         zmin=-6, zmax=6, labels={"color": "점수"})
         fig.update_layout(height=max(420, 16 * len(zc)), margin=dict(l=0, r=0, t=10, b=0), xaxis_title=None, yaxis_title=None)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         st.caption("빨강 = 평소(같은 요일 기준선)보다 많음, 파랑 = 적음. 회색 빈칸 = 수집되지 않은 날(이상으로 보지 않음).")
         st.markdown("#### 이상 구간 (평소 변동폭 대비 점수가 큰 순)")
-        st.dataframe(episodes, use_container_width=True, hide_index=True, height=360)
+        st.dataframe(episodes, width="stretch", hide_index=True, height=360)
 
 with tab_detail:
     if episodes.empty:
@@ -147,7 +142,7 @@ with tab_detail:
         fig.add_vrect(x0=pd.Timestamp(row["시작"]) - pd.Timedelta(hours=12), x1=pd.Timestamp(row["끝"]) + pd.Timedelta(hours=12),
                       fillcolor=RED, opacity=0.08, line_width=0)
         fig.update_layout(height=320, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h"))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         tb = get_toolbox()
         res = {}
@@ -185,7 +180,7 @@ with tab_detail:
                     st.caption(j.note)
                 pr = pd.DataFrame({"원인": [CAUSE_KO[k] for k in j.probabilities], "확률": list(j.probabilities.values())}).sort_values("확률")
                 st.plotly_chart(px.bar(pr, x="확률", y="원인", orientation="h", height=240).update_layout(margin=dict(l=0, r=0, t=0, b=0)),
-                                use_container_width=True)
+                                width="stretch")
 
         st.markdown("#### 브리핑")
         text = template_text(res)
@@ -210,7 +205,7 @@ with tab_ask:
     st.caption("질문 분류는 로컬 판단 모델(tev1), 지역·날짜 추출과 계산은 규칙·도구, 답변 숫자는 모두 계산 결과와 대조해 통과한 것만 보여 줍니다.")
     cols = st.columns(len(EXAMPLES))
     for c, ex in zip(cols, EXAMPLES):
-        if c.button(ex, use_container_width=True):
+        if c.button(ex, width="stretch"):
             st.session_state["ask_q"] = ex
     with st.form("ask"):
         q_text = st.text_input("질문", key="ask_q", placeholder="예: 성산읍 1월 버스 이용이 왜 줄었어?")

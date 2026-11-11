@@ -1,4 +1,4 @@
-# 개발·평가용(센터 실행에는 필요 없음)
+# Development and evaluation only (not needed to run the app). ASCII-only.
 -r requirements.txt
 pytest==9.2.0
 nbformat==5.11.1
