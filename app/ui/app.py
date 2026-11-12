@@ -12,6 +12,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+from plotly.subplots import make_subplots
 
 from app.agent.local import INTENT_KO, answer
 from app.agent.loop import AgentRun
@@ -21,6 +22,7 @@ from app.analytics.detect import group_episodes, score_series, detect_anomalies
 from app.llm.judge import CAUSE_KO, NOT_COVERED_KO, evidence_text, judge_cause, model_status
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
+from app.report import board
 from app.report.briefing import ResultStore, markdown_safe, render_briefing, template_text
 from app.store.cache import CacheStore
 
@@ -105,30 +107,113 @@ st.markdown(f"## {signal} 이상 신호 관제판")
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("데이터 기준일", q["as_of"].get(signal, "-"))
 c2.metric("읍면동", f"{len(z)}곳")
-c3.metric("이상 구간", f"{len(episodes)}개")
-c4.metric("지속 변화 구간", f"{int((episodes['유형'] == '지속 변화').sum()) if not episodes.empty else 0}개")
+_cols = pd.DatetimeIndex(z.columns) if not z.empty else None
+c3.metric("분석 기간", f"{_cols.min():%Y-%m} ~ {_cols.max():%Y-%m}" if _cols is not None else "-")
+c4.metric("이상 구간(전체 기간)", f"{len(episodes)}개")
 
 tab_board, tab_detail, tab_ask, tab_quality = st.tabs(["관제판", "상세 분석·브리핑", "질문하기", "데이터 품질"])
+
+@st.cache_data(show_spinner=False)
+def cached_quick_cause(signal: str, emd: str, day: str, direction: str) -> dict:
+    return board.quick_cause(get_toolbox(), signal, emd, day, direction)
+
+
+def _pick_episode(i: int, label: str) -> None:
+    st.session_state["detail_pick"] = i
+    st.session_state["picked_msg"] = label
+
 
 with tab_board:
     if z.empty:
         st.info("이 신호는 아직 분석할 만큼 수집되지 않았습니다.")
     else:
-        zc = z.clip(-6, 6)
-        fig = px.imshow(zc, aspect="auto", color_continuous_scale=[[0, "#2166AC"], [0.5, "#F7F7F7"], [1, "#B2182B"]],
-                        zmin=-6, zmax=6, labels={"color": "점수"})
-        fig.update_layout(height=max(420, 16 * len(zc)), margin=dict(l=0, r=0, t=10, b=0), xaxis_title=None, yaxis_title=None)
-        st.plotly_chart(fig, width="stretch")
-        st.caption("빨강 = 평소(같은 요일 기준선)보다 많음, 파랑 = 적음. 회색 빈칸 = 수집되지 않은 날(이상으로 보지 않음).")
-        st.markdown("#### 이상 구간 (평소 변동폭 대비 점수가 큰 순)")
-        st.dataframe(episodes, width="stretch", hide_index=True, height=360)
+        cols = pd.DatetimeIndex(z.columns)
+        pc1, pc2 = st.columns([1, 3])
+        period = pc1.selectbox("기간", board.months(z) + ["전체 기간"], index=0, key="board_period")
+        start, end = (cols.min(), cols.max()) if period == "전체 기간" else board.month_bounds(period)
+        pc2.caption("기간을 고르면 그 기간에 무엇이(주요 이상 TOP 5), 어디서(지도), 언제(날짜별 이상 읍면동 수) 달라졌는지 보여 줍니다.")
+        pe = board.period_episodes(episodes, start, end)
+        counts = board.daily_alarm_counts(z, threshold, start, end)
+        regs = board.region_summary(z, threshold, start, end)
+        k1, k2, k3, k4 = st.columns(4)
+        k1.metric("이 기간 이상 구간", f"{len(pe)}개")
+        k2.metric("그중 지속 변화(3일 이상)", f"{int((pe['유형'] == '지속 변화').sum()) if not pe.empty else 0}개")
+        k3.metric("이상이 난 읍면동", f"{int((regs['alarm_days'] > 0).sum())}곳 / {len(regs)}곳")
+        k4.metric("이상 읍면동이 가장 많은 날", f"{counts.idxmax():%Y-%m-%d} ({int(counts.max())}곳)" if len(counts) and counts.max() > 0 else "-")
+        if st.session_state.get("picked_msg"):
+            st.success(f"'{st.session_state.pop('picked_msg')}' 구간을 상세 분석·브리핑 탭에 선택해 두었습니다. 위의 탭을 눌러 보세요.")
+
+        st.markdown("#### 이 기간 주요 이상 TOP 5")
+        st.caption("점수(평소 변동폭 대비 크기) 순. 원인 후보는 화면을 빨리 띄우려고 규칙으로 정한 '빠른 판정'입니다. "
+                   "판정 모델(tev1)의 판정과 검증된 브리핑은 '상세 보기'를 눌러 상세 분석 탭에서 확인하세요.")
+        if pe.empty:
+            st.info("이 기간에는 기준을 넘는 이상 구간이 없습니다.")
+        for rank, (i, r) in enumerate(pe.head(5).iterrows(), 1):
+            up = r["방향"] == "증가"
+            qc = cached_quick_cause(signal, r["읍면동"], str(r["최대일"]), "up" if up else "down")
+            span = str(r["시작"]) if r["시작"] == r["끝"] else f"{r['시작']}~{r['끝']}"
+            with st.container(border=True):
+                a, b, c, d = st.columns([2.3, 1.3, 4.6, 1.1])
+                a.markdown(f"**{rank}. {r['읍면동']}**  \n{markdown_safe(span)} · {r['유형']}")
+                b.markdown(f"<div style='color:{RED if up else '#2166AC'};font-size:1.35em;font-weight:700'>"
+                           f"{'+' if up else '−'}{abs(r['기대 대비(%)'])}%</div><small>기대값 대비 · 점수 {r['점수']}</small>",
+                           unsafe_allow_html=True)
+                c.markdown(f"**{qc['cause']}** <small>(빠른 판정)</small>  \n{markdown_safe(qc['reason'])}", unsafe_allow_html=True)
+                d.button("상세 보기", key=f"go_{i}", on_click=_pick_episode, args=(int(i), f"{r['읍면동']} {r['최대일']}"))
+
+        left, right = st.columns([2, 3])
+        with left:
+            st.markdown("#### 어디서")
+            m = regs.join(store.centroids, how="inner").copy()
+            far = m["lat"] > 33.7   # 추자면(본섬 북쪽 약 45km)은 본섬 북서쪽 위에 붙여 그린다(지도가 작아지지 않게)
+            main = m[~far]
+            m.loc[far, "lat"], m.loc[far, "lon"] = main["lat"].max() + 0.06, main["lon"].min() + 0.03
+            hit = m["alarm_days"] > 0
+            color = [("#B2182B" if v > 0 else "#2166AC") if h else "#C9D1D9" for v, h in zip(m["peak_z"], hit)]
+            size = [10 + 3 * min(abs(v), 10) if h else 7 for v, h in zip(m["peak_z"], hit)]
+            top = set(m[hit]["peak_z"].abs().nlargest(8).index)
+            fmap = go.Figure(go.Scatter(
+                x=m["lon"], y=m["lat"], mode="markers+text", marker=dict(color=color, size=size, line=dict(color="white", width=1)),
+                text=[(e.split(" ")[1] + ("↑" if f else "")) if (e in top or f) else "" for e, f in zip(m.index, far)],
+                textposition="top center", textfont=dict(size=11),
+                hovertext=[f"{e}<br>가장 큰 점수 {v:+.1f} · 이상일 {n}일" for e, v, n in zip(m.index, m["peak_z"], m["alarm_days"])],
+                hoverinfo="text"))
+            fmap.update_layout(height=380, margin=dict(l=0, r=0, t=10, b=0), plot_bgcolor="white", showlegend=False,
+                               xaxis=dict(visible=False), yaxis=dict(visible=False, scaleanchor="x", scaleratio=1.2))
+            st.plotly_chart(fmap, width="stretch")
+            st.caption("읍면동 위치(정류소·AP 좌표 평균). 빨강 = 평소보다 많았던 곳, 파랑 = 적었던 곳, 원이 클수록 변화가 큼, 회색 = 이상 없음. "
+                       "이름은 변화가 큰 8곳만 표시(나머지는 마우스를 올리면 보임). 추자면↑은 실제로 본섬 북쪽 약 45km.")
+        with right:
+            st.markdown("#### 언제")
+            isl = store.island_series(signal)
+            isl = isl[(isl.index >= start) & (isl.index <= end)]
+            ftr = make_subplots(specs=[[{"secondary_y": True}]])
+            ftr.add_bar(x=counts.index, y=counts.values, name="이상 읍면동 수", marker_color=TEAL, opacity=0.75)
+            ftr.add_scatter(x=isl.index, y=isl.values, name=f"제주 전체 {signal}", line=dict(color=NAVY, width=1.6), secondary_y=True)
+            ftr.update_layout(height=380, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h", y=1.08), bargap=0.1)
+            ftr.update_yaxes(title_text="이상 읍면동 수", secondary_y=False)
+            ftr.update_yaxes(title_text=f"제주 전체 {signal}", secondary_y=True, showgrid=False)
+            st.plotly_chart(ftr, width="stretch")
+            st.caption("막대 = 그날 평소와 크게 달랐던 읍면동 수(여러 곳이 함께 움직인 날은 연휴·성수기처럼 섬 전체 요인일 가능성이 큼), 선 = 제주 전체 합계.")
+
+        with st.expander("읍면동 × 날짜 점수 지도 (기준을 넘은 칸만 색칠)"):
+            w = z.loc[:, (cols >= start) & (cols <= end)]
+            wm = w.where(w.abs() >= threshold).clip(-8, 8)
+            fig = px.imshow(wm, aspect="auto", color_continuous_scale=[[0, "#2166AC"], [0.5, "#F7F7F7"], [1, "#B2182B"]],
+                            zmin=-8, zmax=8, labels={"color": "점수"})
+            fig.update_layout(height=max(420, 16 * len(wm)), margin=dict(l=0, r=0, t=10, b=0), xaxis_title=None, yaxis_title=None)
+            st.plotly_chart(fig, width="stretch")
+        with st.expander(f"이 기간 이상 구간 전체 목록 ({len(pe)}개)"):
+            st.dataframe(pe, width="stretch", hide_index=True, height=360)
 
 with tab_detail:
     if episodes.empty:
         st.info("선택할 이상 구간이 없습니다.")
     else:
         labels = [f"{r['읍면동']} · {r['최대일']} · {r['유형']} · {r['방향']} {abs(r['기대 대비(%)'])}%" for _, r in episodes.iterrows()]
-        pick = st.selectbox("이상 구간 선택", range(len(labels)), format_func=lambda i: labels[i])
+        if st.session_state.get("detail_pick", 0) >= len(labels):   # 신호·민감도를 바꿔 목록이 짧아진 경우
+            st.session_state["detail_pick"] = 0
+        pick = st.selectbox("이상 구간 선택", range(len(labels)), format_func=lambda i: labels[i], key="detail_pick")
         row = episodes.iloc[pick]
         emd, day = row["읍면동"], pd.Timestamp(row["최대일"])
 
