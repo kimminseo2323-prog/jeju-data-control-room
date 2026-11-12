@@ -99,7 +99,7 @@ with st.sidebar:
         st.rerun()
     if st.session_state.get("purged"):
         st.caption(f"저장한 브리핑 {st.session_state.pop('purged')}개를 삭제했습니다.")
-    st.caption(f"원인 판정 모델: {judge_status()}")
+    st.caption(f"판단 모델(보기 고르기 전용, 문장 생성 안 함): {judge_status()}")
 
 q = store.quality()
 z, episodes = scan(signal, method, threshold)
@@ -307,8 +307,10 @@ EXAMPLES = ["7월에 유동인구가 이상하게 많았던 곳 알려줘", "이
             "송산동 2024년 9월 29일에 외국인이 왜 많았어?", "반출 가능한 결과물 기준이 뭐야?"]
 
 with tab_ask:
-    st.markdown("#### 질문하기 — 외부 LLM 없이 이 PC 안에서 답합니다")
-    st.caption("질문 분류는 로컬 판단 모델(tev1), 지역·날짜 추출과 계산은 규칙·도구, 답변 숫자는 모두 계산 결과와 대조해 통과한 것만 보여 줍니다.")
+    st.markdown("#### 질문하기")
+    st.caption("답변 문장은 계산 결과를 정해진 틀에 넣어 만듭니다(글을 생성하는 AI는 쓰지 않습니다). "
+               "로컬 판단 모델 tev1은 질문 종류와 원인 후보를 보기 중에서 고르기만 하고, 그 확률을 함께 보여 줍니다. "
+               "지역·날짜 추출과 계산은 코드가 하고, 답변의 숫자는 계산 결과와 대조해 통과한 것만 보여 줍니다.")
     cols = st.columns(len(EXAMPLES))
     for c, ex in zip(cols, EXAMPLES):
         if c.button(ex, width="stretch"):

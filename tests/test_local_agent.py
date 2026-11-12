@@ -164,3 +164,13 @@ def test_yearless_date_means_most_recent_year_in_data():
     s = parse_slots("10월에 유동인구 이상한 곳", lo, hi)
     assert (s.start, s.end) == (pd.Timestamp("2025-10-01"), pd.Timestamp("2025-10-31"))   # 2026-10은 데이터 밖
     assert parse_slots("어린이날에 연동 왜 늘었어", lo, hi).date == pd.Timestamp("2026-05-05")
+
+
+def test_cause_sentence_says_who_chose_it():
+    """답변 문장은 템플릿이 만들고, 원인 후보를 고른 주체(판단 모델 tev1 / 규칙)를 밝힌다. 규칙일 때는 고정 확률을 보이지 않는다."""
+    from app.llm.judge import rule_judge
+    by_model = answer("이호동 12월 28일 유동인구가 왜 늘었어?", _toolbox(), http=FakeHTTP("explain"), judge=fake_judge)
+    by_rule = answer("이호동 12월 28일 유동인구가 왜 늘었어?", _toolbox(), http=FakeHTTP(None), judge=rule_judge)
+    assert "판단 모델(tev1)이 근거를 보고 고른 원인 후보" in by_model.final_text and "71.0%" in by_model.final_text
+    last = [l for l in by_rule.final_text.splitlines() if "원인 후보" in l][-1]
+    assert "규칙으로 고른 원인 후보" in last and "%" not in last and by_rule.verified, by_rule.verify_errors

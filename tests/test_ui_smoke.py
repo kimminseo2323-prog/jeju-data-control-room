@@ -12,7 +12,7 @@ def test_app_renders_all_tabs_without_exceptions():
     at = AppTest.from_file(str(ROOT / "app" / "ui" / "app.py"), default_timeout=180).run()
     assert not at.exception, [e.message for e in at.exception]
     assert [t.label.split(": ")[-1] for t in at.tabs] == ["관제판", "상세 분석·브리핑", "질문하기", "데이터 품질"]
-    assert any(c.value.startswith("원인 판정 모델:") for c in at.sidebar.caption)
+    assert any(c.value.startswith("판단 모델(보기 고르기 전용") for c in at.sidebar.caption)
 
 
 def test_switching_signal_after_using_board_does_not_crash():

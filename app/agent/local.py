@@ -206,7 +206,10 @@ def _explain(q, s: Slots, tb: Toolbox, judge, method, threshold) -> tuple[str, d
                                    "probabilities": {k: round(v * 100, 1) for k, v in j.probabilities.items()}},
                                   [f"로컬 판단 모델 {j.backend}" if j.backend != "rule" else "규칙 기반 판정(로컬 판단 모델 연결 실패)"])
     lines = [template_text(shown),
-             f"근거를 종합한 원인 후보는 '{CAUSE_KO[j.choice]}'(확률 {prob:.1f}%, 확신도 {j.level})입니다 [{r4}][{r2}][{r3}].",
+             # 문장은 템플릿이 만든다. 원인 후보를 고른 주체를 밝히고, 규칙일 때는 고정 확률(75%)을 보이지 않는다
+             (f"판단 모델({j.backend.split(':')[0]})이 근거를 보고 고른 원인 후보는 '{CAUSE_KO[j.choice]}'(확률 {prob:.1f}%, 확신도 {j.level})입니다 [{r4}][{r2}][{r3}]."
+              if j.backend != "rule" else
+              f"규칙으로 고른 원인 후보는 '{CAUSE_KO[j.choice]}'입니다(판단 모델 미연결, 확률 없음) [{r4}][{r2}][{r3}]."),
              "이는 상관에 기반한 후보이며 인과를 뜻하지 않습니다."]
     return "\n".join(lines), call.results
 
