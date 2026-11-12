@@ -33,7 +33,7 @@ def arrow(x1, y1, x2, y2, color=NAVY, text=None, dx=0, dy=1.0, ls="-"):
 
 
 # 사용자
-box(1, 49, 17, 9, "질문하기 탭", "\"이호동 7월 28일에 왜?\"", fc=SAND)
+box(1, 49, 17, 9, "질문하기 탭", "\"○○동 ○월 ○일에 왜?\"", fc=SAND)
 box(1, 33, 17, 9, "관제판·상세 분석", "이상 구간 클릭", fc=SAND)
 box(1, 3, 17, 10, "답변·브리핑", "숫자마다 근거 [R1]", fc=SAND)
 
@@ -55,18 +55,19 @@ arrow(X, 5.5, 18, 7, NAVY, "통과", dy=0.8)
 ax.text(21.5, 17, "실패 시\n답변 보류", ha="center", fontsize=7, color=RED)
 
 # 도구(오른쪽)
-tools = [("detect_anomalies", "이상일·구간 탐지"), ("scan_regions", "43개 읍면동 훑기"), ("find_co_movements", "다른 신호·제주 전체"),
-         ("check_context", "기상·공휴일·행사·입도객"), ("search_docs", "문서 검색(BM25)"), ("get_series", "시계열 조회")]
+tools = [("detect_anomalies", "이상일·구간 탐지"), ("scan_regions", "43개 읍면동 훑기"), ("find_co_movements", "다른 신호·제주 전체·인근"),
+         ("check_context", "기상·공휴일·행사·입도객·작년"), ("nationality_mix", "외국인 국적별 변화"),
+         ("search_docs", "문서 검색(BM25)"), ("get_series", "시계열 조회")]
 for i, (t, s) in enumerate(tools):
-    box(61, 53 - i * 6.3, 19, 4.8, t, s, ec=TEAL, tc=TEAL, fs=8)
+    box(61, 54 - i * 6.1, 19, 4.4, t, s, ec=TEAL, tc=TEAL, fs=8)
 arrow(X + Wd, 34, 61, 34, TEAL)
 
 # 데이터(오른쪽 끝)
-box(84, 33, 15, 25, "로컬 캐시", "허브 Open API\n수집본(parquet)\n유동인구·와이파이\n버스·기상·입도객\n정류소·AP 위치", fc=LT, ec=TEAL, tc=TEAL)
+box(84, 33, 15, 25, "로컬 캐시", "허브 Open API\n수집본(parquet)\n유동인구(내·외국인)\n와이파이·버스\n기상·입도객\n정류소·AP 위치", fc=LT, ec=TEAL, tc=TEAL)
 box(84, 14, 15, 15, "문서 색인", "데이터 명세서\n허브 API 문서\n반출 기준·게시판", fc=LT, ec=TEAL, tc=TEAL)
 box(62, 4, 36, 6, "Ollama (127.0.0.1:11434)", "tev1:4b · 없으면 규칙 기반으로 자동 대체", fc="white", ec=NAVY, tc=NAVY, fs=8.5)
 arrow(80, 45, 84, 45, TEAL)
-arrow(80, 22, 84, 22, TEAL)
+arrow(80, 25.5, 84, 25.5, TEAL)
 ax.text(80, 0.2, "외부 LLM·외부 서버로 데이터를 보내지 않음", ha="right", fontsize=7.2, color=RED)
 
 plt.savefig(OUT, bbox_inches="tight", facecolor="white")

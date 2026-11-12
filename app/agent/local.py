@@ -61,7 +61,8 @@ class LocalRun(AgentRun):
 
 # ---------------- 슬롯 ----------------
 def _year_for(month: int, day: int, lo: pd.Timestamp, hi: pd.Timestamp) -> int:
-    for y in range(lo.year, hi.year + 1):
+    """연도 없는 날짜는 데이터 기간 안의 가장 최근 해로 본다(2024-04~2026-08이면 '7월 28일' → 2026-07-28)."""
+    for y in range(hi.year, lo.year - 1, -1):
         try:
             if lo <= pd.Timestamp(y, month, day) <= hi:
                 return y
@@ -103,11 +104,11 @@ def parse_slots(q: str, lo: pd.Timestamp, hi: pd.Timestamp) -> Slots:
         part = {"초": (1, 10), "중순": (11, 20), "말": (21, last.day)}.get(m[3] or "")
         s.start, s.end = (first.replace(day=part[0]), first.replace(day=part[1])) if part else (first, last)
         return s
-    # 공휴일 이름(어린이날, 설날 등): 데이터 기간 안에서 가장 긴 이름이 맞는 첫 날짜
+    # 공휴일 이름(어린이날, 설날 등): 데이터 기간 안에서 가장 긴 이름이 맞는 날짜 중 가장 최근
     best = None
     for d, name in sorted(KR_HOLIDAYS.items()):
         ts = pd.Timestamp(d)
-        if lo <= ts <= hi and name in q and (best is None or len(name) > len(best[1])):
+        if lo <= ts <= hi and name in q and (best is None or len(name) >= len(best[1])):
             best = (ts, name)
     if best:
         s.date = best[0]

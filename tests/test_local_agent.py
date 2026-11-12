@@ -135,3 +135,12 @@ def test_parse_foreign_visitor_signal():
     lo, hi = pd.Timestamp("2024-04-01"), pd.Timestamp("2026-08-31")
     assert parse_slots("성산읍 외국인 관광객이 7월 28일에 왜 늘었어?", lo, hi).signal == "외국인"
     assert parse_slots("성산읍 7월 28일에 왜 사람이 많았어?", lo, hi).signal == "유동인구"
+
+
+def test_yearless_date_means_most_recent_year_in_data():
+    """데이터가 여러 해(2024-04~2026-08)면 연도 없는 '7월 28일'·'7월'·'어린이날'은 가장 최근 해로 본다."""
+    lo, hi = pd.Timestamp("2024-04-01"), pd.Timestamp("2026-08-31")
+    assert parse_slots("이호동 7월 28일에 왜 사람이 많았어?", lo, hi).date == pd.Timestamp("2026-07-28")
+    s = parse_slots("10월에 유동인구 이상한 곳", lo, hi)
+    assert (s.start, s.end) == (pd.Timestamp("2025-10-01"), pd.Timestamp("2025-10-31"))   # 2026-10은 데이터 밖
+    assert parse_slots("어린이날에 연동 왜 늘었어", lo, hi).date == pd.Timestamp("2026-05-05")

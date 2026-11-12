@@ -211,8 +211,8 @@ with tab_detail:
             b1.success(f"저장: {st.session_state['saved_msg']}")
         b2.download_button("내 PC로 내려받기(HTML)", html, file_name=f"briefing_{emd}_{row['최대일']}.html", mime="text/html")
 
-EXAMPLES = ["7월에 유동인구가 이상하게 많았던 곳 알려줘", "이호동 7월 28일에 사람이 왜 이렇게 많았어?",
-            "버스 데이터는 어디서 가져온 거야?", "반출 가능한 결과물 기준이 뭐야?"]
+EXAMPLES = ["7월에 유동인구가 이상하게 많았던 곳 알려줘", "이호동 2024년 7월 28일에 사람이 왜 이렇게 많았어?",
+            "송산동 2024년 9월 29일에 외국인이 왜 많았어?", "반출 가능한 결과물 기준이 뭐야?"]
 
 with tab_ask:
     st.markdown("#### 질문하기 — 외부 LLM 없이 이 PC 안에서 답합니다")
