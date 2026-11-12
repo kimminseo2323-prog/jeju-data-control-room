@@ -2,18 +2,18 @@
  "summary": {
   "tag": "gpu",
   "host": "http://127.0.0.1:11500",
-  "note": "개발 PC(i7-13700K) RTX 4070 Ti GPU 사용",
+  "note": "개발 PC(i7-13700K) RTX 4070 Ti GPU 사용, 분석 기간 2024-04~2026-08·신호 4종",
   "pin": null,
   "machine": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
-  "setup_s": 8.52,
-  "first_question_s": 7.98,
+  "setup_s": 8.51,
+  "first_question_s": 10.84,
   "median_total_s_by_kind": {
-   "explain": 0.64,
-   "scan": 0.7,
-   "docs": 0.3,
-   "other": 0.29
+   "explain": 1.04,
+   "scan": 0.66,
+   "docs": 0.48,
+   "other": 0.47
   },
-  "max_total_s_warm": 0.7,
+  "max_total_s_warm": 1.08,
   "all_model_backed": true
  },
  "rows": [
@@ -24,17 +24,17 @@
    "intent": "explain",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 7.98,
-   "model_s": 3.0,
-   "other_s": 4.98,
+   "total_s": 10.84,
+   "model_s": 0.36,
+   "other_s": 10.48,
    "model_calls": [
     {
      "what": "intent",
-     "s": 2.93
+     "s": 0.24
     },
     {
      "what": "cause",
-     "s": 0.07
+     "s": 0.12
     }
    ]
   },
@@ -45,30 +45,9 @@
    "intent": "explain",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.62,
-   "model_s": 0.12,
-   "other_s": 0.5,
-   "model_calls": [
-    {
-     "what": "intent",
-     "s": 0.05
-    },
-    {
-     "what": "cause",
-     "s": 0.07
-    }
-   ]
-  },
-  {
-   "round": 1,
-   "kind": "explain",
-   "question": "삼도1동 2025년 3월 29일에 사람이 왜 많았어?",
-   "intent": "explain",
-   "router": "tev1:4b",
-   "verified": true,
-   "total_s": 0.64,
-   "model_s": 0.14,
-   "other_s": 0.5,
+   "total_s": 1.03,
+   "model_s": 0.15,
+   "other_s": 0.88,
    "model_calls": [
     {
      "what": "intent",
@@ -82,14 +61,35 @@
   },
   {
    "round": 1,
+   "kind": "explain",
+   "question": "삼도1동 2025년 3월 29일에 사람이 왜 많았어?",
+   "intent": "explain",
+   "router": "tev1:4b",
+   "verified": true,
+   "total_s": 1.04,
+   "model_s": 0.15,
+   "other_s": 0.88,
+   "model_calls": [
+    {
+     "what": "intent",
+     "s": 0.05
+    },
+    {
+     "what": "cause",
+     "s": 0.1
+    }
+   ]
+  },
+  {
+   "round": 1,
    "kind": "scan",
    "question": "7월에 유동인구가 이상하게 많았던 곳 알려줘",
    "intent": "scan",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.7,
+   "total_s": 0.66,
    "model_s": 0.05,
-   "other_s": 0.65,
+   "other_s": 0.61,
    "model_calls": [
     {
      "what": "intent",
@@ -103,10 +103,10 @@
    "question": "버스 데이터는 어디서 가져온 거야?",
    "intent": "docs",
    "router": "tev1:4b",
-   "verified": true,
-   "total_s": 0.3,
+   "verified": false,
+   "total_s": 0.47,
    "model_s": 0.05,
-   "other_s": 0.25,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",
@@ -121,9 +121,9 @@
    "intent": "other",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.28,
+   "total_s": 0.47,
    "model_s": 0.05,
-   "other_s": 0.23,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",
@@ -138,9 +138,9 @@
    "intent": "explain",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.66,
+   "total_s": 1.04,
    "model_s": 0.16,
-   "other_s": 0.5,
+   "other_s": 0.87,
    "model_calls": [
     {
      "what": "intent",
@@ -159,17 +159,17 @@
    "intent": "explain",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.66,
-   "model_s": 0.15,
-   "other_s": 0.51,
+   "total_s": 1.06,
+   "model_s": 0.16,
+   "other_s": 0.89,
    "model_calls": [
     {
      "what": "intent",
-     "s": 0.08
+     "s": 0.07
     },
     {
      "what": "cause",
-     "s": 0.07
+     "s": 0.09
     }
    ]
   },
@@ -180,9 +180,9 @@
    "intent": "explain",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.64,
-   "model_s": 0.14,
-   "other_s": 0.5,
+   "total_s": 1.08,
+   "model_s": 0.2,
+   "other_s": 0.88,
    "model_calls": [
     {
      "what": "intent",
@@ -190,7 +190,7 @@
     },
     {
      "what": "cause",
-     "s": 0.09
+     "s": 0.15
     }
    ]
   },
@@ -201,13 +201,13 @@
    "intent": "scan",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.42,
-   "model_s": 0.06,
-   "other_s": 0.36,
+   "total_s": 0.66,
+   "model_s": 0.07,
+   "other_s": 0.59,
    "model_calls": [
     {
      "what": "intent",
-     "s": 0.06
+     "s": 0.07
     }
    ]
   },
@@ -217,10 +217,10 @@
    "question": "버스 데이터는 어디서 가져온 거야?",
    "intent": "docs",
    "router": "tev1:4b",
-   "verified": true,
-   "total_s": 0.29,
+   "verified": false,
+   "total_s": 0.48,
    "model_s": 0.05,
-   "other_s": 0.24,
+   "other_s": 0.43,
    "model_calls": [
     {
      "what": "intent",
@@ -235,9 +235,9 @@
    "intent": "other",
    "router": "tev1:4b",
    "verified": true,
-   "total_s": 0.29,
+   "total_s": 0.47,
    "model_s": 0.05,
-   "other_s": 0.24,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",

@@ -2,18 +2,18 @@
  "summary": {
   "tag": "rule_only",
   "host": "http://127.0.0.1:11599",
-  "note": "판단 모델 서버 없음(연결 실패→규칙 기반 분류·판정)",
+  "note": "판단 모델 서버 없음(연결 실패→규칙 기반 분류·판정), 분석 기간 2024-04~2026-08·신호 4종",
   "pin": null,
   "machine": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
-  "setup_s": 8.83,
-  "first_question_s": 7.04,
+  "setup_s": 8.58,
+  "first_question_s": 12.55,
   "median_total_s_by_kind": {
-   "explain": 2.53,
-   "scan": 1.38,
-   "docs": 1.26,
-   "other": 1.25
+   "explain": 2.91,
+   "scan": 1.63,
+   "docs": 1.43,
+   "other": 1.43
   },
-  "max_total_s_warm": 2.54,
+  "max_total_s_warm": 2.92,
   "all_model_backed": false
  },
  "rows": [
@@ -24,13 +24,13 @@
    "intent": "explain",
    "router": "rule",
    "verified": true,
-   "total_s": 7.04,
+   "total_s": 12.55,
    "model_s": 2.02,
-   "other_s": 5.03,
+   "other_s": 10.53,
    "model_calls": [
     {
      "what": "intent",
-     "s": 1.01
+     "s": 1.02
     },
     {
      "what": "cause",
@@ -45,17 +45,17 @@
    "intent": "explain",
    "router": "rule",
    "verified": true,
-   "total_s": 2.54,
-   "model_s": 2.03,
-   "other_s": 0.51,
+   "total_s": 2.92,
+   "model_s": 2.01,
+   "other_s": 0.92,
    "model_calls": [
     {
      "what": "intent",
-     "s": 1.01
+     "s": 1.0
     },
     {
      "what": "cause",
-     "s": 1.01
+     "s": 1.0
     }
    ]
   },
@@ -66,9 +66,9 @@
    "intent": "explain",
    "router": "rule",
    "verified": true,
-   "total_s": 2.53,
+   "total_s": 2.89,
    "model_s": 2.01,
-   "other_s": 0.52,
+   "other_s": 0.89,
    "model_calls": [
     {
      "what": "intent",
@@ -76,7 +76,7 @@
     },
     {
      "what": "cause",
-     "s": 1.01
+     "s": 1.0
     }
    ]
   },
@@ -87,9 +87,9 @@
    "intent": "scan",
    "router": "rule",
    "verified": true,
-   "total_s": 1.38,
+   "total_s": 1.61,
    "model_s": 1.01,
-   "other_s": 0.37,
+   "other_s": 0.6,
    "model_calls": [
     {
      "what": "intent",
@@ -103,14 +103,14 @@
    "question": "버스 데이터는 어디서 가져온 거야?",
    "intent": "docs",
    "router": "rule",
-   "verified": true,
-   "total_s": 1.24,
-   "model_s": 1.0,
-   "other_s": 0.24,
+   "verified": false,
+   "total_s": 1.43,
+   "model_s": 1.01,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",
-     "s": 1.0
+     "s": 1.01
     }
    ]
   },
@@ -121,9 +121,9 @@
    "intent": "other",
    "router": "rule",
    "verified": true,
-   "total_s": 1.24,
+   "total_s": 1.43,
    "model_s": 1.01,
-   "other_s": 0.23,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",
@@ -138,9 +138,9 @@
    "intent": "explain",
    "router": "rule",
    "verified": true,
-   "total_s": 2.52,
-   "model_s": 2.02,
-   "other_s": 0.5,
+   "total_s": 2.91,
+   "model_s": 2.01,
+   "other_s": 0.9,
    "model_calls": [
     {
      "what": "intent",
@@ -148,7 +148,7 @@
     },
     {
      "what": "cause",
-     "s": 1.01
+     "s": 1.0
     }
    ]
   },
@@ -159,9 +159,9 @@
    "intent": "explain",
    "router": "rule",
    "verified": true,
-   "total_s": 2.52,
+   "total_s": 2.9,
    "model_s": 2.01,
-   "other_s": 0.51,
+   "other_s": 0.88,
    "model_calls": [
     {
      "what": "intent",
@@ -180,13 +180,13 @@
    "intent": "explain",
    "router": "rule",
    "verified": true,
-   "total_s": 2.53,
-   "model_s": 2.03,
-   "other_s": 0.51,
+   "total_s": 2.91,
+   "model_s": 2.02,
+   "other_s": 0.89,
    "model_calls": [
     {
      "what": "intent",
-     "s": 1.01
+     "s": 1.0
     },
     {
      "what": "cause",
@@ -201,9 +201,9 @@
    "intent": "scan",
    "router": "rule",
    "verified": true,
-   "total_s": 1.38,
+   "total_s": 1.63,
    "model_s": 1.0,
-   "other_s": 0.37,
+   "other_s": 0.63,
    "model_calls": [
     {
      "what": "intent",
@@ -217,10 +217,10 @@
    "question": "버스 데이터는 어디서 가져온 거야?",
    "intent": "docs",
    "router": "rule",
-   "verified": true,
-   "total_s": 1.26,
+   "verified": false,
+   "total_s": 1.43,
    "model_s": 1.01,
-   "other_s": 0.25,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",
@@ -235,13 +235,13 @@
    "intent": "other",
    "router": "rule",
    "verified": true,
-   "total_s": 1.25,
-   "model_s": 1.0,
-   "other_s": 0.25,
+   "total_s": 1.43,
+   "model_s": 1.01,
+   "other_s": 0.42,
    "model_calls": [
     {
      "what": "intent",
-     "s": 1.0
+     "s": 1.01
     }
    ]
   }
