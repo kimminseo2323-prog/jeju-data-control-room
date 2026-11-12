@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import os
+import time
 from dataclasses import dataclass, field
 
 import requests
@@ -113,7 +114,7 @@ def evidence_text(evidence: dict) -> str:
 def model_status(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL) -> tuple[bool, str]:
     """판단 모델을 실제로 쓸 수 있는지: 그 주소가 Ollama이고 모델이 설치되어 있어야 '연결됨'."""
     try:
-        r = http.get(f"{host}/api/tags", timeout=2)
+        r = http.get(f"{host}/api/tags", timeout=(CONNECT_TIMEOUT, 5))
         r.raise_for_status()
         names = {m.get("name") for m in r.json().get("models", [])}
     except Exception:
@@ -123,7 +124,28 @@ def model_status(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_M
     return False, f"{model} 모델이 설치되지 않음(ollama pull {model}) → 규칙 기반 판정"
 
 
+_VERIFIED: dict[tuple[str, str], tuple[float, bool]] = {}
+VERIFY_TTL = 60.0   # 초. 실제 requests를 쓸 때만 확인 결과를 잠시 기억한다
+
+
+def local_model_ready(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL) -> bool:
+    """그 주소가 판단 모델(tev1)이 설치된 Ollama인지(모델 목록에 있는지). 아니면 질문·근거를 보내지 않는다.
+    기본 포트(11434)에 Ollama가 아닌 다른 프로그램이 떠 있는 PC가 있었다(2026-11-12 설치 재현 중 확인)."""
+    if http is not requests:
+        return model_status(http, host, model)[0]
+    hit, now = _VERIFIED.get((host, model)), time.monotonic()
+    if hit and now - hit[0] < VERIFY_TTL:
+        return hit[1]
+    ok = model_status(http, host, model)[0]
+    _VERIFIED[(host, model)] = (now, ok)
+    return ok
+
+
 def judge_cause(evidence: dict, http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL, timeout: int = 120) -> Judgment:
+    if not local_model_ready(http, host, model):
+        j = rule_judge(evidence)
+        j.note = f"로컬 판단 모델({model})을 확인하지 못함(연결 안 됨 또는 다른 프로그램) → 근거를 보내지 않고 규칙 기반으로 판정"
+        return j
     body = {"model": model, "state": evidence_text(evidence), "questions": {"cause": {
         "type": "choice",
         "instructions": "Which listed cause best explains this anomaly in Jeju tourism/transport data? Judge only from the given evidence.",

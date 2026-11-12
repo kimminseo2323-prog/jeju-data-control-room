@@ -19,9 +19,26 @@ def test_rule_judge_nothing_is_unknown():
     assert rule_judge({**EVID_HOLIDAY, "context": []}).choice == "unknown"
 
 
+class _Tags:
+    """Ollama /api/tags 응답 흉내(설치된 모델 목록)."""
+    def __init__(self, names):
+        self.names = names
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return {"models": [{"name": n} for n in self.names]}
+
+
 class FakeHTTP:
-    def __init__(self, ok=True):
-        self.ok, self.sent = ok, None
+    def __init__(self, ok=True, models=("tev1:4b",)):
+        self.ok, self.sent, self.models = ok, None, list(models)
+
+    def get(self, url, timeout=None):
+        if not self.ok:
+            raise ConnectionError("down")
+        return _Tags(self.models)
 
     def post(self, url, json=None, timeout=None):
         self.sent = (url, json)
@@ -46,6 +63,13 @@ def test_judge_uses_local_model_when_available():
     assert j.backend == "tev1:4b" and j.choice == "holiday" and j.confidence == 0.9
     url, body = http.sent
     assert url.endswith("/v1/systemone") and set(body["questions"]["cause"]["criteria"]) == set(CAUSES)
+
+
+def test_judge_sends_nothing_to_a_server_without_the_local_model():
+    """기본 포트(11434)에 Ollama가 아닌 다른 프로그램이 있어도 근거를 보내지 않는다(설치 재현 중 이 PC에서 발견, 2026-11-12)."""
+    http = FakeHTTP(models=["gemma4-12b-agent"])
+    j = judge_cause(EVID_HOLIDAY, http=http)
+    assert http.sent is None and j.backend == "rule" and j.choice == "holiday"
 
 
 def test_judge_falls_back_to_rules_when_model_down():
@@ -133,6 +157,10 @@ class _RecordTimeout:
     def __init__(self):
         self.timeouts = []
 
+    def get(self, url, timeout=None):
+        self.timeouts.append(timeout)
+        raise ConnectionError("refused")
+
     def post(self, url, json=None, timeout=None):
         self.timeouts.append(timeout)
         raise ConnectionError("refused")
@@ -146,9 +174,9 @@ def test_model_down_is_detected_within_a_second():
     route("이호동 7월 28일에 왜?", http=h)
     judge_cause({"anomaly": {"emd": "제주시 이호동", "signal": "유동인구", "date": "2024-07-28", "pct": 50.0},
                  "context": [], "co_movements": []}, http=h)
-    assert len(h.timeouts) == 2
-    for t in h.timeouts:
-        assert isinstance(t, tuple) and t[0] <= 1 and t[1] >= 60
+    assert len(h.timeouts) >= 2
+    for t in h.timeouts:   # 서버가 없으면 모델 확인(GET) 단계에서 1초 안에 멈추고, 판정 요청(POST)은 보내지 않는다
+        assert isinstance(t, tuple) and t[0] <= 1
 
 
 def test_evidence_text_explains_neighbor_and_recurrence():

@@ -38,10 +38,24 @@ def test_rule_route_keywords():
 
 
 class FakeHTTP:
-    def __init__(self, choice=None):
-        self.choice = choice
+    def __init__(self, choice=None, models=("tev1:4b",)):
+        self.choice, self.models, self.posted = choice, list(models), 0
+
+    def get(self, url, timeout=None):
+        if self.choice is None:
+            raise ConnectionError("down")
+        names = self.models
+
+        class T:
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return {"models": [{"name": n} for n in names]}
+        return T()
 
     def post(self, url, json=None, timeout=None):
+        self.posted += 1
         if self.choice is None:
             raise ConnectionError("down")
         choice = self.choice
@@ -53,6 +67,12 @@ class FakeHTTP:
             def json(self):
                 return {"answers": {"intent": {"choice": choice, "confidence": 0.9, "probabilities": {choice: 0.9}}}}
         return R()
+
+
+def test_route_sends_question_only_to_verified_local_model():
+    h = FakeHTTP("docs", models=["gemma4-12b-agent"])
+    intent, _, backend = route("버스 데이터 출처가 어디야", http=h)
+    assert h.posted == 0 and backend == "rule" and intent == "docs"
 
 
 def test_route_uses_local_model_then_falls_back():

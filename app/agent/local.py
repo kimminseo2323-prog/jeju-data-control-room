@@ -16,7 +16,7 @@ from app.agent.loop import WITHHELD, AgentRun
 from app.agent.tools import ToolError, ToolResult, Toolbox
 from app.agent.verify import verify
 from app.analytics.context import KR_HOLIDAYS
-from app.llm.judge import CAUSE_KO, CONNECT_TIMEOUT, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause
+from app.llm.judge import CAUSE_KO, CONNECT_TIMEOUT, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause, local_model_ready
 from app.report.briefing import template_text
 from app.store.geo import EMD_43
 
@@ -124,6 +124,8 @@ def rule_route(q: str) -> str:
 
 
 def route(q: str, http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL) -> tuple[str, float, str]:
+    if not local_model_ready(http, host, model):   # 확인된 로컬 모델이 아니면 질문을 보내지 않는다
+        return rule_route(q), 0.0, "rule"
     body = {"model": model, "state": f"사용자 질문: {q}", "questions": {"intent": {
         "type": "choice", "instructions": "Classify the user's question to a Jeju tourism/transport anomaly dashboard assistant.",
         "criteria": INTENTS}}}
