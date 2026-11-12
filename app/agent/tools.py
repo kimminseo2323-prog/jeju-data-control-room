@@ -98,7 +98,7 @@ class Toolbox:
             {"name": "find_co_movements", "description": "특정 날짜에 같은 읍면동의 다른 신호, 제주 전체 합계(이 읍면동 제외), 인근 읍면동 합계(분석 중인 신호)도 함께 크게 움직였는지 확인한다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "window": {"type": "integer"},
                             "exclude_signal": {"type": "string", "description": "분석 중인 신호(자기 자신 제외)"}}, "required": ["date", "emd"]}},
-            {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부, (신호를 주면) 작년 같은 시기에도 같은 방향 이상이 있었는지 확인한다.",
+            {"name": "check_context", "description": "특정 날짜·읍면동의 기상, 공휴일, 행사, 그 달의 입도객 성수기·비수기 여부, (신호를 주면) 작년 같은 시기에도 같은 방향 이상이 있었는지 확인한다. 외국인 신호면 공휴일은 한국 대신 중국·일본 공휴일을 본다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "signal": sig}, "required": ["date", "emd"]}},
             {"name": "nationality_mix", "description": "외국인 방문인구가 크게 바뀐 날, 어느 국적이 평소(같은 요일 기준선)보다 얼마나 늘거나 줄었는지 나눠 본다.",
              "parameters": {"type": "object", "properties": {"date": date, "emd": emd, "top": {"type": "integer"}}, "required": ["date", "emd"]}},
@@ -203,7 +203,8 @@ class Toolbox:
     def _t_check_context(self, date, emd, signal=None):
         items = check_context(pd.Timestamp(date), emd, weather=getattr(self.store, "weather", None),
                               station_of_emd=getattr(self.store, "station_of_emd", None), events=getattr(self.store, "events", None),
-                              visitors=getattr(self.store, "visitors", None))
+                              visitors=getattr(self.store, "visitors", None),
+                              holiday_countries=("CN", "JP") if signal == "외국인" else ("KR",))
         if signal:   # 작년 같은 시기에도 같은 방향 이상이 있었는가(매년 반복되는 변화인지)
             try:
                 rec = recurrence(self.store.series(signal, emd), pd.Timestamp(date), signal)

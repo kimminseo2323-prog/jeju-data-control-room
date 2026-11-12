@@ -322,6 +322,33 @@ for s in ["유동인구", "와이파이", "버스", "외국인"]:
     al = next(x for x in d["alarms"] if x["method"] == "seasonal_z" and x["threshold"] == 3.5)
     rows.append({"신호": s, "읍면동": d["regions"], "주입 횟수": d["trials"], "구간 적중률": sw["episode_hit"], "일 재현율": sw["day_recall"], "평소 경보(100일당)": al["alarms_per_100_days"]})
 pd.DataFrame(rows)"""),
+    ("md", """### 외국인 신호에 맞는 공휴일 근거
+원인 판정 평가(5절)에서 외국인 신호는 한국 공휴일을 정답으로 둔 구간의 일치율이 55.6%(63건)로 낮았다. 판정이 틀린 것인지, **한국 공휴일이 외국인 방문의 근거가 아닌 것**인지 데이터로 확인한다.
+읍면동별 급증(점수 3.5 이상) 비율을 공휴일 앞뒤 1일과 그 외 날로 나눠 비교한다."""),
+    ("code", """import holidays
+def surge_ratio(frame, country):
+    Z = pd.concat([score_series(frame[c], "seasonal_z")[2].rename(c) for c in frame.columns if frame[c].notna().sum() > 100], axis=1)
+    cal = holidays.country_holidays(country, years=range(2024, 2027))
+    near = pd.Series([any((d + pd.Timedelta(days=k)).date() in cal for k in (-1, 0, 1)) for d in Z.index], index=Z.index)
+    up, ok = Z >= 3.5, Z.notna()
+    r1, r0 = up[near].sum().sum() / ok[near].sum().sum() * 100, up[~near].sum().sum() / ok[~near].sum().sum() * 100
+    return round(r1, 2), round(r0, 2), round(r1 / r0, 1)
+from app.analytics.detect import score_series
+f = st._foreign.assign(d=lambda x: pd.to_datetime(x["baseDate"].astype(str)))
+def frame(sig=None, nat=None):
+    if sig:
+        return pd.DataFrame({e: st.series(sig, e) for e in st.regions(sig)})
+    return f[f["nationality"] == nat].pivot_table(index="d", columns="emd_full", values="visitPop", aggfunc="sum").reindex(pd.date_range("2024-04-01", "2026-08-31"))
+rows = []
+for label, fr, countries in [("내국인 유동인구", frame("유동인구"), ["KR"]), ("외국인 전체", frame("외국인"), ["KR", "CN", "JP"]),
+                             ("중국 국적", frame(nat="중국"), ["KR", "CN"]), ("일본 국적", frame(nat="일본"), ["KR", "JP"])]:
+    for c in countries:
+        r1, r0, x = surge_ratio(fr, c)
+        rows.append({"대상": label, "공휴일 국가": c, "공휴일 앞뒤 급증 비율(%)": r1, "그 외 날(%)": r0, "배수": x})
+pd.DataFrame(rows)"""),
+    ("md", """**읽은 것**: 한국 공휴일 앞뒤에 내국인 급증은 평소의 9배가 넘지만, 외국인 전체는 1.1배로 거의 차이가 없다. 일본인은 일본 공휴일 앞뒤에 2.3배, 중국인은 중국 공휴일 앞뒤에 1.7배다.
+→ 외국인 신호를 설명할 때는 **한국 공휴일 대신 중국·일본 공휴일**을 맥락으로 넘기도록 바꿨다(`check_context(..., holiday_countries=("CN", "JP"))`, 테스트 `test_foreign_signal_uses_visitor_country_holidays_not_korean`).
+이 변경은 평가 결과를 본 뒤에 한 것이라, 수정 전 결과(`eval/results/judge_eval_before_foreign_holiday.json`)도 함께 둔다."""),
     ("md", """## 3. 인근 읍면동 동반 변화
 읍면동 중심점(정류소·AP 평균 좌표) 사이 거리로 가까운 3곳(15km 이내)을 이웃으로 둔다. 이웃 합계도 같이 움직였다면 '이 동네만의 일'이 아니라 '주변 일대의 흐름'일 가능성이 크다."""),
     ("code", """pd.DataFrame([{"읍면동": e, "인근(가까운 순)": ", ".join(st.neighbors(e)) or "(15km 안에 없음)"} for e in ["제주시 이호동", "서귀포시 성산읍", "제주시 추자면", "서귀포시 송산동"]])"""),
@@ -357,7 +384,17 @@ new.groupby("가장 큰 날").size().sort_values(ascending=False).head(10).renam
     out = {"이상 구간": s["episodes"], "정답 있는 구간": s["labeled"], "일치율": s["agree"][0], "근거 제거 시 안 고름": s["ablation_not_chosen"][0], "규칙 일치율": s["rule_agree"][0]}
     out.update({f"{k} 일치(n)": f"{v['agree'][0]} ({v['agree'][1]})" for k, v in s["by_label"].items()})
     return out
-pd.DataFrame({"근거 문장 수정 전": summ("eval/results/judge_eval_before_label.json"), "수정 후(현재)": summ("eval/results/judge_eval.json")}).T"""),
+pd.DataFrame({"① 1년치·근거 문장 수정 전": summ("eval/results/_1year/judge_eval_before_label.json"),
+              "② 1년치·근거 문장 수정 후": summ("eval/results/_1year/judge_eval.json"),
+              "③ 기간 연장+외국인·한국 공휴일": summ("eval/results/judge_eval_before_foreign_holiday.json"),
+              "④ 기간 연장+외국인·중국·일본 공휴일(현재)": summ("eval/results/judge_eval.json")}).T"""),
+    ("md", "### 신호별 일치율 (정답이 있는 구간)"),
+    ("code", """def by_signal(p):
+    r = pd.DataFrame(json.loads(Path(p).read_text("utf-8"))["rows"])
+    r = r[r["labels"].map(len).gt(0)]
+    r["agree"] = [c in l for c, l in zip(r["choice"], r["labels"])]
+    return r.groupby("signal")["agree"].agg(lambda a: f"{a.mean():.3f} ({len(a)})")
+pd.DataFrame({"③ 한국 공휴일": by_signal("eval/results/judge_eval_before_foreign_holiday.json"), "④ 중국·일본 공휴일(현재)": by_signal("eval/results/judge_eval.json")})"""),
     ("code", """s = json.loads(Path("eval/results/judge_eval.json").read_text("utf-8"))["summary"]
 pd.DataFrame({"정답 없음(근거 기간 안)": pd.Series(s["unlabeled_choices"]), "근거 기간 밖": pd.Series(s["outside_coverage_choices"])}).fillna(0).astype(int)"""),
 ]

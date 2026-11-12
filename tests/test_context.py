@@ -79,3 +79,21 @@ def test_ordinary_month_visitors_not_reported():
 
 def test_month_without_visitor_data_not_reported():
     assert [i for i in check_context(pd.Timestamp("2026-01-10"), "제주시 이호동", visitors=_monthly()) if i.kind == "visitors"] == []
+
+
+def test_foreign_signal_uses_visitor_country_holidays_not_korean():
+    """외국인 신호: 한국 공휴일 앞뒤 급증은 평소의 1.1배뿐(일본인은 자국 공휴일 2.3배, 중국인 1.7배) → 중국·일본 공휴일을 근거로."""
+    items = check_context(pd.Timestamp("2025-10-01"), "제주시 연동", holiday_countries=("CN", "JP"))
+    hol = [i.detail for i in items if i.kind == "holiday"]
+    assert any(d.startswith("중국 공휴일") for d in hol)
+    assert not any("개천절" in d or "추석" in d for d in hol)   # 2025-10-03 개천절, 10-05~07 추석은 넣지 않음
+
+
+def test_japanese_golden_week_reported_for_foreign_signal():
+    items = check_context(pd.Timestamp("2025-05-04"), "제주시 연동", holiday_countries=("CN", "JP"))
+    assert any(i.kind == "holiday" and i.detail.startswith("일본 공휴일") for i in items)
+
+
+def test_default_is_korean_holidays():
+    items = check_context(pd.Timestamp("2025-10-03"), "제주시 연동")
+    assert any(i.kind == "holiday" and "개천절" in i.detail for i in items)

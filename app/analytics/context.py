@@ -15,6 +15,11 @@ RAIN_MM = 30.0     # 일강수량 기준(본 서비스 임의 기준, 기상특�
 WIND_MS = 14.0     # 최대풍속 기준(본 서비스 임의 기준)
 SEASON_PCT = 5.0   # 월 입도객이 주변 12개월 평균보다 ±5% 이상이면 성수기/비수기로 표시(본 서비스 임의 기준)
 KR_HOLIDAYS = holidays.country_holidays("KR", years=range(2015, 2031), language="ko")
+# 외국인 신호용: 방문객 국가 공휴일. 2024-04~2026-08 읍면동 급증(점수 3.5 이상) 비율이 자국 공휴일 앞뒤에서
+# 일본인 2.3배·중국인 1.7배인 반면 한국 공휴일 앞뒤에서는 외국인 전체 1.1배였다(노트북 06).
+HOLIDAY_COUNTRY_KO = {"KR": "", "CN": "중국 공휴일", "JP": "일본 공휴일"}
+_HOLIDAYS = {"KR": KR_HOLIDAYS,
+             **{c: holidays.country_holidays(c, years=range(2015, 2031), language="en_US") for c in ("CN", "JP")}}
 
 
 @dataclass(frozen=True)
@@ -87,7 +92,7 @@ def season_index(visitors: pd.Series, month: pd.Timestamp) -> float | None:
 
 def check_context(day: pd.Timestamp, emd: str, weather: pd.DataFrame | None = None,
                   station_of_emd: dict | None = None, events: pd.DataFrame | None = None,
-                  visitors: pd.Series | None = None) -> list[ContextItem]:
+                  visitors: pd.Series | None = None, holiday_countries: tuple[str, ...] = ("KR",)) -> list[ContextItem]:
     items: list[ContextItem] = []
     day = pd.Timestamp(day).normalize()
 
@@ -104,12 +109,15 @@ def check_context(day: pd.Timestamp, emd: str, weather: pd.DataFrame | None = No
                 items.append(ContextItem("weather", f"{st} 관측소 " + ", ".join(parts),
                                          "제주데이터허브 일별 기상 정보(579)"))
 
-    for k in (-1, 0, 1):
-        d = (day + pd.Timedelta(days=k)).date()
-        if d in KR_HOLIDAYS:
-            rel = {-1: "전날", 0: "당일", 1: "다음날"}[k]
-            items.append(ContextItem("holiday", f"{KR_HOLIDAYS[d]} ({rel}, {d.isoformat()})",
-                                     "holidays 오픈소스 패키지(대한민국 공휴일)"))
+    for country in holiday_countries:
+        cal, prefix = _HOLIDAYS[country], HOLIDAY_COUNTRY_KO[country]
+        for k in (-1, 0, 1):
+            d = (day + pd.Timedelta(days=k)).date()
+            if d in cal:
+                rel = {-1: "전날", 0: "당일", 1: "다음날"}[k]
+                name = f"{prefix} {cal[d]}" if prefix else cal[d]
+                items.append(ContextItem("holiday", f"{name} ({rel}, {d.isoformat()})",
+                                         f"holidays 오픈소스 패키지({'대한민국' if country == 'KR' else prefix[:2]} 공휴일)"))
 
     if events is not None and len(events):
         ev = events[(events["start"] <= day) & (events["end"] >= day) & ((events["emd"] == emd) | events["emd"].isna())]

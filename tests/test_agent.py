@@ -236,3 +236,13 @@ def test_nationality_mix_names_who_drove_the_change():
     top = r.data["top"][0]
     assert top["nationality"] == "중국" and top["diff"] > 250
     assert top["share_of_change"] > 80
+
+
+def test_check_context_for_foreign_signal_uses_visitor_country_holidays():
+    """외국인 신호를 설명할 때는 한국 공휴일이 아니라 중국·일본 공휴일을 맥락으로 본다."""
+    tb = Toolbox(MemoryStore(series={}), index=None)
+    foreign = tb.dispatch("check_context", {"date": "2025-10-03", "emd": "제주시 연동", "signal": "외국인"}, "R1").data["items"]
+    domestic = tb.dispatch("check_context", {"date": "2025-10-03", "emd": "제주시 연동", "signal": "유동인구"}, "R2").data["items"]
+    assert any(i["kind"] == "holiday" and i["detail"].startswith("중국 공휴일") for i in foreign)
+    assert not any("개천절" in i["detail"] for i in foreign)
+    assert any("개천절" in i["detail"] for i in domestic)
