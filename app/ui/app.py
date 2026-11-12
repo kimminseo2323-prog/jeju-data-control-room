@@ -119,7 +119,7 @@ def cached_quick_cause(signal: str, emd: str, day: str, direction: str) -> dict:
 
 
 def _pick_episode(i: int, label: str) -> None:
-    st.session_state["detail_pick"] = i
+    st.session_state["detail_goto"] = i
     st.session_state["picked_msg"] = label
 
 
@@ -211,9 +211,15 @@ with tab_detail:
         st.info("선택할 이상 구간이 없습니다.")
     else:
         labels = [f"{r['읍면동']} · {r['최대일']} · {r['유형']} · {r['방향']} {abs(r['기대 대비(%)'])}%" for _, r in episodes.iterrows()]
-        if st.session_state.get("detail_pick", 0) >= len(labels):   # 신호·민감도를 바꿔 목록이 짧아진 경우
-            st.session_state["detail_pick"] = 0
-        pick = st.selectbox("이상 구간 선택", range(len(labels)), format_func=lambda i: labels[i], key="detail_pick")
+        # 신호·방법·민감도마다 따로 기억한다(같은 키로 목록이 바뀌면 브라우저가 값을 글자로 돌려보내 오류가 났음, 2026-11-13)
+        pick_key = f"detail_pick|{signal}|{method}|{threshold}"
+        goto = st.session_state.pop("detail_goto", None)   # 관제판 '상세 보기'에서 고른 구간
+        if isinstance(goto, int) and 0 <= goto < len(labels):
+            st.session_state[pick_key] = goto
+        cur = st.session_state.get(pick_key)
+        if cur is not None and not (isinstance(cur, int) and 0 <= cur < len(labels)):
+            del st.session_state[pick_key]
+        pick = st.selectbox("이상 구간 선택", range(len(labels)), format_func=lambda i: labels[i], key=pick_key)
         row = episodes.iloc[pick]
         emd, day = row["읍면동"], pd.Timestamp(row["최대일"])
 
