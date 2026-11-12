@@ -61,7 +61,9 @@ def run(job_name: str, start: dt.date, end: dt.date) -> bool:
             print(f"[{job_name}] 완료된 요청만 임시 캐시로 저장: {info}")
             return False
         except FetchFailed as e:
-            print(f"[{job_name}] 실패: {e}")
+            print(f"[{job_name}] 실패: {i}/{len(reqs)}번째 요청 {params} — {e} (같은 명령으로 다시 시도하면 이어받음)")
+            info = export_completed(job, start, end)
+            print(f"[{job_name}] 완료된 요청만 임시 캐시로 저장: {info}")
             return False
         df = pd.DataFrame(rows)
         for k, v in params.items():

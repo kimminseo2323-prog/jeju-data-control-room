@@ -285,6 +285,84 @@ pd.DataFrame([{"모델": m, "세트": k, "문항": r["summary"][k]["n"], "키워
 ]
 
 
+NOTEBOOKS["06_분석보완_외국인_기간연장"] = [
+    ("md", """# 06. 분석 보완 — 외국인 신호, 기간 연장, 작년 반복, 인근 읍면동, 원인 판정 대규모 평가
+**배경 (2026-11-11 허브 목록·사이트 재확인)**
+- 유동인구(583)·외국인 단기체류 유동인구(589)는 2026-08-31까지 있다 → 분석 기간을 2024-04~2026-08로 늘렸다
+- 기상(579)·축제(761)는 2025-03까지, 입도객(580)은 2025-07까지 → 그 뒤 날짜는 해당 근거를 **'확인 불가'**로 표시한다(없다는 뜻이 아님)
+- 크루즈 기항(319)은 연도별 합계, 공항·관광지 입장객은 월 단위라 일 단위 근거로 쓰지 않았다
+
+모든 계산은 `app/` 모듈을 그대로 부른다."""),
+    ("code", SETUP + """
+import json
+from app.store.cache import CacheStore
+from app.agent.tools import Toolbox
+st = CacheStore("data/cache"); tb = Toolbox(st, None)
+pd.DataFrame([{"신호": s, "읍면동 수": len(st.regions(s)), "시작": st.island_series(s).dropna().index.min().date(), "끝": st.island_series(s).dropna().index.max().date()} for s in st.signals()])"""),
+    ("md", "## 1. 근거 자료별 제공 기간 — 이 밖의 날짜는 '확인 불가'"),
+    ("code", """pd.DataFrame([{"근거": k, "시작": v[0].date(), "끝": v[1].date()} for k, v in st.coverage.items()])"""),
+    ("md", """## 2. 외국인 신호(허브 589)
+외국인 단기체류 유동인구를 읍면동·일 단위로 합쳐 네 번째 신호로 넣었다. 국적별 값이 있어, 이상이 난 날 **어느 국적이 움직였는지** 나눠 볼 수 있다(`nationality_mix` 도구)."""),
+    ("code", """fig, ax = plt.subplots(2, 1, figsize=(10, 5), sharex=True)
+for a, s, c in zip(ax, ["유동인구", "외국인"], ["#1F3A5F", "#2A7F7F"]):
+    x = st.island_series(s); a.plot(x.index, x / 1e4, color=c, lw=.8); a.set_ylabel("만 명"); a.set_title(f"제주 전체 {s}", loc="left", fontsize=10)
+plt.tight_layout()"""),
+    ("code", """emd, day = "서귀포시 송산동", "2024-09-29"
+r = tb.dispatch("nationality_mix", {"date": day, "emd": emd, "top": 3}, "R1").data
+print(f"{emd} {day} 외국인 전체 변화(기대값 대비): {r['total_diff']:+,}명")
+pd.DataFrame(r["top"])"""),
+    ("md", "### 외국인 신호 탐지 평가 — 가짜 이상 주입 (`python -m eval.inject_eval --signal 외국인`)"),
+    ("code", """rows = []
+for s in ["유동인구", "와이파이", "버스", "외국인"]:
+    p = Path(f"eval/results/inject_eval_{s}.json")
+    if not p.exists():
+        continue
+    d = json.loads(p.read_text("utf-8"))
+    sw = next(x for x in d["sweep"] if x["method"] == "seasonal_z" and x["threshold"] == 3.5)
+    al = next(x for x in d["alarms"] if x["method"] == "seasonal_z" and x["threshold"] == 3.5)
+    rows.append({"신호": s, "읍면동": d["regions"], "주입 횟수": d["trials"], "구간 적중률": sw["episode_hit"], "일 재현율": sw["day_recall"], "평소 경보(100일당)": al["alarms_per_100_days"]})
+pd.DataFrame(rows)"""),
+    ("md", """## 3. 인근 읍면동 동반 변화
+읍면동 중심점(정류소·AP 평균 좌표) 사이 거리로 가까운 3곳(15km 이내)을 이웃으로 둔다. 이웃 합계도 같이 움직였다면 '이 동네만의 일'이 아니라 '주변 일대의 흐름'일 가능성이 크다."""),
+    ("code", """pd.DataFrame([{"읍면동": e, "인근(가까운 순)": ", ".join(st.neighbors(e)) or "(15km 안에 없음)"} for e in ["제주시 이호동", "서귀포시 성산읍", "제주시 추자면", "서귀포시 송산동"]])"""),
+    ("md", """## 4. 작년 같은 시기 반복
+기간을 늘리면서 1년 전 같은 시기(52주 전 같은 요일 ±3일)와 비교할 수 있게 됐다. 그때도 같은 방향 이상(점수 3 이상)이 있었다면 '매년 반복되는 변화일 수 있음'으로 근거에 붙인다.
+2025-04 이후 이상 구간 중 몇 개에 반복 근거가 붙는지 센다."""),
+    ("code", """import re
+from app.analytics.detect import detect_anomalies, group_episodes
+from app.analytics.context import recurrence
+rows = []
+for s in ["유동인구", "외국인"]:
+    for emd in st.regions(s):
+        x = st.series(s, emd)
+        for e in group_episodes(detect_anomalies(x, threshold=3.5)):
+            if e.peak.date < pd.Timestamp("2025-04-01"):
+                continue
+            rc = recurrence(x, e.peak.date, s)
+            rows.append({"신호": s, "읍면동": emd, "가장 큰 날": e.peak.date.date(), "방향": "증가" if e.peak.score > 0 else "감소", "작년 반복": rc is not None, "작년 날짜": re.search(r"\\d{4}-\\d{2}-\\d{2}", rc.detail).group() if rc else ""})
+rec = pd.DataFrame(rows)
+rec.groupby("신호")["작년 반복"].agg(["sum", "count", "mean"]).round(3)"""),
+    ("md", "공휴일(가장 큰 날 ±1일)과 겹치는 구간은 이미 공휴일 근거가 있다. **공휴일이 아닌데 작년에도 반복된 구간**이 이 근거가 새로 설명하는 부분이다."),
+    ("code", """import holidays
+kr = holidays.KR(years=range(2024, 2027))
+rec["공휴일 ±1일"] = rec["가장 큰 날"].map(lambda d: any(d + pd.Timedelta(days=k) in kr for k in (-1, 0, 1)))
+display(pd.crosstab([rec["신호"], rec["공휴일 ±1일"]], rec["작년 반복"], margins=True))
+new = rec[~rec["공휴일 ±1일"] & rec["작년 반복"]]
+new.groupby("가장 큰 날").size().sort_values(ascending=False).head(10).rename("읍면동 수")"""),
+    ("md", """## 5. 원인 판정 대규모 평가 (`python -m eval.judge_eval`)
+실제 이상 구간 전체에 판정 모델(tev1:4b)을 돌려, 데이터에서 따로 확인되는 사실(공휴일·이름이 명시된 축제·강한 비바람)과 맞는지 본다.
+**한계**: 정답이 판정에 넘기는 근거와 같은 자료에서 나온다 → '근거를 제대로 읽는가'를 재는 시험이지, 현장에서 확인한 원인이 아니다."""),
+    ("code", """def summ(p):
+    s = json.loads(Path(p).read_text("utf-8"))["summary"]
+    out = {"이상 구간": s["episodes"], "정답 있는 구간": s["labeled"], "일치율": s["agree"][0], "근거 제거 시 안 고름": s["ablation_not_chosen"][0], "규칙 일치율": s["rule_agree"][0]}
+    out.update({f"{k} 일치(n)": f"{v['agree'][0]} ({v['agree'][1]})" for k, v in s["by_label"].items()})
+    return out
+pd.DataFrame({"근거 문장 수정 전": summ("eval/results/judge_eval_before_label.json"), "수정 후(현재)": summ("eval/results/judge_eval.json")}).T"""),
+    ("code", """s = json.loads(Path("eval/results/judge_eval.json").read_text("utf-8"))["summary"]
+pd.DataFrame({"정답 없음(근거 기간 안)": pd.Series(s["unlabeled_choices"]), "근거 기간 밖": pd.Series(s["outside_coverage_choices"])}).fillna(0).astype(int)"""),
+]
+
+
 def build(name: str, cells: list[tuple[str, str]]) -> Path:
     nb = nbformat.v4.new_notebook()
     nb.metadata["kernelspec"] = {"name": "jeju-venv", "display_name": "Python (jeju venv)", "language": "python"}
