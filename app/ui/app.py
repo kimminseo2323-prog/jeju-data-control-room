@@ -23,6 +23,7 @@ from app.llm.judge import CAUSE_KO, NOT_COVERED_KO, evidence_text, judge_cause, 
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
 from app.report import board
+from app.ui import style
 from app.report.briefing import ResultStore, markdown_safe, render_briefing, template_text
 from app.store.cache import CacheStore
 
@@ -82,7 +83,7 @@ def judge_status() -> str:
 # ---------------- sidebar ----------------
 store = get_store()
 with st.sidebar:
-    st.markdown("### 📡 제주 데이터 관제실")
+    st.markdown("#### 보기 설정")
     signals = store.signals()
     signal = st.selectbox("신호", signals, index=0)
     method = st.radio("탐지 방법", ["seasonal_z", "robust_resid"],
@@ -103,15 +104,15 @@ with st.sidebar:
 q = store.quality()
 z, episodes = scan(signal, method, threshold)
 
-st.markdown(f"## {signal} 이상 신호 관제판")
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("데이터 기준일", q["as_of"].get(signal, "-"))
-c2.metric("읍면동", f"{len(z)}곳")
+st.markdown(style.CSS, unsafe_allow_html=True)
 _cols = pd.DatetimeIndex(z.columns) if not z.empty else None
-c3.metric("분석 기간", f"{_cols.min():%Y-%m} ~ {_cols.max():%Y-%m}" if _cols is not None else "-")
-c4.metric("이상 구간(전체 기간)", f"{len(episodes)}개")
+st.markdown(style.header_html(signal, q["as_of"].get(signal, "-"),
+                              f"{_cols.min():%Y-%m} ~ {_cols.max():%Y-%m}" if _cols is not None else "-", len(z)),
+            unsafe_allow_html=True)
 
-tab_board, tab_detail, tab_ask, tab_quality = st.tabs(["관제판", "상세 분석·브리핑", "질문하기", "데이터 품질"])
+TABS = {"board": ":material/radar: 관제판", "detail": ":material/query_stats: 상세 분석·브리핑",
+        "ask": ":material/forum: 질문하기", "quality": ":material/fact_check: 데이터 품질"}
+tab_board, tab_detail, tab_ask, tab_quality = st.tabs(list(TABS.values()))
 
 @st.cache_data(show_spinner=False)
 def cached_quick_cause(signal: str, emd: str, day: str, direction: str) -> dict:
@@ -158,7 +159,7 @@ with tab_board:
                 b.markdown(f"<div style='color:{RED if up else '#2166AC'};font-size:1.35em;font-weight:700'>"
                            f"{'+' if up else '−'}{abs(r['기대 대비(%)'])}%</div><small>기대값 대비 · 점수 {r['점수']}</small>",
                            unsafe_allow_html=True)
-                c.markdown(f"**{qc['cause']}** <small>(빠른 판정)</small>  \n{markdown_safe(qc['reason'])}", unsafe_allow_html=True)
+                c.markdown(f"**{qc['cause']}** <span class='jj-tag'>빠른 판정</span>  \n{markdown_safe(qc['reason'])}", unsafe_allow_html=True)
                 d.button("상세 보기", key=f"go_{i}", on_click=_pick_episode, args=(int(i), f"{r['읍면동']} {r['최대일']}"))
 
         left, right = st.columns([2, 3])
