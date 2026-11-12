@@ -17,7 +17,19 @@ if not defined PY (
   if not errorlevel 1 set "PY=python"
 )
 if not defined PY (
-  echo  파이썬 3.12를 찾지 못했습니다. 설치 매뉴얼 1단계를 먼저 해 주세요.
+  echo.
+  echo  파이썬 3.12를 찾지 못했습니다.
+  where python >nul 2>nul
+  if not errorlevel 1 (
+    for /f "delims=" %%v in ('python --version 2^>^&1') do echo  지금 이 PC에 있는 파이썬: %%v ^(이 프로그램은 3.12가 필요합니다^)
+  )
+  echo.
+  echo  파이썬 내려받기 페이지를 엽니다. 다음 순서로 설치해 주세요.
+  echo    1^) "Python 3.12.x" 항목의 "Windows installer (64-bit)"를 내려받아 실행
+  echo    2^) 첫 화면 아래 "Add python.exe to PATH"에 체크한 뒤 "Install Now"
+  echo    3^) 설치가 끝나면 이 창을 닫고 install.bat 을 다시 더블클릭
+  echo  자세한 내용: docs\설치_실행_매뉴얼.md 1단계
+  if not defined JEJU_NO_BROWSER start "" "https://www.python.org/downloads/windows/"
   pause
   exit /b 1
 )
