@@ -1,6 +1,6 @@
 """결과 설명서 PDF 만들기: docs/결과_설명서.md → HTML(pandoc) → PDF(Edge 헤드리스 인쇄).
 
-실행: python docs/_build/build_results.py
+실행: python docs/_build/build_results.py [docs/설치_실행_매뉴얼.md ...]   (인자가 없으면 결과 설명서)
 결과: docs/결과_설명서.pdf (A4). 원본은 Markdown이며, PDF는 읽기 편하도록 만든 사본이다.
 """
 from __future__ import annotations
@@ -32,24 +32,27 @@ p:has(> img) { page-break-inside: avoid; }
 """
 
 
-def main():
+def main(src: Path = SRC, out: Path = OUT):
     with tempfile.TemporaryDirectory() as tmp:
         css = Path(tmp) / "style.css"
         css.write_text(CSS, "utf-8")
-        html = DOCS / "_결과_설명서_tmp.html"   # 이미지 상대경로(images/) 때문에 docs 폴더에 잠깐 만든다
+        html = DOCS / f"_{src.stem}_tmp.html"   # 이미지 상대경로(images/) 때문에 docs 폴더에 잠깐 만든다
         try:
-            subprocess.run(["pandoc", str(SRC), "-f", "gfm", "-t", "html5", "-s", "--metadata", "title=결과 설명서 — 제주 데이터 관제실",
+            subprocess.run(["pandoc", str(src), "-f", "gfm", "-t", "html5", "-s", "--metadata", f"title={src.stem.replace('_', ' ')}",
                             "--css", str(css), "--self-contained", "-o", str(html)], cwd=DOCS, check=True)
             # pandoc이 메타데이터 제목을 본문 위에 한 번 더 넣으므로 숨긴다(본문 첫 줄이 제목)
             t = html.read_text("utf-8").replace('<header id="title-block-header">', '<header id="title-block-header" style="display:none">')
             html.write_text(t, "utf-8")
             exe = next(b for b in BROWSERS if b.exists())
-            subprocess.run([str(exe), "--headless", "--disable-gpu", "--no-pdf-header-footer", f"--print-to-pdf={OUT}",
+            subprocess.run([str(exe), "--headless", "--disable-gpu", "--no-pdf-header-footer", f"--print-to-pdf={out}",
                             html.as_uri()], check=True, timeout=120)
         finally:
             html.unlink(missing_ok=True)
-    print(OUT)
+    print(out)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    srcs = [Path(a).resolve() for a in sys.argv[1:]] or [SRC]
+    for s in srcs:
+        main(s, s.with_suffix(".pdf"))

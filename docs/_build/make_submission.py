@@ -1,6 +1,6 @@
 """제출 폴더 만들기: 프로젝트에서 제출할 파일만 골라 `숨비소리/` 폴더로 복사한다(이 폴더를 그대로 압축해 제출).
 
-실행: python docs/_build/make_submission.py
+실행: python docs/_build/make_submission.py  (먼저 문서 PDF를 만든다: python docs/_build/build_results.py docs/결과_설명서.md docs/설치_실행_매뉴얼.md docs/데이터_활용_명세.md)
 결과: <프로젝트>/숨비소리/  (다시 실행하면 이 폴더만 지우고 새로 만든다)
 
 넣는 것: 실행 소스(app), 테스트, 평가 스크립트·결과, 노트북, 문서(README·설치 매뉴얼·데이터 활용 명세·결과 설명서),
@@ -31,22 +31,56 @@ def _skip(p: Path) -> bool:
     return any(fnmatch.fnmatch(part, pat) for part in p.parts for pat in SKIP)
 
 
+README_TXT = """제주 데이터 관제실 (팀 숨비소리)
+제주 읍면동별 유동인구·외국인·와이파이·버스에서 평소와 다른 날을 찾고, 이유 후보를 근거와 함께 보여 주는 프로그램입니다.
+
+[쓰는 순서]
+  1. 1_설치.bat 더블클릭 (처음 한 번, 약 3분, 인터넷 필요)
+     - 파이썬 3.12가 없으면 내려받기 페이지가 열립니다. 설치할 때 "Add python.exe to PATH"에 체크한 뒤, 1_설치.bat을 다시 더블클릭하세요.
+     - Ollama(https://ollama.com/download)가 설치되어 있으면 판단 모델(tev1:4b, 4.6GB)도 자동으로 받습니다.
+       없어도 실행되며, 이때 원인 판정과 질문 분류는 규칙 기반으로 동작합니다.
+  2. 2_실행.bat 더블클릭 (쓸 때마다)
+     - 브라우저에 http://127.0.0.1:8501 화면이 열립니다. 처음에는 30초쯤 걸립니다.
+     - 끝낼 때는 검은 창을 닫습니다.
+
+[폴더]
+  문서       설치·실행 매뉴얼, 결과 설명서, 기획서, 데이터 활용 명세 (PDF)
+  프로그램   실행 소스·데이터·평가 결과 (직접 열 필요 없음, 개발자용 안내는 프로그램/README.md)
+
+[알아 둘 것]
+  - 화면은 이 PC에서만 열리고, 분석·질문 중에는 데이터가 밖으로 나가지 않습니다.
+  - 원인은 '후보'이며 인과를 뜻하지 않습니다.
+  - 문제가 생기면 문서/설치_실행_매뉴얼.pdf 의 '문제 해결' 표를 보세요.
+"""
+
+WRAPPER = '@echo off\r\nchcp 65001 >nul\r\ncall "%~dp0프로그램\\{bat}"\r\n'   # 압축을 푼 맨 위에서 프로그램 폴더의 배치 파일을 부른다
+DOC_PDFS = {"설치_실행_매뉴얼.pdf": ROOT / "docs" / "설치_실행_매뉴얼.pdf", "결과_설명서.pdf": ROOT / "docs" / "결과_설명서.pdf",
+            "데이터_활용_명세.pdf": ROOT / "docs" / "데이터_활용_명세.pdf", PLAN_PDF: ROOT / "기획서" / PLAN_PDF}
+
+
 def build() -> Path:
+    """압축을 풀면 안내 파일, 설치·실행 배치 파일 두 개, 문서·프로그램 폴더만 보이게 만든다."""
     assert OUT.parent == ROOT and OUT.name == "숨비소리"
     if OUT.exists():
         shutil.rmtree(OUT)
-    OUT.mkdir()
+    prog = OUT / "프로그램"
+    prog.mkdir(parents=True)
     for f in FILES:
-        (OUT / f).parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / f, OUT / f)
+        (prog / f).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / f, prog / f)
     for d in DIRS:
         for src in (ROOT / d).rglob("*"):
             if src.is_file() and not _skip(src.relative_to(ROOT)):
-                dst = OUT / src.relative_to(ROOT)
+                dst = prog / src.relative_to(ROOT)
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
-    (OUT / "기획서").mkdir()
-    shutil.copy2(ROOT / "기획서" / PLAN_PDF, OUT / "기획서" / PLAN_PDF)
+    (OUT / "문서").mkdir()
+    for name, src in DOC_PDFS.items():
+        shutil.copy2(src, OUT / "문서" / name)
+    (OUT / "1_설치.bat").write_bytes(WRAPPER.format(bat="install.bat").encode("utf-8"))
+    (OUT / "2_실행.bat").write_bytes(WRAPPER.format(bat="run.bat").encode("utf-8"))
+    # 메모장에서 한글이 깨지지 않게 UTF-8 BOM + 윈도 줄바꿈
+    (OUT / "0_먼저_읽어주세요.txt").write_bytes(b"\xef\xbb\xbf" + README_TXT.replace("\n", "\r\n").encode("utf-8"))
     return OUT
 
 
