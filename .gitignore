@@ -16,3 +16,5 @@ data/cache/
 data/manual/
 .tools/
 data/results/
+# 제출 폴더(docs/_build/make_submission.py로 생성)
+숨비소리/
