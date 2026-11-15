@@ -77,7 +77,7 @@ def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | N
         same = [i for i in items if not _opposite(i, direction)]
         other = [i for i in items if _opposite(i, direction)]
         if same:
-            out.append(f"같은 날 확인된 맥락은 {', '.join(i['detail'] for i in same)}이며 원인 후보로 볼 수 있습니다 [{hit[0]}].")
+            out.append(f"원인 후보로 볼 수 있는 같은 날 맥락: {', '.join(i['detail'] for i in same)} [{hit[0]}].")   # 목록 뒤에 조사를 붙이면 '있음이며'처럼 어색해짐
         for i in other:
             out.append(f"참고로 {i['detail']}는 이상 방향과 반대라 원인 후보에서 뺐습니다 [{hit[0]}].")
     if hit and hit[1].data.get("not_covered"):

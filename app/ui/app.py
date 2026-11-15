@@ -65,15 +65,25 @@ def short(emd: str) -> str:
     return emd.split(" ", 1)[-1]
 
 
+CHUJA_AT = (126.215, 33.505)   # 추자면을 옮겨 그릴 자리(가운데): 본섬 북서쪽 빈 바다. 지도 틀 안이라 섬이 한쪽으로 쏠리지 않는다
+
+
 def chuja_shift() -> tuple[float, float] | None:
-    """추자면(본섬 북쪽 약 45km)을 본섬 서쪽 바다로 옮겨 그릴 거리. 지도 높이가 늘지 않게(세로가 늘면 섬이 작아진다) 옆에 둔다."""
-    emd = get_emd()
-    far = [e for e in emd["emd"] if e["label"][1] > CHUJA_LAT]
-    main = [e["label"] for e in emd["emd"] if e["label"][1] <= CHUJA_LAT]
+    """추자면(본섬 북쪽 약 45km)을 본섬 북서쪽 바다(CHUJA_AT)로 옮겨 그릴 거리."""
+    far = [e for e in get_emd()["emd"] if e["label"][1] > CHUJA_LAT]
     if not far:
         return None
-    lon0, lat0 = far[0]["label"]
-    return (min(x for x, _ in main) - 0.17 - lon0, max(y for _, y in main) - 0.06 - lat0)
+    pts = [p for e in far for r in e["rings"] for p in r]
+    cx = (min(x for x, _ in pts) + max(x for x, _ in pts)) / 2
+    cy = (min(y for _, y in pts) + max(y for _, y in pts)) / 2
+    return CHUJA_AT[0] - cx, CHUJA_AT[1] - cy
+
+
+def bounds(shapes: dict, names=None, pad: float = 0.0) -> tuple[list[float], list[float]]:
+    """그린 모양들의 경도·위도 범위(+여백). names를 주면 그곳들만."""
+    xs = [x for n in (names or shapes) if n in shapes for x in shapes[n]["lon"] if x is not None]
+    ys = [y for n in (names or shapes) if n in shapes for y in shapes[n]["lat"] if y is not None]
+    return [min(xs) - pad, max(xs) + pad], [min(ys) - pad, max(ys) + pad]
 
 
 def draw_emd(fig, fills: dict[str, str], hover: dict[str, str], shift=None, include_chuja=True, edge: dict[str, str] | None = None) -> dict:
@@ -115,10 +125,21 @@ def label_ranked(fig, names: dict[str, str], shapes: dict) -> None:
                                text=text, showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor=INK, standoff=3, font=font)
 
 
-def map_layout(fig, height: int) -> None:
+YPAD = 40         # 관제판 '언제' 그래프의 세로축 눈금 글자 자리(px)
+LAT_SCALE = 1.2   # 북위 33.4도에서 위도 1도는 경도 1도의 약 1.2배 길이
+
+
+def map_height(xr: list[float], yr: list[float], width: int) -> int:
+    """지도 칸 너비(px)에 경도·위도 범위가 꽉 차는 높이."""
+    return round(width * (yr[1] - yr[0]) * LAT_SCALE / (xr[1] - xr[0]))
+
+
+def map_layout(fig, height: int, xr: list[float], yr: list[float]) -> None:
+    """범위를 고정하고 칸 비율이 다르면 바다 쪽 범위를 넓혀 채운다(constrain=range). 섬이 잘리거나 한쪽으로 쏠리지 않는다."""
     style.plot(fig, height=height)
-    fig.update_layout(margin=dict(l=0, r=0, t=4, b=0), showlegend=False, hoverlabel=dict(namelength=-1),
-                      xaxis=dict(visible=False), yaxis=dict(visible=False, scaleanchor="x", scaleratio=1.2), dragmode="pan")
+    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False, hoverlabel=dict(namelength=-1), dragmode="pan",
+                      xaxis=dict(visible=False, range=xr, constrain="range"),
+                      yaxis=dict(visible=False, range=yr, scaleanchor="x", scaleratio=LAT_SCALE, constrain="range"))
 
 
 @st.cache_data(show_spinner="이상 신호 계산 중…")
@@ -198,13 +219,79 @@ def _pick_episode(i: int, label: str) -> None:
     st.session_state["picked_msg"] = label
 
 
+TREND_H = 340   # 상세 탭 첫 줄 높이(추이 그래프). 위치 지도는 범위 버튼 줄만큼 더 높여 아래 끝을 맞춘다
+RANGE_BAR_H = 92   # 범위 버튼 줄 + 범례 줄
+
+
+def draw_trend(signal: str, method: str, threshold: float, row, emd: str, day, up: bool) -> None:
+    """고른 읍면동의 실제 값과 기대값(평소). 기본은 구간 앞뒤 8주, 버튼으로 전체 기간."""
+    s = store.series(signal, emd)
+    _, expected, zz = score_series(s, method)
+    rng = st.segmented_control("그래프 범위", ["구간 앞뒤 8주", "전체 기간"], default="구간 앞뒤 8주", key="detail_range",
+                               label_visibility="collapsed") or "구간 앞뒤 8주"
+    x0, x1 = (pd.Timestamp(row["시작"]) - pd.Timedelta(weeks=8), pd.Timestamp(row["끝"]) + pd.Timedelta(weeks=8)) \
+        if rng == "구간 앞뒤 8주" else (s.index.min(), s.index.max())
+    sw, ew, zw = s[x0:x1], expected[x0:x1], zz[x0:x1]
+    fig = go.Figure()
+    fig.add_vrect(x0=pd.Timestamp(row["시작"]) - pd.Timedelta(hours=12), x1=pd.Timestamp(row["끝"]) + pd.Timedelta(hours=12),
+                  fillcolor=PICK, opacity=0.14, line_width=0)
+    fig.add_scatter(x=ew.index, y=ew.values, name="기대값(평소)", line=dict(color=style.SUBTLE, width=1.5),
+                    hovertemplate="기대값 %{y:,.0f}<extra></extra>")
+    fig.add_scatter(x=sw.index, y=sw.values, name="실제", line=dict(color=INK, width=1.6), hovertemplate="실제 %{y:,.0f}<extra></extra>")
+    an = zw[zw.abs() >= threshold].dropna()
+    keys = [(f"line:{style.SUBTLE}", "기대값(평소)"), (f"line:{INK}", "실제")]
+    for name, part, col in (("평소보다 많은 날", an[an > 0], UP), ("평소보다 적은 날", an[an < 0], DOWN)):
+        if len(part):
+            keys.append((f"dot:{col}", name))
+            fig.add_scatter(x=part.index, y=sw.reindex(part.index), mode="markers", name=name, hoverinfo="skip",
+                            marker=dict(color=col, size=9, line=dict(color="#FFFFFF", width=2)))
+    if day in sw.index:
+        fig.add_annotation(x=day, y=sw[day], text=f"{row['기대 대비(%)']:+.0f}%", showarrow=False, yshift=14,
+                           font=dict(size=12, color=UP if up else DOWN))
+    keys.append((f"{PICK}24", "고른 구간"))
+    # 범례는 Plotly 범례 대신 HTML로: 칸 왼쪽 끝(소제목·지도 범례와 같은 선)에서 시작한다
+    st.markdown(style.key_html(keys), unsafe_allow_html=True)
+    style.plot(fig, height=TREND_H)
+    fig.update_layout(margin=dict(l=0, r=0, t=12, b=0), hovermode="x unified", showlegend=False)
+    fig.update_xaxes(hoverformat="%Y-%m-%d", tickformat="%m-%d" if rng == "구간 앞뒤 8주" else "%Y-%m")
+    fig.update_yaxes(tickformat=",")
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
+def draw_location(emd: str, neighbors: list[str]) -> None:
+    """고른 읍면동(귤색)과 함께 움직였는지 비교한 인근 읍면동(회색, 먹색 테두리). 이 곳들이 꽉 차게 확대한다."""
+    cent = store.centroids
+    if get_emd() is None or emd not in cent.index:
+        st.caption("읍면동 경계 파일이 없어 위치 지도를 그리지 못했습니다.")
+        return
+    nb = [e for e in neighbors if e in cent.index]
+    fills = {emd: PICK, **{e: style.LINE_STRONG for e in nb}}
+    hover = {emd: f"{emd}(고른 곳)", **{e: f"{e}(인근)" for e in nb}}
+    loc = go.Figure()
+    shapes = draw_emd(loc, fills, hover, include_chuja=cent.loc[emd, "lat"] > CHUJA_LAT, edge={e: INK for e in nb})
+    pts = [(e, shapes[e]["label"]) for e in [emd, *nb] if e in shapes]
+    loc.add_scatter(x=[p[0] for _, p in pts], y=[p[1] for _, p in pts], mode="markers+text",
+                    marker=dict(color=INK, size=[8] + [6] * (len(pts) - 1), line=dict(color="#FFFFFF", width=1.5)),
+                    text=[short(e) for e, _ in pts], hoverinfo="skip", textposition="bottom center",
+                    textfont=dict(size=[13] + [11] * (len(pts) - 1), color=INK, weight=[600] + [400] * (len(pts) - 1),
+                                  shadow="0 0 3px #fff, 0 0 3px #fff"))
+    # 고른 곳과 이웃의 범위 + 사방 25% 여백(이름이 틀 밖으로 나가지 않게). 칸 비율에 맞춰 바다·옆 동 쪽 범위가 늘어난다
+    xr, yr = bounds(shapes, [e for e, _ in pts])
+    px_, py_ = max(xr[1] - xr[0], 0.02) * 0.25, max(yr[1] - yr[0], 0.02) * 0.25
+    map_layout(loc, TREND_H + RANGE_BAR_H, [xr[0] - px_, xr[1] + px_], [yr[0] - py_, yr[1] + py_])
+    st.plotly_chart(loc, width="stretch", config={"displayModeBar": False, "scrollZoom": True})
+    st.markdown(style.key_html([(PICK, "고른 읍면동"), (style.LINE_STRONG, "인근(함께 움직였는지 비교한 곳)")]), unsafe_allow_html=True)
+    if not nb:
+        st.caption("15km 안에 이웃 읍면동이 없어 인근 비교는 하지 않습니다.")
+
+
 with tab_board:
     if z.empty:
         st.info("이 신호는 아직 분석할 만큼 수집되지 않았습니다.")
     else:
         cols = pd.DatetimeIndex(z.columns)
-        pc1, pc2 = st.columns([1, 4], vertical_alignment="bottom")
-        period = pc1.selectbox("기간", board.months(z) + ["전체 기간"], index=0, key="board_period")
+        pc1, pc2 = st.columns([1, 4], vertical_alignment="center")
+        period = pc1.selectbox("기간", board.months(z) + ["전체 기간"], index=0, key="board_period", label_visibility="collapsed")
         start, end = (cols.min(), cols.max()) if period == "전체 기간" else board.month_bounds(period)
         pe = board.period_episodes(episodes, start, end)
         counts = board.daily_alarm_counts(z, threshold, start, end)
@@ -233,17 +320,18 @@ with tab_board:
                 fmap = go.Figure()
                 shapes = draw_emd(fmap, fills, hover, shift=shift)
                 if shift and "제주시 추자면" in shapes:   # 옮겨 그린 추자면임을 점선 상자로 표시
-                    xs = [x for x in shapes["제주시 추자면"]["lon"] if x is not None]
-                    ys = [y for y in shapes["제주시 추자면"]["lat"] if y is not None]
-                    fmap.add_shape(type="rect", x0=min(xs) - 0.03, x1=max(xs) + 0.03, y0=min(ys) - 0.03, y1=max(ys) + 0.035,
-                                   line=dict(color=style.SUBTLE, width=1, dash="dot"))
-                    fmap.add_annotation(x=(min(xs) + max(xs)) / 2, y=max(ys) + 0.035, yanchor="bottom", showarrow=False,
-                                        text="추자면<br>(실제는 북쪽 45km)", font=dict(size=11, color=style.MUTED))
+                    (cx0, cx1), (cy0, cy1) = bounds(shapes, ["제주시 추자면"], pad=0.015)
+                    fmap.add_shape(type="rect", x0=cx0, x1=cx1, y0=cy0, y1=cy1, line=dict(color=style.SUBTLE, width=1, dash="dot"))
+                    fmap.add_annotation(x=cx0, y=cy1, xanchor="left", yanchor="bottom", showarrow=False,
+                                        text="추자면(실제는 북쪽 45km)", font=dict(size=11, color=style.MUTED))
                 ranks: dict[str, list[str]] = {}
                 for rank, (_, r) in enumerate(top.iterrows(), 1):
                     ranks.setdefault(r["읍면동"], []).append(str(rank))
                 label_ranked(fmap, {e: f"{','.join(ranks[e])} {short(e)}" for e in ranks}, shapes)
-                map_layout(fmap, 430)
+                # 섬 전체 + 시내 이름 줄(위·아래 바다) + 추자면 설명이 들어가는 범위. 칸 너비(약 750px)에 꽉 차는 높이
+                xr, yr = bounds(shapes, pad=0.02)
+                yr = [min(yr[0], CITY_ZONES[1][4] - 0.035), max(yr[1], CITY_ZONES[0][4] + 0.035)]
+                map_layout(fmap, map_height(xr, yr, 750), xr, yr)
                 st.plotly_chart(fmap, width="stretch", config={"displayModeBar": False, "scrollZoom": True})
                 st.markdown(style.key_html([(UP, f"많음(점수 {STRONG:.0f} 이상)"), (style.UP_SOFT, "많음"), (style.LAND, "이상 없음"),
                                             (style.DOWN_SOFT, "적음"), (DOWN, f"적음(점수 {STRONG:.0f} 이상)")]), unsafe_allow_html=True)
@@ -259,11 +347,13 @@ with tab_board:
                 st.caption(f"이 기간은 {qcs[0]['unchecked'].replace(' 확인 불가', '')} 자료 제공 기간 밖이라 그 맥락은 확인하지 못했습니다.")
             for rank, ((i, r), qc) in enumerate(zip(top.iterrows(), qcs), 1):
                 up = r["방향"] == "증가"
-                st.markdown(style.episode_row_html(rank, r["읍면동"], span_text(r["시작"], r["끝"], r["일수"]), r["유형"], up,
-                                                   r["기대 대비(%)"], r["점수"], qc["cause"], qc["points"], "" if same_na else qc["unchecked"]),
-                            unsafe_allow_html=True)
-                st.button("상세 분석 보기", key=f"go_{i}", type="tertiary", on_click=_pick_episode,
-                          args=(int(i), f"{r['읍면동']} {r['최대일']}"))
+                # 카드 한 장 = 내용 + '상세 분석 보기'. 왼쪽 색 막대가 버튼까지 감싸도록 컨테이너에 그린다(style.CSS의 st-key-ep)
+                with st.container(key=f"ep_{rank}_{'up' if up else 'down'}"):
+                    st.markdown(style.episode_row_html(rank, r["읍면동"], span_text(r["시작"], r["끝"], r["일수"]), r["유형"], up,
+                                                       r["기대 대비(%)"], r["점수"], qc["cause"], qc["points"], "" if same_na else qc["unchecked"]),
+                                unsafe_allow_html=True)
+                    st.button("상세 분석 보기", key=f"go_{i}", type="tertiary", on_click=_pick_episode,
+                              args=(int(i), f"{r['읍면동']} {r['최대일']}"))
             st.caption("원인 후보는 화면을 빨리 띄우려고 규칙으로 정한 '빠른 판정'입니다. 판단 모델의 판정과 검증된 브리핑은 상세 분석에서 봅니다.")
 
         st.markdown("#### 언제 달라졌나")
@@ -280,9 +370,11 @@ with tab_board:
             ftr.add_annotation(x=counts.idxmax(), y=counts.max(), text=f"{counts.idxmax():%m-%d} {int(counts.max())}곳", showarrow=False,
                                yshift=10, font=dict(size=12, color=INK), row=2, col=1)
         style.plot(ftr, height=420)
-        ftr.update_layout(margin=dict(l=0, r=0, t=28, b=0), showlegend=False, bargap=0.2, hovermode="x")
-        ftr.update_annotations(selector=dict(text=f"제주 전체 {signal}(하루 합계, 만)"), x=0, xanchor="left", font=dict(size=13, color=style.INK_2))
-        ftr.update_annotations(selector=dict(text="평소와 크게 달랐던 읍면동 수"), x=0, xanchor="left", font=dict(size=13, color=style.INK_2))
+        # 왼쪽 여백(눈금 글자 자리)을 고정하고 두 칸 제목을 그만큼 왼쪽으로 당겨 위 소제목·눈금과 같은 선에 맞춘다
+        ftr.update_layout(margin=dict(l=YPAD, r=0, t=28, b=0), showlegend=False, bargap=0.2, hovermode="x")
+        for t in (f"제주 전체 {signal}(하루 합계, 만)", "평소와 크게 달랐던 읍면동 수"):
+            ftr.update_annotations(selector=dict(text=t), x=0, xanchor="left", xshift=-YPAD, font=dict(size=13, color=style.INK_2))
+        ftr.update_yaxes(automargin=False)
         ftr.update_yaxes(rangemode="tozero", row=2, col=1)
         ftr.update_xaxes(tickformat="%m-%d" if period != "전체 기간" else "%Y-%m")
         st.plotly_chart(ftr, width="stretch", config={"displayModeBar": False})
@@ -321,33 +413,6 @@ with tab_detail:
                                      f"가장 큰 날 {row['최대일']}: 기대값보다 {row['기대 대비(%)']:+.1f}%, 점수 {abs(row['점수']):.1f}, {row['유형']}"),
                     unsafe_allow_html=True)
 
-        s = store.series(signal, emd)
-        _, expected, zz = score_series(s, method)
-        rng = st.segmented_control("그래프 범위", ["구간 앞뒤 8주", "전체 기간"], default="구간 앞뒤 8주", key="detail_range",
-                                   label_visibility="collapsed") or "구간 앞뒤 8주"
-        x0, x1 = (pd.Timestamp(row["시작"]) - pd.Timedelta(weeks=8), pd.Timestamp(row["끝"]) + pd.Timedelta(weeks=8)) \
-            if rng == "구간 앞뒤 8주" else (s.index.min(), s.index.max())
-        sw, ew, zw = s[x0:x1], expected[x0:x1], zz[x0:x1]
-        fig = go.Figure()
-        fig.add_vrect(x0=pd.Timestamp(row["시작"]) - pd.Timedelta(hours=12), x1=pd.Timestamp(row["끝"]) + pd.Timedelta(hours=12),
-                      fillcolor=PICK, opacity=0.14, line_width=0)
-        fig.add_scatter(x=ew.index, y=ew.values, name="기대값(평소)", line=dict(color=style.SUBTLE, width=1.5),
-                        hovertemplate="기대값 %{y:,.0f}<extra></extra>")
-        fig.add_scatter(x=sw.index, y=sw.values, name="실제", line=dict(color=INK, width=1.6), hovertemplate="실제 %{y:,.0f}<extra></extra>")
-        an = zw[zw.abs() >= threshold].dropna()
-        for name, part, col in (("평소보다 많은 날", an[an > 0], UP), ("평소보다 적은 날", an[an < 0], DOWN)):
-            if len(part):
-                fig.add_scatter(x=part.index, y=sw.reindex(part.index), mode="markers", name=name, hoverinfo="skip",
-                                marker=dict(color=col, size=9, line=dict(color="#FFFFFF", width=2)))
-        if day in sw.index:
-            fig.add_annotation(x=day, y=sw[day], text=f"{row['기대 대비(%)']:+.0f}%", showarrow=False, yshift=14,
-                               font=dict(size=12, color=UP if up else DOWN))
-        style.plot(fig, height=340)
-        fig.update_layout(margin=dict(l=0, r=0, t=30, b=0), hovermode="x unified", legend=dict(y=1.12))
-        fig.update_xaxes(hoverformat="%Y-%m-%d", tickformat="%m-%d" if rng == "구간 앞뒤 8주" else "%Y-%m")
-        fig.update_yaxes(tickformat=",")
-        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-
         tb = get_toolbox()
         res = {}
         for i, (name, args) in enumerate([
@@ -358,6 +423,14 @@ with tab_detail:
         ], 1):
             res[f"R{i}"] = tb.dispatch(name, args, f"R{i}")
 
+        # 첫 줄: 추이(넓게) + 위치 지도(좁게). 두 칸 모두 소제목으로 시작하고 높이를 맞춘다
+        c_trend, c_loc = st.columns([8, 4], gap="large")
+        with c_trend:
+            st.markdown("#### 실제 값과 평소 값")
+            draw_trend(signal, method, threshold, row, emd, day, up)
+        with c_loc:
+            st.markdown("#### 위치와 인근 읍면동")
+            draw_location(emd, res["R2"].data.get("neighbors", []))
         items = res["R3"].data["items"]
         not_covered = res["R3"].data.get("not_covered", [])
         co = res["R2"].data["co_movements"]
@@ -420,7 +493,8 @@ with tab_detail:
                                             marker_color=[PICK if c == CAUSE_KO[j.choice] else style.LINE_STRONG for c in pr["원인"]]))
                     style.plot(bars, height=20 + 30 * len(pr))
                     bars.update_layout(margin=dict(l=0, r=40, t=0, b=0), bargap=0.55)
-                    bars.update_xaxes(visible=False, range=[0, 1.08]).update_yaxes(title=None, gridcolor="#FFFFFF", ticks="")
+                    bars.update_xaxes(visible=False, range=[0, 1.08]).update_yaxes(title=None, gridcolor="#FFFFFF", ticks="", ticksuffix="  ",
+                                                                                    tickfont=dict(size=12, color=style.INK_2))
                     st.plotly_chart(bars, width="stretch", config={"displayModeBar": False, "staticPlot": True})
                     if len(rest):
                         st.caption(f"1% 미만: {', '.join(rest['원인'][::-1])}")
@@ -429,34 +503,6 @@ with tab_detail:
             with st.expander("판정 모델에 넘기는 근거"):
                 st.text(evidence_text(evidence))
 
-            cent = store.centroids
-            if get_emd() is not None and emd in cent.index:
-                st.markdown("#### 위치와 인근 읍면동")
-                nb = [e for e in res["R2"].data.get("neighbors", []) if e in cent.index]
-                is_chuja = cent.loc[emd, "lat"] > CHUJA_LAT
-                fills = {emd: PICK, **{e: style.LINE_STRONG for e in nb}}
-                hover = {emd: f"{emd}(고른 곳)", **{e: f"{e}(인근)" for e in nb}}
-                loc = go.Figure()
-                shapes = draw_emd(loc, fills, hover, include_chuja=is_chuja, edge={e: INK for e in nb})
-                pts = [(e, shapes[e]["label"]) for e in [emd, *nb] if e in shapes]
-                loc.add_scatter(x=[p[0] for _, p in pts], y=[p[1] for _, p in pts], mode="markers+text",
-                                marker=dict(color=INK, size=[8] + [6] * (len(pts) - 1),
-                                            line=dict(color="#FFFFFF", width=1.5)),
-                                text=[short(e) for e, _ in pts], hoverinfo="skip",
-                                textposition=["top center"] + [("middle left" if p[0] < pts[0][1][0] else "middle right") for _, p in pts[1:]],
-                                textfont=dict(size=[13] + [11] * (len(pts) - 1), color=INK, shadow="0 0 3px #fff, 0 0 3px #fff"))
-                map_layout(loc, 320)
-                # 고른 곳과 이웃이 보이게 확대(동 지역은 작아서 섬 전체로 그리면 겹친다). 끌거나 휠로 넓혀 볼 수 있다
-                xs = [x for e in [emd, *nb] if e in shapes for x in shapes[e]["lon"] if x is not None]
-                ys = [y for e in [emd, *nb] if e in shapes for y in shapes[e]["lat"] if y is not None]
-                cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
-                half = max(max(xs) - min(xs), (max(ys) - min(ys)) * 1.2, 0.12) * 0.75
-                loc.update_layout(xaxis=dict(range=[cx - half * 1.6, cx + half * 1.6]), yaxis=dict(range=[cy - half / 1.2, cy + half / 1.2]))
-                st.plotly_chart(loc, width="stretch", config={"displayModeBar": False, "scrollZoom": True})
-                st.markdown(style.key_html([(PICK, "고른 읍면동"), (style.LINE_STRONG, "인근 읍면동(함께 움직였는지 비교한 곳)")]),
-                            unsafe_allow_html=True)
-                st.caption("고른 곳 주변을 확대했습니다(마우스 휠로 넓혀 보기). "
-                           + ("15km 안에 이웃 읍면동이 없어 인근 비교는 하지 않습니다." if not nb else ""))
 
         st.markdown("#### 브리핑")
         text = template_text(res)
@@ -522,23 +568,28 @@ with tab_ask:
                 st.caption("검증 메시지: " + " / ".join(run.verify_errors[:3]))
 
 with tab_quality:
-    st.markdown("#### 신호별 마지막 자료 날짜")
-    st.markdown(style.table_html(pd.DataFrame(q["as_of"].items(), columns=["신호", "마지막 날짜"])), unsafe_allow_html=True)
-    st.markdown("#### 위치 매핑(좌표 → 읍면동)")
-    loc_df = pd.DataFrame([{"대상": "버스 정류소", **q["bus_stations"]}, {"대상": "와이파이 AP그룹", **q["wifi_ap_groups"]}]) \
-        .rename(columns={"mapped": "매핑", "unmatched": "매칭 실패"})
-    st.markdown(style.table_html(loc_df, num_cols=tuple(c for c in loc_df.columns if c != "대상")), unsafe_allow_html=True)
-    if q.get("bus_usage"):
-        st.markdown("#### 버스 이용 자료 → 읍면동 연결(이용자 수 기준)")
-        bu = q["bus_usage"]
-        bu_df = pd.DataFrame([{"연결 방법": k, "비율": f"{v:.1f}%"} for k, v in {
-            "정류소ID 일치": bu["by_id"], "정류소 이름 일치": bu["by_name"],
-            "같은 이름이 여러 읍면동(제외)": bu["ambiguous_name"], "매칭 실패(제외)": bu["unmatched"]}.items()])
-        st.markdown(style.table_html(bu_df, num_cols=("비율",)), unsafe_allow_html=True)
-        st.caption("이용 자료(613)와 정류소 정보(612)의 정류소ID 체계가 달라, 기호를 뺀 정류소 이름이 한 읍면동에만 있을 때 연결합니다. "
-                   "여러 읍면동에 같은 이름이 있는 정류소(터미널 등)는 추측하지 않고 제외합니다.")
-    emd_src = (get_emd() or {}).get("source")
-    if emd_src:
-        st.markdown("#### 지도 경계")
-        st.caption(emd_src + ". 읍면동 이름 43곳이 분석 자료와 모두 일치합니다.")
-    st.caption("수집이 끝나지 않은 신호는 끝까지 받은 기간만 표시합니다. 원인 판정은 상관에 기반한 후보이며 인과가 아닙니다.")
+    # 두 칸: 왼쪽 = 자료가 언제까지 있나·좌표 연결, 오른쪽 = 버스 이용 자료 연결. 표는 칸 너비를 꽉 채운다
+    ql, qr = st.columns(2, gap="large")
+    with ql:
+        st.markdown("#### 신호별 마지막 자료 날짜")
+        st.markdown(style.table_html(pd.DataFrame(q["as_of"].items(), columns=["신호", "마지막 날짜"])), unsafe_allow_html=True)
+        st.caption("수집이 끝나지 않은 신호는 끝까지 받은 기간만 표시합니다.")
+        st.markdown("#### 위치 매핑(좌표 → 읍면동)")
+        loc_df = pd.DataFrame([{"대상": "버스 정류소", **q["bus_stations"]}, {"대상": "와이파이 AP그룹", **q["wifi_ap_groups"]}]) \
+            .rename(columns={"mapped": "매핑", "unmatched": "매칭 실패"})
+        st.markdown(style.table_html(loc_df, num_cols=tuple(c for c in loc_df.columns if c != "대상")), unsafe_allow_html=True)
+    with qr:
+        if q.get("bus_usage"):
+            st.markdown("#### 버스 이용 자료 → 읍면동 연결(이용자 수 기준)")
+            bu = q["bus_usage"]
+            bu_df = pd.DataFrame([{"연결 방법": k, "비율": f"{v:.1f}%"} for k, v in {
+                "정류소ID 일치": bu["by_id"], "정류소 이름 일치": bu["by_name"],
+                "같은 이름이 여러 읍면동(제외)": bu["ambiguous_name"], "매칭 실패(제외)": bu["unmatched"]}.items()])
+            st.markdown(style.table_html(bu_df, num_cols=("비율",)), unsafe_allow_html=True)
+            st.caption("이용 자료(613)와 정류소 정보(612)의 정류소ID 체계가 달라, 기호를 뺀 정류소 이름이 한 읍면동에만 있을 때 연결합니다. "
+                       "여러 읍면동에 같은 이름이 있는 정류소(터미널 등)는 추측하지 않고 제외합니다.")
+        emd_src = (get_emd() or {}).get("source")
+        if emd_src:
+            st.markdown("#### 지도 경계")
+            st.caption(emd_src + ". 읍면동 이름 43곳이 분석 자료와 모두 일치합니다.")
+    st.caption("원인 판정은 상관에 기반한 후보이며 인과가 아닙니다.")

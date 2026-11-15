@@ -53,20 +53,26 @@ h4 {{ font-weight:600 !important; font-size:1.05rem !important; color:var(--jj-i
 .stTabs [data-baseweb="tab-panel"] {{ padding-top:18px; }}
 
 /* 기간 요약 문장 */
-.jj-sum {{ font-size:1.12rem; line-height:1.7; color:var(--jj-ink2); margin:2px 0 6px; max-width:70em; }}
+.jj-sum {{ font-size:1.12rem; line-height:1.6; color:var(--jj-ink2); margin:0; max-width:70em; }}
 .jj-sum b {{ color:var(--jj-ink); font-weight:600; }}
 
-/* TOP 5 줄: 왼쪽 막대 색 = 방향(많음/적음) */
-.jj-row {{ display:grid; grid-template-columns:30px 1fr auto; column-gap:12px; padding:12px 14px 10px 12px;
-          border-top:1px solid var(--jj-line); border-left:3px solid var(--jj-subtle); background:#FFFFFF; }}
-.jj-row.up {{ border-left-color:var(--jj-up); }} .jj-row.down {{ border-left-color:var(--jj-down); }}
+/* TOP 5 카드: 컨테이너(st-key-ep_순위_방향)가 왼쪽 막대를 그려 '상세 분석 보기'까지 한 장으로 묶는다. 막대 색 = 방향 */
+[class*="st-key-ep_"] {{ border-left:3px solid var(--jj-subtle); padding:10px 14px 10px 12px; gap:4px !important; background:#FFFFFF; }}
+[class*="st-key-ep_"][class*="_up"] {{ border-left-color:var(--jj-up); }}
+[class*="st-key-ep_"][class*="_down"] {{ border-left-color:var(--jj-down); }}
+[class*="st-key-ep_"] [data-testid="stMarkdownContainer"] {{ margin-bottom:0 !important; }}   /* Streamlit 기본 -15px 때문에 버튼이 윗줄에 겹쳤음 */
+[class*="st-key-ep_"] [data-testid="stButton"] {{ padding-left:42px; }}
+.jj-row {{ display:grid; grid-template-columns:30px 1fr auto; column-gap:12px; }}
+/* 좁은 칸에서 한글 낱말·날짜가 중간에서 끊기지 않게 */
+.jj-row, .jj-sum, .jj-ev, .jj-answer, .jj-title {{ word-break:keep-all; overflow-wrap:anywhere; }}
+.jj-row .nw {{ white-space:nowrap; }}
 .jj-row .rank {{ font-size:1.25rem; font-weight:600; color:var(--jj-ink); line-height:1.3; }}
 .jj-row .name {{ font-weight:600; font-size:1.02rem; color:var(--jj-ink); }}
 .jj-row .when {{ color:var(--jj-muted); font-size:0.86rem; margin-top:1px; }}
 .jj-row .pct {{ text-align:right; font-size:1.3rem; font-weight:400; line-height:1.3; white-space:nowrap; }}
 .jj-row.up .pct {{ color:var(--jj-up); }} .jj-row.down .pct {{ color:var(--jj-down); }}
 .jj-row .pct small {{ display:block; font-size:0.78rem; color:var(--jj-muted); }}
-.jj-row .why {{ grid-column:2 / -1; margin-top:8px; font-size:0.9rem; color:var(--jj-ink2); line-height:1.55; }}
+.jj-row .why {{ grid-column:2 / -1; margin-top:6px; font-size:0.9rem; color:var(--jj-ink2); line-height:1.55; }}
 .jj-row .why b {{ font-weight:600; color:var(--jj-ink); margin-right:6px; }}
 .jj-row .why .na {{ display:block; color:var(--jj-subtle); font-size:0.82rem; }}
 
@@ -95,15 +101,17 @@ h4 {{ font-weight:600 !important; font-size:1.05rem !important; color:var(--jj-i
 .jj-meta b {{ color:var(--jj-ink2); font-weight:600; margin-right:4px; }}
 
 /* 표 */
-.jj-table {{ border-collapse:collapse; width:auto; min-width:min(560px, 100%); font-size:0.93rem; margin:4px 0 8px; border:none !important; }}
+.jj-table {{ border-collapse:collapse; width:100%; font-size:0.93rem; margin:4px 0 8px; border:none !important; }}
 .jj-table th, .jj-table td {{ border-left:none !important; border-right:none !important; border-top:none !important; }}
 .jj-table th {{ text-align:left; font-weight:600; color:var(--jj-ink2); background:var(--jj-ledger); padding:8px 12px; border-bottom:1px solid var(--jj-line-strong); }}
 .jj-table td {{ padding:8px 12px; border-bottom:1px solid var(--jj-line); }}
 .jj-table .n {{ text-align:right; font-variant-numeric:tabular-nums; }}
 
 /* 범례 */
-.jj-key {{ display:inline-flex; align-items:center; gap:6px; margin-right:16px; color:var(--jj-muted); font-size:0.84rem; }}
+.jj-key {{ display:inline-flex; align-items:center; vertical-align:middle; gap:6px; margin-right:16px; color:var(--jj-muted); font-size:0.84rem; }}
 .jj-key i {{ width:12px; height:12px; display:inline-block; }}
+.jj-key i.ln {{ width:18px; height:2px; }}
+.jj-key i.dot {{ width:9px; height:9px; border-radius:50%; }}
 .jj-key i.ring {{ background:#FFFFFF !important; border:2px solid {INK}; width:10px; height:10px; }}
 
 /* 버튼: 기본은 먹색 테두리, 주요 동작은 먹색 채움, 줄 안의 '상세 보기'는 글자 버튼 */
@@ -150,7 +158,7 @@ def episode_row_html(rank: int, emd: str, span: str, kind: str, up: bool, pct: f
     if unchecked:
         why += f'<span class="na">{_e(unchecked)}</span>'
     return (f'<div class="jj-row {"up" if up else "down"}"><div class="rank">{rank}</div>'
-            f'<div><div class="name">{_e(emd)}</div><div class="when">{_e(span)}, {_e(kind)}</div></div>'
+            f'<div><div class="name">{_e(emd)}</div><div class="when"><span class="nw">{_e(span)},</span> {_e(kind)}</div></div>'
             f'<div class="pct">{"+" if up else "−"}{abs(pct):.1f}%<small>점수 {abs(score):.1f}</small></div>'
             f'<div class="why">{why}</div></div>')
 
@@ -199,9 +207,15 @@ def table_html(df, num_cols: tuple[str, ...] = ()) -> str:
 
 
 def key_html(items: list[tuple[str, str]]) -> str:
-    """색 범례: [(색, 설명), ...]. 색 자리에 'ring'을 주면 흰 바탕 테두리 표시."""
-    return "".join(f'<span class="jj-key"><i class="ring"></i>{_e(t)}</span>' if c == "ring" else
-                   f'<span class="jj-key"><i style="background:{c}"></i>{_e(t)}</span>' for c, t in items)
+    """색 범례: [(색, 설명), ...]. 색 = 칠한 칸, 'line:색' = 선, 'dot:색' = 점, 'ring' = 흰 바탕 테두리.
+    그래프 범례도 이것으로 그려 칸 왼쪽 끝(소제목과 같은 선)에서 시작하게 한다."""
+    def swatch(c: str) -> str:
+        if c == "ring":
+            return '<i class="ring"></i>'
+        kind, _, color = c.rpartition(":")
+        cls = {"line": ' class="ln"', "dot": ' class="dot"'}.get(kind, "")
+        return f'<i{cls} style="background:{color}"></i>'
+    return "".join(f'<span class="jj-key">{swatch(c)}{_e(t)}</span>' for c, t in items)
 
 
 def plot(fig, height: int | None = None):

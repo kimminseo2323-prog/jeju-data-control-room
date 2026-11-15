@@ -140,3 +140,13 @@ def test_template_reports_nationality_driving_the_change():
     text = template_text(res)
     assert "국적별로는 중국이 평소보다 1,200명 많아 전체 변화의 85.7%를 차지했습니다 [R2]." in text
     assert verify(text, res).ok
+
+
+def test_context_sentence_reads_naturally_after_any_detail():
+    # 맥락 문구가 '…있음'으로 끝나면 '있음이며'처럼 어색했다(우도면 2025-08-01, 2026-11-15). 목록 뒤에 조사를 붙이지 않는다
+    r = dict(RESULTS)
+    r["R2"] = ToolResult("R2", "check_context", {}, {"date": "2025-01-29", "emd": "서귀포시 성산읍", "items": [
+        {"kind": "last_year", "detail": "작년 같은 시기에도 평소보다 많았음, 매년 반복되는 변화일 수 있음"}]}, [])
+    line = next(l for l in template_text(r).split("\n") if "원인 후보로 볼 수" in l)
+    assert line.startswith("원인 후보로 볼 수 있는 같은 날 맥락: 작년 같은 시기에도") and "있음이며" not in line
+    assert verify(template_text(r), r).ok
