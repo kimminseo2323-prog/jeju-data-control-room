@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "숨비소리"
-PLAN_PDF = "숨비소리_AI_Agent_기획서_v0.5.pdf"
+PLAN_PDF = "숨비소리_AI_Agent_기획서_v0.6.pdf"
 
 FILES = ["README.md", "install.bat", "run.bat", "requirements.txt", "requirements-dev.txt", "pytest.ini", ".env.example",
          ".streamlit/config.toml", "02_게시판_QA정리.md", "데이터명세서_kr.xlsx"]

@@ -33,17 +33,23 @@ def template_text(results: dict) -> str:
             for e in d["episodes"][:5]:
                 word = "많았" if e["direction"] == "up" else "적었"
                 span = e["start"] if e["start"] == e["end"] else f"{e['start']}~{e['end']}"
-                lines.append(f"{span}({e['kind']}): 가장 큰 날 {e['peak_date']} 값은 {e['peak_value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 "
-                             f"기대값 {e['peak_expected']:,}보다 {abs(e['peak_pct'])}% {word}습니다 [{rid}].")
+                lines.append(f"{span}({e['kind']}): 가장 큰 날 {e['peak_date']} 값은 {_n(e['peak_value'])}{SIGNAL_UNIT.get(d['signal'], '')}으로 "
+                             f"기대값 {_n(e['peak_expected'])}보다 {abs(e['peak_pct'])}% {word}습니다 [{rid}].")
                 lines += _evidence_lines(e["peak_date"], d["emd"], ctx, cos, e["direction"], nat)
             continue
         lines.append(f"{d['emd']} {d['signal']}에서 이상 신호 {d['count']}건이 확인됐습니다 [{rid}].")
         for a in d["anomalies"][:5]:
             word = "많았" if a["direction"] == "up" else "적었"
-            lines.append(f"{a['date']} 값은 {a['value']:,}{SIGNAL_UNIT.get(d['signal'], '')}으로 기대값 {a['expected']:,}보다 "
+            lines.append(f"{a['date']} 값은 {_n(a['value'])}{SIGNAL_UNIT.get(d['signal'], '')}으로 기대값 {_n(a['expected'])}보다 "
                          f"{abs(a['pct'])}% {word}습니다 [{rid}].")
             lines += _evidence_lines(a["date"], d["emd"], ctx, cos, a["direction"], nat)
     return "\n".join(lines)
+
+
+def _n(x) -> str:
+    """사람 수·건수: 소수점 아래가 0이면 정수로(263,187.0명 → 263,187명). 검증은 정수를 반올림 값과 대조하므로 그대로 통과한다."""
+    x = float(x)
+    return f"{x:,.0f}" if x == int(x) else f"{x:,.1f}"
 
 
 def markdown_safe(text: str) -> str:
@@ -90,7 +96,7 @@ def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | N
         t = hit[1].data["top"][0]
         word = "많아" if t["diff"] > 0 else "적어"
         share = f" 전체 변화의 {t['share_of_change']}%를 차지했습니다" if t.get("share_of_change") is not None else " 가장 크게 움직였습니다"
-        out.append(f"국적별로는 {t['nationality']}{_josa(t['nationality'], '이', '가')} 평소보다 {abs(t['diff']):,}명 {word}{share} [{hit[0]}].")
+        out.append(f"국적별로는 {t['nationality']}{_josa(t['nationality'], '이', '가')} 평소보다 {_n(abs(t['diff']))}명 {word}{share} [{hit[0]}].")
     return out
 
 

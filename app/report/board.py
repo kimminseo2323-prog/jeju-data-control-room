@@ -5,6 +5,8 @@
 """
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
 from app.llm.judge import CAUSE_KO, NOT_COVERED_KO, rule_judge
@@ -63,12 +65,16 @@ def quick_cause(tb, signal: str, emd: str, day: str, direction: str) -> dict:
           "context": same, "co_movements": co}
     cause = CAUSE_KO[rule_judge(ev).choice]
     order = {"weather": 0, "holiday": 1, "event": 2, "recurrence": 3, "visitors": 4}
-    reasons = [c["detail"] for c in sorted(same, key=lambda c: order.get(c["kind"], 9))][:1]
+    points = [short_point(c["detail"]) for c in sorted(same, key=lambda c: order.get(c["kind"], 9))][:1]
     if co:
         word = "증가" if co[0]["direction"] == "up" else "감소"
-        reasons.append(f"{co[0]['signal']}도 함께 {word}" + (f" 외 {len(co) - 1}건" if len(co) > 1 else ""))
-    if not reasons:   # 그날 비교할 다른 신호 자료가 하나도 없으면 '동반 변화 없음'이라 하지 않는다
-        reasons.append("같은 날 확인된 맥락·동반 변화 없음" if cr.get("checked") else "같은 날 확인된 맥락 없음, 비교할 다른 신호 자료 없음")
-    if cx.get("not_covered"):
-        reasons.append("·".join(NOT_COVERED_KO.get(k, k) for k in cx["not_covered"]) + " 확인 불가")
-    return {"cause": cause, "reason": " / ".join(reasons)}
+        points.append(f"{co[0]['signal']}도 함께 {word}" + (f" 외 {len(co) - 1}건" if len(co) > 1 else ""))
+    if not points:   # 그날 비교할 다른 신호 자료가 하나도 없으면 '동반 변화 없음'이라 하지 않는다
+        points.append("같은 날 확인된 맥락·동반 변화 없음" if cr.get("checked") else "같은 날 확인된 맥락 없음, 비교할 다른 신호 자료 없음")
+    unchecked = ("·".join(NOT_COVERED_KO.get(k, k) for k in cx["not_covered"]) + " 확인 불가") if cx.get("not_covered") else ""
+    return {"cause": cause, "points": points, "unchecked": unchecked, "reason": " / ".join(points + ([unchecked] if unchecked else []))}
+
+
+def short_point(detail: str) -> str:
+    """관제판 한 줄용으로 맥락 문장을 줄인다: 점수 괄호와 '…일 수 있음' 꼬리를 뗀다(상세 탭에는 원문 그대로)."""
+    return re.sub(r"\(점수 [^)]*\)", "", detail).split(", 매년 반복")[0].strip()

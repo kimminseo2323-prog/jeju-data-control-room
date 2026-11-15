@@ -119,9 +119,9 @@ def evidence_text(evidence: dict) -> str:
 def judgment_label(j: Judgment) -> str:
     """화면에 보일 판정 한 줄. 규칙 판정은 확률이 없으므로(보기 확률은 고정값) 확률·확신도를 보이지 않는다."""
     if j.backend == "rule":
-        return f"{CAUSE_KO[j.choice]} · 규칙으로 고른 후보(판단 모델 미연결, 확률 없음)"
+        return f"{CAUSE_KO[j.choice]} (규칙으로 고른 후보, 판단 모델이 연결되지 않아 확률 없음)"
     p = j.probabilities.get(j.choice, 0)
-    return f"{CAUSE_KO[j.choice]} · 확신도 {j.level} ({p:.0%}) · 판단 모델 {j.backend}"
+    return f"{CAUSE_KO[j.choice]} (확신도 {j.level}, {p:.0%}, 판단 모델 {j.backend})"
 
 
 def model_status(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL) -> tuple[bool, str]:
@@ -133,7 +133,7 @@ def model_status(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_M
     except Exception:
         return False, "연결 안 됨 → 규칙 기반 판정"
     if model in names:
-        return True, f"연결됨 · {model} (로컬)"
+        return True, f"{model} 연결됨(이 PC)"
     return False, f"{model} 모델이 설치되지 않음(ollama pull {model}) → 규칙 기반 판정"
 
 

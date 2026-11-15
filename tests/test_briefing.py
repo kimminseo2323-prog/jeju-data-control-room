@@ -138,5 +138,5 @@ def test_template_reports_nationality_driving_the_change():
                                                           "top": [{"nationality": "중국", "value": 1800.0, "expected": 600.0, "diff": 1200.0, "share_of_change": 85.7},
                                                                   {"nationality": "대만", "value": 300.0, "expected": 200.0, "diff": 100.0, "share_of_change": 7.1}]})}
     text = template_text(res)
-    assert "국적별로는 중국이 평소보다 1,200.0명 많아 전체 변화의 85.7%를 차지했습니다 [R2]." in text
+    assert "국적별로는 중국이 평소보다 1,200명 많아 전체 변화의 85.7%를 차지했습니다 [R2]." in text
     assert verify(text, res).ok

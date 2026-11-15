@@ -1,48 +1,61 @@
-"""제주 윤곽(시군구 경계) 지도: 원본 GeoJSON에서 제주 2개 시만 골라 화면용으로 줄인다."""
+"""제주 읍면동(행정동) 경계 지도: 원본 GeoJSON에서 제주 43곳만 골라 화면용으로 줄인다."""
 import json
 
-from app.store.jeju_map import CHUJA_LAT, build_outline, outline_traces
+from app.store.jeju_map import CHUJA_LAT
 
 
 def _square(lon, lat, d):
     return [[[lon, lat], [lon + d, lat], [lon + d, lat + d], [lon, lat + d], [lon, lat]]]
 
 
-def _src(tmp_path):
+
+def _wiggly(lon, lat, d, n=200):
+    """점이 많은 사각형(변마다 잔물결) — 단순화하면 점 수가 줄어야 한다."""
+    import math
+    pts = []
+    for k in range(n):
+        t = k / n * 4
+        side, f = int(t), t - int(t)
+        x, y = [(lon + d * f, lat), (lon + d, lat + d * f), (lon + d - d * f, lat + d), (lon, lat + d - d * f)][side]
+        pts.append([x + 1e-5 * math.sin(k), y + 1e-5 * math.cos(k)])
+    return [pts + [pts[0]]]
+
+
+def _emd_src(tmp_path):
     feats = [
-        {"type": "Feature", "properties": {"SIDO": "제주특별자치도", "SIGUNGU": "제주시", "label_lon": 126.48, "label_lat": 33.42},
-         "geometry": {"type": "MultiPolygon", "coordinates": [_square(126.3, 33.3, 0.3),          # 본섬 북쪽
-                                                               _square(126.95, 33.5, 0.03),        # 우도
-                                                               _square(126.3, 33.95, 0.02),        # 추자도
-                                                               _square(126.6, 33.6, 0.0005)]}},    # 아주 작은 바위섬
-        {"type": "Feature", "properties": {"SIDO": "제주특별자치도", "SIGUNGU": "서귀포시", "label_lon": 126.59, "label_lat": 33.33},
-         "geometry": {"type": "MultiPolygon", "coordinates": [_square(126.3, 33.2, 0.3)]}},
-        {"type": "Feature", "properties": {"SIDO": "서울특별시", "SIGUNGU": "종로구", "label_lon": 127.0, "label_lat": 37.5},
-         "geometry": {"type": "Polygon", "coordinates": _square(127.0, 37.5, 0.05)}},
+        {"type": "Feature", "properties": {"adm_nm": "제주특별자치도 제주시 한림읍", "sidonm": "제주특별자치도"},
+         "geometry": {"type": "MultiPolygon", "coordinates": [_wiggly(126.2, 33.35, 0.1)]}},
+        {"type": "Feature", "properties": {"adm_nm": "제주특별자치도 제주시 추자면", "sidonm": "제주특별자치도"},
+         "geometry": {"type": "MultiPolygon", "coordinates": [_square(126.3, 33.95, 0.02)]}},
+        {"type": "Feature", "properties": {"adm_nm": "서울특별시 종로구 사직동", "sidonm": "서울특별시"},
+         "geometry": {"type": "MultiPolygon", "coordinates": [_square(127.0, 37.5, 0.01)]}},
     ]
-    p = tmp_path / "sigungu.geojson"
+    p = tmp_path / "emd.geojson"
     p.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False), "utf-8")
     return p
 
 
-def test_outline_keeps_only_jeju_cities(tmp_path):
-    out = build_outline(_src(tmp_path))
-    assert [c["name"] for c in out["cities"]] == ["제주시", "서귀포시"]
+def test_emd_keeps_jeju_with_our_names(tmp_path):
+    from app.store.jeju_map import build_emd
+    out = build_emd(_emd_src(tmp_path))
+    assert [e["name"] for e in out["emd"]] == ["제주시 추자면", "제주시 한림읍"]
 
 
-def test_outline_keeps_islands_but_drops_specks(tmp_path):
-    jeju = build_outline(_src(tmp_path))["cities"][0]
-    assert len(jeju["rings"]) == 3     # 본섬 조각·우도·추자도는 남기고 아주 작은 바위섬은 뺀다
+def test_emd_rings_are_simplified_but_closed(tmp_path):
+    from app.store.jeju_map import build_emd
+    ring = next(e for e in build_emd(_emd_src(tmp_path))["emd"] if e["name"] == "제주시 한림읍")["rings"][0]
+    assert 4 <= len(ring) < 50 and ring[0] == ring[-1]
 
 
-def test_chuja_rings_move_with_the_marker(tmp_path):
-    out = build_outline(_src(tmp_path))
-    shift = (0.1, -0.4)                            # (경도, 위도): 남쪽으로 0.4도
-    lats = [y for tr in outline_traces(out, chuja_shift=shift) for y in tr["lat"] if y is not None]
-    assert max(lats) < CHUJA_LAT                     # 추자 조각도 표시 위치로 옮겨져 본섬 근처에 그려진다
+def test_emd_label_point_is_inside_the_area(tmp_path):
+    from app.store.jeju_map import build_emd
+    e = next(e for e in build_emd(_emd_src(tmp_path))["emd"] if e["name"] == "제주시 한림읍")
+    assert 126.2 < e["label"][0] < 126.3 and 33.35 < e["label"][1] < 33.45
 
 
-def test_chuja_can_be_left_out(tmp_path):
-    out = build_outline(_src(tmp_path))
-    lats = [y for tr in outline_traces(out, include_chuja=False) for y in tr["lat"] if y is not None]
-    assert max(lats) < CHUJA_LAT
+def test_emd_shapes_move_chuja(tmp_path):
+    from app.store.jeju_map import build_emd, emd_shapes
+    shapes = emd_shapes(build_emd(_emd_src(tmp_path)), chuja_shift=(0.1, -0.4))
+    chuja = shapes["제주시 추자면"]
+    assert max(y for y in chuja["lat"] if y is not None) < CHUJA_LAT and chuja["label"][1] < CHUJA_LAT
+    assert "제주시 추자면" not in emd_shapes(build_emd(_emd_src(tmp_path)), include_chuja=False)

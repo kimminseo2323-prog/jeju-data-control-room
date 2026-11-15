@@ -58,3 +58,22 @@ def test_quick_cause_without_evidence_says_unknown():
     tb = Toolbox(MemoryStore(series={("유동인구", "제주시 연동"): s}), index=None)
     r = quick_cause(tb, "유동인구", "제주시 연동", "2024-10-23", "up")
     assert r["cause"] == "판단 불가" and r["reason"]
+
+
+def test_quick_cause_splits_evidence_from_unchecked():
+    """관제판 줄은 근거(확인된 것)와 확인하지 못한 것을 따로 보여 준다 — 한 줄에 ' / '로 이어 붙이면 읽기 어렵다."""
+    idx = pd.date_range("2024-07-01", "2024-12-31", freq="D")
+    rng = np.random.default_rng(0)
+    s = pd.Series(1000 + rng.normal(0, 20, len(idx)), index=idx)
+    s[pd.Timestamp("2024-09-16")] += 900
+    tb = Toolbox(MemoryStore(series={("유동인구", "서귀포시 성산읍"): s}), index=None)
+    r = quick_cause(tb, "유동인구", "서귀포시 성산읍", "2024-09-16", "up")
+    assert any("추석" in p for p in r["points"]) and all(" / " not in p for p in r["points"])
+    assert isinstance(r["unchecked"], str)
+
+
+def test_short_point_drops_score_and_hedge():
+    from app.report.board import short_point
+    d = "작년 같은 시기(2025-08-01)에도 유동인구 평소보다 많았음(점수 6.22), 매년 반복되는 변화일 수 있음"
+    assert short_point(d) == "작년 같은 시기(2025-08-01)에도 유동인구 평소보다 많았음"
+    assert short_point("추석 (당일, 2024-09-16)") == "추석 (당일, 2024-09-16)"

@@ -8,6 +8,10 @@ enableStaticServing = true
 [browser]
 gatherUsageStats = false
 
+# 오른쪽 위 'Deploy' 등 개발자 메뉴를 숨긴다(센터 PC에서 쓰는 화면)
+[client]
+toolbarMode = "minimal"
+
 # 화면 디자인: IBM Carbon 디자인 시스템의 구조(각진 모서리, 1px 선, 회색 단계 면)를 따르고,
 # 색은 의미가 있을 때만 쓴다(빨강 = 평소보다 많음, 파랑 = 적음, 귤색 = 지금 고른 것). 자세한 기준은 docs/디자인_기준.md
 [theme]
