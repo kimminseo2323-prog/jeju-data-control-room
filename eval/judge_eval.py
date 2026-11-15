@@ -65,7 +65,8 @@ def main():
             co = tb.dispatch("find_co_movements", {"date": day, "emd": ep["emd"], "window": 1, "exclude_signal": signal}, "R2").data
             cx = tb.dispatch("check_context", {"date": day, "emd": ep["emd"], "signal": signal}, "R3").data
             evidence = {"anomaly": {"emd": ep["emd"], "signal": signal, "date": day, "pct": ep["peak_pct"], "kind": ep["kind"], "days": ep["days"]},
-                        "context": cx["items"], "co_movements": co["co_movements"], "not_covered": cx["not_covered"]}
+                        "context": cx["items"], "co_movements": co["co_movements"], "not_covered": cx["not_covered"],
+                        "co_checked": co["checked"], "co_no_data": co.get("no_data", [])}
             labels = silver_labels(cx["items"], ep["direction"])
             j = judge_cause(evidence, host=a.host)
             r = rule_judge(evidence)

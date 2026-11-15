@@ -70,7 +70,7 @@ def run_agent(question: str, llm, toolbox: Toolbox, max_steps: int = 8, history:
         for call in reply.tool_calls:
             if len(run.calls) >= max_steps:
                 run.stopped = True
-                run.final_text = reply.text or "도구 호출 한도에 도달해 분석을 중단했습니다."
+                run.final_text = "도구 호출 한도에 도달해 분석을 중단했습니다. 검증된 답변이 없어 문장은 표시하지 않습니다."   # 중간 문장은 검증 전이라 보이지 않음
                 return run
             run.calls.append(call)
             rid = f"R{len(run.results) + 1}"

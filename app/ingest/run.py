@@ -56,7 +56,7 @@ def run(job_name: str, start: dt.date, end: dt.date) -> bool:
         try:
             rows = client.fetch_all(job.api_id, params)
         except QuotaExceeded as e:
-            print(f"[{job_name}] 쿼터 소진: {i}/{len(reqs)}번째 요청 {params} 의 {e.next_page}페이지부터 내일 이어받기")
+            print(f"[{job_name}] 수집 멈춤: {e.hint()}. {i}/{len(reqs)}번째 요청 {params} 의 {e.next_page}페이지부터 같은 명령으로 이어받기")
             info = export_completed(job, start, end)
             print(f"[{job_name}] 완료된 요청만 임시 캐시로 저장: {info}")
             return False

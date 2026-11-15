@@ -26,10 +26,20 @@ def job_paths(state_dir: Path, api_id: str, params: dict) -> tuple[Path, Path]:
 
 
 class QuotaExceeded(Exception):
-    def __init__(self, api_id: str, next_page: int):
-        super().__init__(f"daily quota reached for {api_id}; resume at page {next_page}")
+    """수집을 멈추고 다음에 이어받을 때. 우리 쪽 일일 호출 수 한도에 닿았거나(http403=False), 허브가 403을 돌려줬을 때(http403=True)."""
+
+    def __init__(self, api_id: str, next_page: int, http403: bool = False):
+        why = "HTTP 403 from hub" if http403 else "daily call limit reached"
+        super().__init__(f"{why} for {api_id}; resume at page {next_page}")
         self.api_id = api_id
         self.next_page = next_page
+        self.http403 = http403
+
+    def hint(self) -> str:
+        if self.http403:
+            return ("허브가 403(접근 거부)을 돌려줌 — 일일 쿼터 초과이거나 이 데이터가 허브 프로젝트에 담기지 않은 경우일 수 있음"
+                    "(어느 쪽인지 미확인, 허브 마이페이지 > 프로젝트 관리에서 확인)")
+        return "이 프로그램의 일일 호출 수 한도(jobs.py daily_quota)에 닿음"
 
 
 class FetchFailed(Exception):
@@ -76,8 +86,8 @@ class HubClient:
                 r = self.session.get(url, params=query, timeout=30)
                 if r.status_code == 200:
                     return r.json()
-                if r.status_code == 403:  # 허브는 일일 쿼터 초과 시 403을 돌려줌(2026-11-10 확인) → 재시도하지 않음
-                    raise QuotaExceeded(api_id, number)
+                if r.status_code == 403:  # 접근 거부: 쿼터 초과인지 프로젝트 미등록인지 응답만으로는 구분 못 함(미확인) → 재시도하지 않고 멈춤
+                    raise QuotaExceeded(api_id, number, http403=True)
                 last = f"HTTP {r.status_code}"
             except requests.RequestException as e:  # 네트워크 오류도 재시도
                 last = repr(e)

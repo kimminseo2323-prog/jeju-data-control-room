@@ -31,6 +31,7 @@ INTENT_KO = {"scan": "이상 찾기", "explain": "원인 설명", "docs": "문�
 SCOPE_TEXT = ("이 질문은 다루지 않습니다. 이 도우미는 제주 관광·교통 데이터의 이상 신호 찾기, 변화 이유 후보 설명, "
               "데이터 문서 검색만 답합니다. 예: '유동인구가 이상했던 곳 알려줘', '이호동 유동인구가 왜 늘었어?', '버스 데이터 출처가 뭐야?'")
 ASK_REGION = "어느 읍면동인지 함께 적어 주세요. 예: '이호동 유동인구가 왜 늘었어?'"
+BAD_DATE = "질문에 적은 날짜가 달력에 없는 날짜입니다. 날짜를 확인해 다시 물어봐 주세요."
 
 _RULES = [
     ("explain", re.compile(r"왜|원인|이유|때문")),
@@ -49,6 +50,7 @@ class Slots:
     date: pd.Timestamp | None = None
     start: pd.Timestamp | None = None
     end: pd.Timestamp | None = None
+    bad_date: str | None = None   # 달력에 없는 날짜(예: 2월 30일, 13월)를 적은 경우 그 표현
 
 
 @dataclass
@@ -88,16 +90,25 @@ def parse_slots(q: str, lo: pd.Timestamp, hi: pd.Timestamp) -> Slots:
 
     m = re.search(r"(20\d{2})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})", q)
     if m:
-        s.date = pd.Timestamp(int(m[1]), int(m[2]), int(m[3]))
+        try:
+            s.date = pd.Timestamp(int(m[1]), int(m[2]), int(m[3]))
+        except ValueError:
+            s.bad_date = m[0]
         return s
     m = re.search(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일|(?<!\d)(\d{1,2})/(\d{1,2})(?!\d)", q)
     if m:
         mo, d = (int(m[1]), int(m[2])) if m[1] else (int(m[3]), int(m[4]))
-        s.date = pd.Timestamp(_year_for(mo, d, lo, hi), mo, d)
+        try:
+            s.date = pd.Timestamp(_year_for(mo, d, lo, hi), mo, d)
+        except ValueError:
+            s.bad_date = m[0]
         return s
     m = re.search(r"(?:(20\d{2})\s*년\s*)?(\d{1,2})\s*월\s*(초|중순|말)?", q)
     if m:
         mo = int(m[2])
+        if not 1 <= mo <= 12:
+            s.bad_date = m[0]
+            return s
         y = int(m[1]) if m[1] else _year_for(mo, 1, lo, hi)
         first = pd.Timestamp(y, mo, 1)
         last = first + pd.offsets.MonthEnd(0)
@@ -196,7 +207,8 @@ def _explain(q, s: Slots, tb: Toolbox, judge, method, threshold) -> tuple[str, d
         except ToolError:
             pass
     evidence = {"anomaly": {"emd": s.emd, "signal": s.signal, "date": day, "pct": ep["peak_pct"], "kind": ep["kind"], "days": ep["days"]},
-                "context": cx.data["items"], "co_movements": co.data["co_movements"], "not_covered": cx.data.get("not_covered", [])}
+                "context": cx.data["items"], "co_movements": co.data["co_movements"], "not_covered": cx.data.get("not_covered", []),
+                "co_checked": co.data["checked"], "co_no_data": co.data.get("no_data", [])}
     j = judge(evidence)
     r4 = f"R{len(call.results) + 1}"
     prob = round(j.probabilities.get(j.choice, 0) * 100, 1)
@@ -267,7 +279,9 @@ def answer(q: str, tb: Toolbox, http=requests, judge=judge_cause, method: str = 
     lo, hi = _data_range(tb.store)
     s = parse_slots(q, lo, hi)
     try:
-        if intent == "explain":
+        if s.bad_date and intent in ("explain", "scan"):
+            text, results = BAD_DATE, {}
+        elif intent == "explain":
             text, results = _explain(q, s, tb, judge, method, threshold)
         elif intent == "scan":
             text, results = _scan(s, tb, method, threshold)

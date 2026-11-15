@@ -29,7 +29,7 @@ def template_text(results: dict) -> str:
             lines.append(f"{d['emd']} {d['signal']}에서 {period}기준을 넘는 이상 신호는 없었습니다 [{rid}].")
             continue
         if d.get("episodes"):
-            lines.append(f"{d['emd']} {d['signal']}에서 이상 구간 {d['episode_count']}개(이상일 {d['count']}일)가 확인됐습니다 [{rid}].")
+            lines.append(f"{d['emd']} {d['signal']}에서 이상 구간 {d['episode_count']}개(조회 기간 안 이상일 {d['count']}일)가 확인됐습니다 [{rid}].")
             for e in d["episodes"][:5]:
                 word = "많았" if e["direction"] == "up" else "적었"
                 span = e["start"] if e["start"] == e["end"] else f"{e['start']}~{e['end']}"
@@ -83,6 +83,8 @@ def _evidence_lines(day: str, emd: str, ctx: dict, cos: dict, direction: str | N
         for c in hit[1].data["co_movements"]:
             word = "많았" if c["direction"] == "up" else "적었"
             out.append(f"같은 시기 {c['signal']}도 {c['date']}에 평소보다 {word}습니다(점수 {c['z']}) [{hit[0]}].")
+        if hit[1].data.get("no_data"):   # 자료가 없는 신호는 '변화 없음'이 아니라 '확인 불가'
+            out.append(f"{', '.join(hit[1].data['no_data'])}는 이 시기 자료가 없어 함께 움직였는지 확인하지 못했습니다 [{hit[0]}].")
     hit = (nat or {}).get((day, emd))
     if hit and hit[1].data.get("top"):
         t = hit[1].data["top"][0]

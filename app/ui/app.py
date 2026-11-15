@@ -15,11 +15,11 @@ import streamlit as st
 from plotly.subplots import make_subplots
 
 from app.agent.local import INTENT_KO, answer
-from app.agent.loop import AgentRun
+from app.agent.loop import WITHHELD, AgentRun
 from app.agent.tools import Toolbox
 from app.agent.verify import verify
 from app.analytics.detect import group_episodes, score_series, detect_anomalies
-from app.llm.judge import CAUSE_KO, NOT_COVERED_KO, evidence_text, judge_cause, model_status
+from app.llm.judge import CAUSE_KO, NOT_COVERED_KO, evidence_text, judge_cause, judgment_label, model_status
 from app.rag.corpus import load_corpus
 from app.rag.index import build_index
 from app.report import board
@@ -254,14 +254,23 @@ with tab_detail:
             st.markdown("#### 같은 날 맥락")
             items = res["R3"].data["items"]
             not_covered = res["R3"].data.get("not_covered", [])
-            lines = [f"- {it['detail']}" for it in items] or ["- 기상·공휴일·행사·성수기 기록 없음"]
+            lines = [f"- {it['detail']}" for it in items]
+            if not items:   # 자료 기간 안에서 확인한 것만 '기록 없음'이라 말한다
+                checked_kinds = [n for k, n in (("weather", "기상"), (None, "공휴일"), ("event", "행사"), ("visitors", "성수기·비수기"))
+                                 if k not in not_covered]
+                lines.append(f"- {'·'.join(checked_kinds)} 기록 없음")
             if not_covered:
                 lines.append(f"- {'·'.join(NOT_COVERED_KO.get(k, k) for k in not_covered)}: 이 날짜는 자료 제공 기간 밖이라 확인하지 못함")
             st.write("\n".join(lines))
             st.markdown("#### 다른 신호·제주 전체·인근 읍면동 동반 변화")
             co = res["R2"].data["co_movements"]
-            st.write("\n".join(f"- {c['signal']} {c['date']} 점수 {c['z']}" for c in co) if co else
-                     f"- 확인한 신호({', '.join(res['R2'].data['checked'])}) 중 동반 변화 없음")
+            checked, no_data = res["R2"].data["checked"], res["R2"].data.get("no_data", [])
+            co_lines = [f"- {c['signal']} {c['date']} 점수 {c['z']}" for c in co]
+            if not co:
+                co_lines.append(f"- 확인한 신호({', '.join(checked)}) 중 동반 변화 없음" if checked else "- 이 날짜에 비교할 수 있는 다른 신호 자료 없음")
+            if no_data:
+                co_lines.append(f"- 자료 없음(확인 불가): {', '.join(no_data)}")
+            st.write("\n".join(co_lines))
             if signal == "외국인":
                 st.markdown("#### 국적별 변화(평소 대비)")
                 try:
@@ -270,13 +279,17 @@ with tab_detail:
                     st.dataframe(pd.DataFrame(nm.data["top"]).rename(columns={
                         "nationality": "국적", "value": "그날", "expected": "기대값", "diff": "차이", "share_of_change": "전체 변화 중(%)"}),
                         hide_index=True, width="stretch")
+                    if nm.data.get("no_baseline") or nm.data.get("no_value"):
+                        st.caption("비교에서 뺀 국적(0명으로 치지 않음) — 평소 기록 부족: " + (", ".join(nm.data.get("no_baseline", [])) or "-")
+                                   + " / 그날 값 없음: " + (", ".join(nm.data.get("no_value", [])) or "-"))
                 except Exception as e:   # 국적 자료가 없는 날
                     st.caption(f"국적별 자료 없음: {e}")
         with right:
             st.markdown("#### 원인 후보 판정")
             evidence = {"anomaly": {"emd": emd, "signal": signal, "date": str(day.date()), "pct": float(row["기대 대비(%)"]),
                                     "kind": row["유형"], "days": int(row["일수"])},
-                        "context": items, "co_movements": co, "not_covered": not_covered}
+                        "context": items, "co_movements": co, "not_covered": not_covered,
+                        "co_checked": res["R2"].data["checked"], "co_no_data": res["R2"].data.get("no_data", [])}
             with st.expander("판정 모델에 넘긴 근거(이 내용만 보고 판단)"):
                 st.text(evidence_text(evidence))
             if st.button("원인 판정 실행", type="primary"):
@@ -284,20 +297,23 @@ with tab_detail:
                     st.session_state["judge"] = (labels[pick], judge_cause(evidence))
             if st.session_state.get("judge", (None,))[0] == labels[pick]:
                 j = st.session_state["judge"][1]
-                st.markdown(f"**{CAUSE_KO[j.choice]}** · 확신도 {j.level} ({j.probabilities.get(j.choice, 0):.0%}) · `{j.backend}`")
+                st.markdown(f"**{judgment_label(j)}**")
                 if j.note:
                     st.caption(j.note)
-                pr = pd.DataFrame({"원인": [CAUSE_KO[k] for k in j.probabilities], "확률": list(j.probabilities.values())}).sort_values("확률")
-                bars = px.bar(pr, x="확률", y="원인", orientation="h")
-                bars.update_traces(marker_color=[PICK if c == CAUSE_KO[j.choice] else style.LINE_STRONG for c in pr["원인"]])
-                st.plotly_chart(style.plot(bars, height=240).update_layout(margin=dict(l=0, r=0, t=0, b=0)),
-                                width="stretch")
+                if j.backend != "rule":   # 규칙 판정의 보기 확률은 고정값이라 그리지 않는다
+                    pr = pd.DataFrame({"원인": [CAUSE_KO[k] for k in j.probabilities], "확률": list(j.probabilities.values())}).sort_values("확률")
+                    bars = px.bar(pr, x="확률", y="원인", orientation="h")
+                    bars.update_traces(marker_color=[PICK if c == CAUSE_KO[j.choice] else style.LINE_STRONG for c in pr["원인"]])
+                    st.plotly_chart(style.plot(bars, height=240).update_layout(margin=dict(l=0, r=0, t=0, b=0)),
+                                    width="stretch")
 
         st.markdown("#### 브리핑")
         text = template_text(res)
         v = verify(text, res)
+        if not v.ok:   # 질문하기와 같이, 검증을 통과하지 못한 문장은 보이지 않는다
+            text = WITHHELD
         run = AgentRun(f"{emd} {signal} {row['최대일']} 이상 구간", [], results=res, final_text=text, verified=v.ok)
-        st.markdown(("✅ 검증 통과" if v.ok else "⚠️ 검증 미통과") + " — 모든 숫자가 계산 결과와 일치하는지 확인했습니다.")
+        st.markdown("✅ 검증 통과 — 문장의 모든 숫자가 계산 결과와 일치합니다." if v.ok else "⚠️ 검증 미통과 — 문장은 표시하지 않습니다.")
         st.text(text)
         html = render_briefing(run, generated_at=pd.Timestamp.now(), data_as_of=q["as_of"])
         b1, b2 = st.columns(2)

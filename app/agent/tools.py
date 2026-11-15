@@ -127,23 +127,25 @@ class Toolbox:
         return data, [SIGNAL_SOURCES.get(signal, signal)]
 
     def _found(self, signal, emd, start, end, method, threshold):
-        # 기준선은 전체 기간으로 계산하고, 기간 인자는 결과만 거른다(잘라서 계산하면 기준선이 달라짐)
+        """(기간 안의 이상일, 기간과 겹치는 이상 구간). 기준선은 전체 기간으로 계산하고 기간 인자는 결과만 거른다
+        (잘라서 계산하면 기준선이 달라짐). 이상 구간은 전체 이상일로 묶은 뒤 고르므로 기간 경계에서 잘리지 않는다(관제판과 같은 일수·유형)."""
         full = self.store.series(signal, emd)
         lo = pd.Timestamp(start) if start else full.index.min()
         hi = pd.Timestamp(end) if end else full.index.max()
-        return [a for a in detect_anomalies(full, method=method, threshold=float(threshold)) if lo <= a.date <= hi]
+        allan = detect_anomalies(full, method=method, threshold=float(threshold))
+        return [a for a in allan if lo <= a.date <= hi], [e for e in group_episodes(allan) if e.end >= lo and e.start <= hi]
 
     @staticmethod
-    def _episode_rows(found) -> list[dict]:
+    def _episode_rows(episodes) -> list[dict]:
         return [{"start": str(e.start.date()), "end": str(e.end.date()), "days": e.days, "kind": e.kind, "direction": e.direction,
                  "peak_date": str(e.peak.date.date()), "peak_pct": round(e.peak.pct * 100, 1), "peak_value": round(e.peak.value, 1),
-                 "peak_expected": round(e.peak.expected, 1), "peak_score": round(e.peak.score, 2)} for e in group_episodes(found)]
+                 "peak_expected": round(e.peak.expected, 1), "peak_score": round(e.peak.score, 2)} for e in episodes]
 
     def _t_detect_anomalies(self, signal, emd, start=None, end=None, method="seasonal_z", threshold=3.0):
-        found = self._found(signal, emd, start, end, method, threshold)
+        found, episodes = self._found(signal, emd, start, end, method, threshold)
         rows = [{"date": str(a.date.date()), "value": round(a.value, 1), "expected": round(a.expected, 1),
                  "pct": round(a.pct * 100, 1), "score": round(a.score, 2), "direction": a.direction} for a in found]
-        eps = self._episode_rows(found)
+        eps = self._episode_rows(episodes)
         eps.sort(key=lambda x: -abs(x["peak_pct"]))
         return {"signal": signal, "emd": emd, "start": start, "end": end, "method": method, "threshold": threshold, "count": len(rows),
                 "episode_count": len(eps), "episodes": eps, "anomalies": rows}, [SIGNAL_SOURCES.get(signal, signal)]
@@ -153,7 +155,7 @@ class Toolbox:
         regions = self.store.regions(signal)
         eps, hit = [], 0
         for emd in regions:
-            rows = self._episode_rows(self._found(signal, emd, start, end, method, threshold))
+            rows = self._episode_rows(self._found(signal, emd, start, end, method, threshold)[1])
             hit += bool(rows)
             eps += [{"emd": emd, **r} for r in rows]
         eps.sort(key=lambda x: -abs(x["peak_score"]))
@@ -194,10 +196,16 @@ class Toolbox:
                     continue
             if parts:
                 sigs[f"인근 읍면동 {exclude_signal}"] = pd.concat(parts, axis=1).sum(axis=1, min_count=1)
-        moves = find_co_movements(pd.Timestamp(date), sigs, threshold=3.0, window=int(window))
+        # 그날(±window) 값이 하나도 없는 신호는 '평소 수준'이 아니라 '자료 없음'으로 따로 둔다
+        # (예: 와이파이는 2024-10~2025-03, 버스는 2025-01~03만 있어 그 밖의 날짜는 확인할 수 없음)
+        day0 = pd.Timestamp(date)
+        days = pd.date_range(day0 - pd.Timedelta(days=int(window)), day0 + pd.Timedelta(days=int(window)), freq="D")
+        no_data = sorted(k for k, s in sigs.items() if not s.reindex(days).notna().any())
+        sigs = {k: s for k, s in sigs.items() if k not in no_data}
+        moves = find_co_movements(day0, sigs, threshold=3.0, window=int(window))
         rows = [{"signal": m.signal, "date": str(m.date.date()), "z": round(m.z, 2), "direction": m.direction} for m in moves]
         base = lambda k: k.removeprefix("제주 전체 ").removeprefix("인근 읍면동 ")
-        return ({"date": date, "emd": emd, "checked": sorted(sigs), "neighbors": nb, "co_movements": rows},
+        return ({"date": date, "emd": emd, "checked": sorted(sigs), "no_data": no_data, "neighbors": nb, "co_movements": rows},
                 sorted({SIGNAL_SOURCES[base(k)] for k in sigs if base(k) in SIGNAL_SOURCES}))
 
     def _t_check_context(self, date, emd, signal=None):
@@ -220,26 +228,32 @@ class Toolbox:
         return {"date": date, "emd": emd, "items": rows, "not_covered": not_covered}, sorted({i.source for i in items})
 
     def _t_nationality_mix(self, date, emd, top=3):
-        """국적별 그날 값 - 기대값(같은 요일 앞뒤 4주 중앙값). 변화량이 큰 국적 순, 전체 변화 중 비중(%)."""
+        """국적별 그날 값 - 기대값(같은 요일 앞뒤 4주 중앙값). 변화량이 큰 국적 순, 전체 변화 중 비중(%).
+        기대값을 못 구한 국적(평소 기록이 3주 미만)과 그날 값이 없는 국적은 0으로 치지 않고 따로 적는다."""
         from app.analytics.detect import _expected_seasonal
         t = self.store.nationality_table(emd).astype(float)
         day = pd.Timestamp(date)
         if day not in t.index:
             raise ToolError(f"no foreign visitor data on {date}")
-        rows = []
+        rows, no_baseline, no_value = [], [], []
         for nat in t.columns:
             exp = _expected_seasonal(t[nat]).get(day)
             val = t.at[day, nat]
-            if pd.isna(exp) and pd.isna(val):
+            if pd.isna(exp) or pd.isna(val):
+                if pd.notna(val):
+                    no_baseline.append(nat)
+                elif pd.notna(exp):
+                    no_value.append(nat)
                 continue
-            val, exp = (0.0 if pd.isna(val) else float(val)), (0.0 if pd.isna(exp) else float(exp))
+            val, exp = float(val), float(exp)
             rows.append({"nationality": nat, "value": round(val, 1), "expected": round(exp, 1), "diff": round(val - exp, 1)})
         total = sum(r["diff"] for r in rows)
         same = [r for r in rows if total and (r["diff"] > 0) == (total > 0)]
         for r in rows:
             r["share_of_change"] = round(r["diff"] / total * 100, 1) if total else None
         same.sort(key=lambda r: -abs(r["diff"]))
-        return ({"date": date, "emd": emd, "total_diff": round(total, 1), "nationalities": len(rows), "top": same[:int(top)]},
+        return ({"date": date, "emd": emd, "total_diff": round(total, 1), "nationalities": len(rows), "top": same[:int(top)],
+                 "no_baseline": no_baseline, "no_value": no_value},
                 [SIGNAL_SOURCES["외국인"]])
 
     def _t_search_docs(self, query, k=5):

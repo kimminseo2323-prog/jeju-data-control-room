@@ -1,6 +1,7 @@
 """전체 수집 계획. 실행: python -m app.ingest.plan
 
-API별 일일 쿼터(1,000회)가 따로 있으므로 작업마다 별도 프로세스로 병렬 실행한다.
+API별 일일 쿼터(기본 1,000회, 증설 승인된 데이터는 app/ingest/jobs.py)가 따로 있으므로 작업마다 별도 프로세스로 병렬 실행한다.
+기간은 지금 data/cache에 있는 분석 데이터와 같다(다시 받아도 기간이 줄지 않게, 2026-11-15 맞춤).
 쿼터에 걸린 작업은 멈춘 곳을 저장하고 끝나며, 다음 날 같은 명령으로 이어받는다.
 """
 from __future__ import annotations
@@ -12,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 LOG = ROOT / "data" / "state" / "logs"
 
-# (작업, 시작, 끝) — 주 분석 기간 2024-04-01~2025-03-31, 저비용 신호는 최근까지
+# (작업, 시작, 끝) — 유동인구(내국인·외국인)는 2024-04~2026-08, 와이파이·버스·기상은 허브 제공 기간에 맞춤
 PLAN = [
     ("bus_stations", "2025-03-31", "2025-03-31"),
     ("bus_routes", "2025-03-31", "2025-03-31"),
@@ -22,7 +23,8 @@ PLAN = [
     ("bus_total_daily", "2024-04-01", "2026-11-05"),
     ("wifi_users_daily", "2024-04-01", "2026-11-05"),
     ("weather_daily", "2024-04-01", "2025-04-30"),
-    ("pop_domestic", "2024-04-01", "2025-03-31"),
+    ("pop_domestic", "2024-04-01", "2026-08-31"),
+    ("pop_foreign_short", "2024-04-01", "2026-08-31"),   # 2025-04·05는 허브 원천 오류로 건너뜀(jobs.py)
     ("wifi_ap_daily", "2024-10-01", "2025-03-31"),
     ("bus_station_daily", "2025-01-01", "2025-03-31"),
 ]
@@ -42,7 +44,7 @@ def main() -> None:
     for job, p, log in procs:
         code = p.wait()
         log.close()
-        status = {0: "완료", 2: "쿼터 소진·실패(로그 확인, 내일 이어받기)"}.get(code, f"오류 코드 {code}")
+        status = {0: "완료", 2: "멈춤(쿼터·HTTP 403·서버 오류 — 로그 확인 후 같은 명령으로 이어받기)"}.get(code, f"오류 코드 {code}")
         print(f"{job:20s} {status}")
 
 

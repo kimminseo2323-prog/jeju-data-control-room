@@ -22,13 +22,15 @@ class Job:
     extra: dict = field(default_factory=dict)
     date_param: str = "searchDate"   # daily 모드의 날짜 파라미터 이름
     daily_quota: int = 1000          # 허브 프로젝트 화면의 데이터별 일쿼터량(증설 승인 시 변경)
+    skip_starts: tuple[str, ...] = ()   # range 모드에서 받지 않는 달(시작일 YYYYMMDD) — 허브 원천 오류로 받을 수 없는 달
 
 
 JOBS: dict[str, Job] = {j.name: j for j in [
     Job("pop_domestic", 583, "Daaa1t3at3tt8a8DD3t55538t35Dab1t", "읍면동 단위 내국인 유동인구", "range",
         daily_quota=5000),   # 2026-11-11 증설 승인 확인
     Job("pop_foreign_short", 589, "t18b1bttt8abaDt51b8aat85ttaa8t5b", "읍면동 단위 외국인 단기체류 유동인구", "range",
-        daily_quota=5000),   # 2026-11-12 증설 승인(사용자 확인)
+        daily_quota=5000,    # 2026-11-12 증설 승인(사용자 확인)
+        skip_starts=("20250401", "20250501")),   # 허브 원천 오류: HTTP 500 'Bad value for type int'(2026-11-12 확인)
     Job("wifi_ap_daily", 593, "1aa9D5DabtDt1at935b1tt5t1D95t5at", "와이파이 AP그룹별 일일 사용량", "daily",
         daily_quota=5000),   # 2026-11-11 증설 승인 확인
     Job("wifi_users_daily", 586, "tDtb1taa8aat816att6at6tba1aDtbba", "와이파이 일일 사용자수", "daily"),
@@ -65,7 +67,8 @@ def expand(job: Job, start: dt.date, end: dt.date) -> list[dict]:
         while cur <= end:
             nxt = (cur.replace(day=1) + dt.timedelta(days=32)).replace(day=1)
             last = min(end, nxt - dt.timedelta(days=1))
-            out.append({"startDate": cur.strftime("%Y%m%d"), "endDate": last.strftime("%Y%m%d"), **job.extra})
+            if cur.strftime("%Y%m%d") not in job.skip_starts:
+                out.append({"startDate": cur.strftime("%Y%m%d"), "endDate": last.strftime("%Y%m%d"), **job.extra})
             cur = last + dt.timedelta(days=1)
         return out
     raise ValueError(f"unknown mode {job.mode}")

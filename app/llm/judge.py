@@ -94,8 +94,13 @@ def evidence_text(evidence: dict) -> str:
             elif str(c["signal"]).startswith("인근 읍면동"):
                 line += " 즉 주변 지역도 함께 움직였다."
             lines.append(line)
+    elif "co_checked" in evidence:   # 그날 자료가 있는 신호만 '평소 수준'이라 말한다
+        if evidence["co_checked"]:
+            lines.append(f"동반 변화 없음: 확인한 {', '.join(evidence['co_checked'])}는 평소 수준이었다.")
     else:
         lines.append("동반 변화 없음: 확인한 다른 신호와 제주 전체 합계는 평소 수준이었다.")
+    if evidence.get("co_no_data"):
+        lines.append(f"자료 없음: {', '.join(evidence['co_no_data'])}는 이 날짜 자료가 없어 함께 움직였는지 확인하지 못했다(변화가 없었다는 뜻이 아니다).")
     ctx = evidence.get("context", [])
     for c in ctx:
         label = CONTEXT_KO.get(c.get("kind"))
@@ -109,6 +114,14 @@ def evidence_text(evidence: dict) -> str:
     if unchecked:
         lines.append(f"확인 불가: 이 날짜는 {'·'.join(unchecked)} 자료 제공 기간 밖이라 확인하지 못했다(없다는 뜻이 아니다).")
     return "\n".join(lines)
+
+
+def judgment_label(j: Judgment) -> str:
+    """화면에 보일 판정 한 줄. 규칙 판정은 확률이 없으므로(보기 확률은 고정값) 확률·확신도를 보이지 않는다."""
+    if j.backend == "rule":
+        return f"{CAUSE_KO[j.choice]} · 규칙으로 고른 후보(판단 모델 미연결, 확률 없음)"
+    p = j.probabilities.get(j.choice, 0)
+    return f"{CAUSE_KO[j.choice]} · 확신도 {j.level} ({p:.0%}) · 판단 모델 {j.backend}"
 
 
 def model_status(http=requests, host: str = DEFAULT_HOST, model: str = DEFAULT_MODEL) -> tuple[bool, str]:

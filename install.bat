@@ -58,6 +58,10 @@ if errorlevel 1 (
   echo  없어도 실행되며, 이때 원인 판정과 질문 분류는 규칙 기반으로 동작합니다.
 ) else (
   ollama pull tev1:4b
+  if errorlevel 1 (
+    echo  판단 모델을 받지 못했습니다. 인터넷 연결을 확인하고 1_설치.bat 을 다시 실행하거나,
+    echo  그대로 써도 됩니다. 이때 원인 판정과 질문 분류는 규칙 기반으로 동작합니다.
+  )
 )
 if not exist ".env" copy ".env.example" ".env" >nul
 

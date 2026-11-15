@@ -54,7 +54,8 @@ def period_episodes(ep: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp) ->
 
 def quick_cause(tb, signal: str, emd: str, day: str, direction: str) -> dict:
     """도구(동반 변화·맥락)와 규칙 판정으로 원인 후보와 근거 한 줄을 만든다. 판정 모델은 쓰지 않는다."""
-    co = tb.dispatch("find_co_movements", {"date": day, "emd": emd, "window": 1, "exclude_signal": signal}, "R1").data["co_movements"]
+    cr = tb.dispatch("find_co_movements", {"date": day, "emd": emd, "window": 1, "exclude_signal": signal}, "R1").data
+    co = cr["co_movements"]
     cx = tb.dispatch("check_context", {"date": day, "emd": emd, "signal": signal}, "R2").data
     same = [c for c in cx["items"]
             if not (c["kind"] == "visitors" and c.get("value") is not None and (c["value"] > 0) != (direction == "up"))]
@@ -66,8 +67,8 @@ def quick_cause(tb, signal: str, emd: str, day: str, direction: str) -> dict:
     if co:
         word = "증가" if co[0]["direction"] == "up" else "감소"
         reasons.append(f"{co[0]['signal']}도 함께 {word}" + (f" 외 {len(co) - 1}건" if len(co) > 1 else ""))
-    if not reasons:
-        reasons.append("같은 날 확인된 맥락·동반 변화 없음")
+    if not reasons:   # 그날 비교할 다른 신호 자료가 하나도 없으면 '동반 변화 없음'이라 하지 않는다
+        reasons.append("같은 날 확인된 맥락·동반 변화 없음" if cr.get("checked") else "같은 날 확인된 맥락 없음, 비교할 다른 신호 자료 없음")
     if cx.get("not_covered"):
         reasons.append("·".join(NOT_COVERED_KO.get(k, k) for k in cx["not_covered"]) + " 확인 불가")
     return {"cause": cause, "reason": " / ".join(reasons)}
