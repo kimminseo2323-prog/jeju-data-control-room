@@ -1,4 +1,4 @@
-// 기획서 v0.4 생성기. 실행: NODE_PATH=<docx 모듈 폴더> node 기획서/_build/build.js <출력.docx>
+// 기획서 v0.5 생성기. 실행: NODE_PATH=<docx 모듈 폴더> node 기획서/_build/build.js <출력.docx>
 // v0.1(계획 단계)은 git 기록과 기획서/숨비소리_AI_Agent_기획서_v0.1.docx 에 남아 있다.
 // 모든 수치는 eval/results/*.json, data/cache, 노트북 01~05 출력에서 옮겼다(2026-11-11).
 const fs = require("fs");
@@ -6,13 +6,17 @@ const path = require("path");
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, ShadingType,
   AlignmentType, HeadingLevel, LevelFormat, ImageRun, PageBreak, BorderStyle, Footer, PageNumber,
-  TableLayoutType, VerticalAlign,
+  TableLayoutType, VerticalAlign, CharacterSet,
 } = require("docx");
 
 const OUT = process.argv[2];
 const HERE = __dirname;
-const FONT = { ascii: "Malgun Gothic", eastAsia: "Malgun Gothic", hAnsi: "Malgun Gothic", cs: "Malgun Gothic" };
-const NAVY = "1F3A5F", TEAL = "2A7F7F", GRAY = "5B6770", LIGHT = "EEF3F7", SAND = "F6F1E7", RED = "B5473A";
+// 디자인 기준: docs/디자인_기준.md — 현무암 먹색과 회색 단계, 색은 뜻이 있을 때만(감귤색 = 강조 표시 막대)
+// 글꼴: IBM Plex Sans KR(OFL)을 문서에 넣는다(EMBED_TTF). 넣지 못하면 맑은 고딕으로 보인다.
+const FONT_NAME = "IBM Plex Sans KR";
+const FONT = { ascii: FONT_NAME, eastAsia: FONT_NAME, hAnsi: FONT_NAME, cs: FONT_NAME };
+const EMBED_TTF = process.env.PLEX_TTF;   // IBMPlexSansKR-Regular.ttf 경로(선택)
+const NAVY = "161616", TEAL = "393939", GRAY = "525252", LIGHT = "F4F4F4", SAND = "F4F4F4", RED = "DA1E28", PICK = "E8630A", HEAD = "E0E0E0";
 const W = 9638; // A4 본문 폭(DXA), 여백 2cm
 
 // ---------- helpers ----------
@@ -36,16 +40,16 @@ function img(file, widthPx) {
     children: [new ImageRun({ type: "png", data: buf, transformation: { width: widthPx, height: Math.round(widthPx * h / w) } })] });
 }
 
-const border = { style: BorderStyle.SINGLE, size: 4, color: "C9D3DD" };
+const border = { style: BorderStyle.SINGLE, size: 4, color: "C6C6C6" };
 const borders = { top: border, bottom: border, left: border, right: border };
 function table(widths, header, rows, o = {}) {
   const sum = widths.reduce((a, b) => a + b, 0);
   const cell = (txt, i, isHead, shade) => new TableCell({
     width: { size: widths[i], type: WidthType.DXA }, borders,
-    shading: isHead ? { type: ShadingType.CLEAR, fill: NAVY, color: "auto" } : (shade ? { type: ShadingType.CLEAR, fill: shade, color: "auto" } : undefined),
+    shading: isHead ? { type: ShadingType.CLEAR, fill: HEAD, color: "auto" } : (shade ? { type: ShadingType.CLEAR, fill: shade, color: "auto" } : undefined),
     margins: { top: 45, bottom: 45, left: 85, right: 85 }, verticalAlign: VerticalAlign.CENTER,
     children: String(txt).split("\n").map(line => new Paragraph({
-      children: isHead ? [t(line, { bold: true, color: "FFFFFF", size: 17 })] : rich(line, { size: 17 }),
+      children: isHead ? [t(line, { bold: true, color: NAVY, size: 17 })] : rich(line, { size: 17 }),
       spacing: { after: 0, line: 255 },
     })),
   });
@@ -53,7 +57,7 @@ function table(widths, header, rows, o = {}) {
     width: { size: sum, type: WidthType.DXA }, columnWidths: widths, layout: TableLayoutType.FIXED,
     rows: [
       new TableRow({ tableHeader: true, children: header.map((h, i) => cell(h, i, true)) }),
-      ...rows.map((r, ri) => new TableRow({ cantSplit: true, children: r.map((c, i) => cell(c, i, false, o.firstColShade && i === 0 ? LIGHT : (ri % 2 ? "FAFBFC" : undefined))) })),
+      ...rows.map((r, ri) => new TableRow({ cantSplit: true, children: r.map((c, i) => cell(c, i, false, o.firstColShade && i === 0 ? LIGHT : (ri % 2 ? "FAFAFA" : undefined))) })),
     ],
   });
 }
@@ -62,7 +66,7 @@ function callout(lines, fill = SAND) {
     width: { size: W, type: WidthType.DXA }, columnWidths: [W], layout: TableLayoutType.FIXED,
     rows: [new TableRow({ children: [new TableCell({
       width: { size: W, type: WidthType.DXA }, shading: { type: ShadingType.CLEAR, fill, color: "auto" },
-      borders: { top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, left: { style: BorderStyle.SINGLE, size: 24, color: TEAL } },
+      borders: { top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, left: { style: BorderStyle.SINGLE, size: 24, color: PICK } },
       margins: { top: 110, bottom: 110, left: 200, right: 160 },
       children: lines.map(l => new Paragraph({ children: rich(l, { size: 19 }), spacing: { after: 60, line: 290 } })),
     })] })],
@@ -73,29 +77,29 @@ function callout(lines, fill = SAND) {
 const c = [];
 
 // 표지·요약
-c.push(new Paragraph({ children: [t("제주 AI·빅데이터 활용 AI Agent 개발 챌린지 · AI Agent 기획서 v0.4", { size: 18, color: GRAY })], spacing: { after: 200 } }));
+c.push(new Paragraph({ children: [t("제주 AI·빅데이터 활용 AI Agent 개발 챌린지 · AI Agent 기획서 v0.5", { size: 18, color: GRAY })], spacing: { after: 200 } }));
 c.push(new Paragraph({ children: [t("제주 데이터 관제실", { size: 44, bold: true, color: NAVY })], spacing: { after: 80 } }));
-c.push(new Paragraph({ children: [t("관광·교통 이상 신호 탐지·원인 설명 AI Agent", { size: 28, color: TEAL, bold: true })], spacing: { after: 160 } }));
+c.push(new Paragraph({ children: [t("관광·교통 이상 신호 탐지·원인 설명 AI Agent", { size: 28, color: TEAL })], spacing: { after: 160 } }));
 c.push(new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: NAVY, space: 4 } }, children: [t("팀 숨비소리  |  팀장 nnin (Data Scientist) · 팀원 hjshin93 (Data Analyst)  |  2026.11", { size: 18, color: GRAY })], spacing: { after: 220 } }));
 c.push(callout([
   "**한 줄 정의** — 제주데이터허브의 내국인·외국인 유동인구, 와이파이, 버스 이용을 읍면동·일 단위로 살펴 **평소와 다른 날과 지역**을 찾고, 같은 날 다른 신호·제주 전체·인근 읍면동의 움직임, 기상·공휴일·축제·입도객, 작년 같은 시기를 대조해 **무엇이, 어디서, 얼마나, 왜(후보)** 달라졌는지 근거와 함께 알려 주는 AI Agent",
-  "**누가 쓰나** — 제주빅데이터센터를 찾는 기관·사업자(관광·교통 담당 공무원, 관광사업자, 연구자). SQL·코딩 없이 화면 클릭과 한국어 질문으로 사용",
-  "**무엇이 다른가** — 계산은 코드가 하고, 판단(보기 고르기)은 **센터 PC 안에서 도는 로컬 판단 모델(tev1)**이, 문장은 **템플릿**이 만들며(글을 생성하는 AI 없음), **검증기를 통과한 숫자만** 보여 줍니다. 외부 LLM으로 데이터를 보내지 않아 운영비가 0원이고, 성능은 가짜 이상·가짜 오류를 넣는 평가로 **수치로 공개**합니다.",
+  "**누가 쓰나** — 관광·교통 담당 공무원, 관광사업자, 연구자. SQL·코딩 없이 화면 클릭과 한국어 질문으로 사용",
+  "**무엇이 다른가** — 계산은 코드가 하고, 판단(보기 고르기)은 **센터 PC 안에서 도는 로컬 판단 모델(tev1)**이, 문장은 **템플릿**이 만들며(글을 생성하는 AI 없음), **검증기를 통과한 숫자만** 보여 줍니다. 외부 LLM으로 데이터를 보내지 않고, 성능은 가짜 이상·오류를 넣는 평가로 **수치로 공개**합니다.",
 ]));
-c.push(gap(140));
+c.push(gap(80));
 c.push(table([2300, 7338], ["항목", "요약"], [
-  ["활용 데이터", "제주데이터허브 Open API 9종(내국인·외국인 유동인구·와이파이·버스·정류소·AP 위치·기상·관측소·입도객) + 허브 파일 1종(축제·행사) + 공휴일 + 문서(데이터 명세서·API 문서)"],
-  ["분석 기간", "유동인구 2024-04-01 ~ 2026-08-31(외국인은 허브 원천 오류로 2025-04·05 제외), 와이파이 6개월, 버스 3개월 — 수집 완료. 기상·축제는 2025-03, 입도객은 2025-07까지라 그 뒤 날짜는 '확인 불가'로 표시"],
+  ["활용 데이터", "제주데이터허브 Open API 9종(유동인구 내·외국인, 와이파이, 버스, 위치, 기상, 입도객) + 축제 파일 + 공휴일 + 문서"],
+  ["분석 기간", "유동인구 2024-04 ~ 2026-08(외국인 2025-04·05는 허브 원천 오류로 제외), 와이파이 6개월, 버스 3개월. 기상·축제는 2025-03, 입도객은 2025-07까지라 그 뒤는 '확인 불가'"],
   ["Agent 구성", "질문 분류(tev1) → 조건 추출(규칙) → 도구 7종 → 원인 판정(tev1) → 문장 작성(템플릿) → 검증기"],
-  ["실행 환경", "Windows · Python 3.12 · Ollama(tev1:4b, CPU 실행 가능) · 브라우저 127.0.0.1:8501, 1_설치.bat / 2_실행.bat 두 번 클릭"],
-  ["현재 상태", "모든 기능 구현, 테스트 177개 통과, 제출본 설치 재현 약 2분 30초"],
+  ["실행 환경", "Windows · Python 3.12 · Ollama(tev1:4b, CPU 가능) · 1_설치.bat / 2_실행.bat 두 번 클릭"],
+  ["현재 상태", "모든 기능 구현, 테스트 197개 통과, 제출본 설치 재현 약 2분 30초"],
 ], { firstColShade: true }));
-c.push(gap(120));
-c.push(table([2300, 4038, 3300], ["평가", "결과(2026-11-12)", "읽는 법"], [
+c.push(gap(60));
+c.push(table([2300, 4038, 3300], ["평가", "결과(2026-11-15)", "읽는 법"], [
   ["이상 탐지", "가짜 이상 480건 주입, 유동인구 ±80% 변화의 **80~94%** 탐지(외국인 62~72%)\n평소 경보 100일당 4.1일(연휴 급증 포함)", "±20% 같은 작은 변화는 11~25%만 탐지(한계)"],
   ["숫자 검증기", "오류 없는 브리핑 60건 **100% 통과**\n숫자 변경 87.3%·지어낸 숫자 100% 차단", "검증을 통과한 문장만 화면에 표시"],
   ["질문 분류", "처음 보는 질문 12개 중 10개(**83%**)", "키워드 규칙만 쓰면 33%"],
-  ["원인 판정", "정답을 정한 10건 **10/10**\n실제 이상 구간 1,262개 중 약한 정답 509개와 **88.2%** 일치(내국인 97%, 외국인 57%)", "약한 정답(판정 근거와 같은 자료, 현장 확인 아님). 6코어 CPU 원인 질문 약 14초(센터 PC 미측정)"],
+  ["원인 판정", "정답을 정한 10건 **10/10**\n실제 이상 구간 1,262개 중 약한 정답 509개와 **83.1%** 일치(내국인 94%, 외국인 44%)", "약한 정답(판정 근거와 같은 자료). CPU 원인 질문 약 14초(센터 PC 미측정)"],
 ], { firstColShade: true }));
 c.push(BR());
 
@@ -270,18 +274,18 @@ c.push(H2("6.3 로컬 모델 — 질문 분류와 원인 판정"));
 c.push(table([2600, 3600, 3438], ["평가", "결과", "조건"], [
   ["질문 분류(intent_probe)", "처음 보는 질문 12개: tev1:4b 83%, 0.8b 58%, 키워드 규칙 33%\n설계에 쓴 질문 24개: 모델+규칙 결합 96%", "처음 보는 질문은 결합 방식 설계 전에 적어 두고 평가에만 사용"],
   ["원인 판정(tev1_probe)", "정답을 정한 10건: 4B 10/10, 0.8B 5~6/10", "기상·연휴·축제·관광 수요·데이터 오류·판단 불가, 손수 만든 사례"],
-  ["원인 판정(judge_eval)", "실제 이상 구간 1,262개 중 약한 정답이 있는 509개: 일치 **88.2%**(내국인 97.4%·버스 94.4%·와이파이 90.9%·외국인 56.5%), 정답 근거를 지우면 그 원인을 안 고름 100%", "약한 정답 = 공휴일·이름이 명시된 축제·강한 비바람(판정 근거와 같은 자료, 현장 확인 아님). 외국인은 공휴일과 급증의 관계 자체가 약함(한국 1.1배, 중국·일본 1.7~2.3배). 평가를 본 뒤 바꾼 것과 바꾸기 전 결과를 함께 공개"],
+  ["원인 판정(judge_eval)", "실제 이상 구간 1,262개 중 약한 정답이 있는 509개: 일치 **83.1%**(내국인 93.9%·버스 94.4%·와이파이 86.4%·외국인 44.4%; 자료 없는 신호를 '평소 수준'으로 넘기던 잘못을 고친 뒤 값, 고치기 전 88.2%), 정답 근거를 지우면 그 원인을 안 고름 100%", "약한 정답 = 공휴일·이름이 명시된 축제·강한 비바람(판정 근거와 같은 자료, 현장 확인 아님). 외국인은 공휴일과 급증의 관계 자체가 약함(한국 1.1배, 중국·일본 1.7~2.3배). 평가를 본 뒤 바꾼 것과 바꾸기 전 결과를 함께 공개"],
   ["문서 검색(rag_probe)", "답이 있는 문서가 상위 3개 안: 설계 질문 7/10 → 9/10, 따로 둔 질문 6/6", "제목 가중·우리 문서 추가·문서당 조각 하나로 개선"],
   ["처리 시간(speed_probe)", "질문 → 검증된 답변, 중앙값. **6코어 CPU: 원인 질문 13.7초, 지역 훑기 4.7초, 문서·범위 밖 4.3초**\nGPU 1.0초 이하, 모델 서버 없음(규칙 기반) 2.9초 이하", "개발 PC(i7-13700K)를 센터 PC와 같은 6코어로 묶어 측정(2024-04~2026-08, 신호 4종). 센터 PC는 코어당 성능이 낮아 더 느릴 수 있음(미확인)"],
 ]));
 c.push(H2("6.4 실제 데이터에서 확인한 사례"));
 c.push(table([2600, 3900, 3138], ["사례", "데이터가 보여 준 것", "Agent 판정"], [
-  ["추석 2024-09-16~17, 추석·개천절 연휴 2025-10-05~09", "이상 읍면동이 가장 많은 날(2025-10-06·07 40곳, 2024-09-16 36곳). 성산읍 2024-09-16 +148.7%, 제주 전체·인근 읍면동도 증가", "공휴일·연휴 81.6% (성산읍)"],
-  ["이호동 2024-07-26~29", "+103.8%(07-28), 같은 날 제주 전체 유동인구도 증가", "관광 수요 변화 66.8%"],
-  ["이호동 2024-08-02", "+48.0%, 이호테우축제 첫날", "축제·행사 54.3%"],
-  ["삼도1동 2025-03-28~30", "+162.9%, 와이파이(점수 13.7)·버스·외국인도 함께 증가 → 데이터 오류 가능성 낮음", "관광 수요 변화 60.8%, 단 맞는 행사를 데이터에서 찾지 못해 **실제 원인은 미확인**"],
-  ["송산동 외국인 2024-09-29", "+396.9%, 국적별로 일본이 변화의 73.1%", "판단 불가 93.5% — 누가 움직였는지는 보이지만 왜인지(행사·크루즈 일정)는 일 단위 자료 없음"],
-  ["우도면 2025-07-31~08-02", "+124.1%, 작년 같은 시기(2024-08-01)에도 급증, 제주 전체·인근도 증가. 기상·축제·입도객은 자료 기간 밖", "관광 수요 변화 72.1% ('확인 불가' 표시와 함께)"],
+  ["추석 2024-09-16~17, 추석·개천절 연휴 2025-10-05~09", "이상 읍면동이 가장 많은 날(2025-10-06·07 40곳, 2024-09-16 36곳). 성산읍 2024-09-16 +148.7%, 제주 전체·인근 읍면동도 증가", "공휴일·연휴 80.8% (성산읍)"],
+  ["이호동 2024-07-26~29", "+103.8%(07-28), 같은 날 제주 전체 유동인구도 증가", "관광 수요 변화 56.5%"],
+  ["이호동 2024-08-02", "+48.0%, 이호테우축제 첫날", "축제·행사 59.1%"],
+  ["삼도1동 2025-03-28~30", "+162.9%, 와이파이(점수 13.7)·버스·외국인도 함께 증가 → 데이터 오류 가능성 낮음", "관광 수요 변화 61.1%, 단 맞는 행사를 데이터에서 찾지 못해 **실제 원인은 미확인**"],
+  ["송산동 외국인 2024-09-29", "+396.9%, 국적별로 일본이 변화의 73.1%", "판단 불가 98.0% — 누가 움직였는지는 보이지만 왜인지(행사·크루즈 일정)는 일 단위 자료 없음"],
+  ["우도면 2025-07-31~08-02", "+124.1%, 작년 같은 시기(2024-08-01)에도 급증, 제주 전체·인근도 증가. 기상·축제·입도객은 자료 기간 밖", "관광 수요 변화 68.4% ('확인 불가' 표시와 함께)"],
 ]));
 c.push(img("shots/03_briefing_c.png", 560));
 c.push(CAP("그림 3. 상세 화면의 검증된 브리핑(우도면 2025-08-01) — 작년 같은 시기 반복을 근거로 쓰고, 자료 기간이 끝난 기상·축제·입도객은 '확인 불가'로 표시"));
@@ -293,14 +297,16 @@ c.push(B("**지역 훑기 속도**: 기준선을 날짜마다 따로 계산 → 
 c.push(B("**외국인 신호에 한국 공휴일**: 한국 공휴일 앞뒤 외국인 급증은 평소의 1.1배뿐(내국인 9.4배) → 외국인은 중국·일본 공휴일을 근거로(일본인 2.3배·중국인 1.7배)"));
 c.push(B("**자료가 끝난 뒤의 날짜**: 기상 자료가 없는 날이 '특이사항 없음'처럼 보임 → 근거별 제공 기간 밖이면 '확인 불가'로 표시"));
 c.push(B("**수집 중단 시 손실**: 허브 서버 오류로 멈추면 그날 받은 달이 저장되지 않음 → 끝까지 받은 달은 캐시로 내보냄"));
-c.push(P("각 수정마다 문제를 재현하는 자동 테스트를 먼저 만들고 고쳤습니다(전체 177개).", { size: 18 }));
+c.push(B("**자료 없는 신호를 '평소 수준'으로 씀**(11/15 전체 코드 점검): 와이파이·버스는 2025-03까지만 있는데 그 뒤 날짜도 '확인한 다른 신호는 평소 수준'으로 판정 모델에 넘김 → '자료 없음(확인 불가)'으로 분리. 원인 판정 일치율이 88.2% → 83.1%로 내려갔고 그대로 공개"));
+c.push(B("**그 밖의 점검 결과**: 없는 날짜(2월 30일) 입력 시 오류 화면, 규칙 판정에 고정 확률(75%) 표시, 옛 수집 계획(다시 받으면 분석 기간이 1년으로 줄어듦), 기간 경계에서 잘리는 이상 구간 → 모두 고침"));
+c.push(P("각 수정마다 문제를 재현하는 자동 테스트를 먼저 만들고 고쳤습니다(전체 197개).", { size: 18 }));
 c.push(gap(160));
 
 // 7. 개발·탑재 계획
 c.push(H1("7. 개발·탑재 계획"));
 c.push(H2("7.1 구현 범위"));
 c.push(table([1500, 8138], ["구분", "범위"], [
-  ["구현 완료", "허브 수집기(한도·이어받기), 위치 매핑, 이상 탐지 2방법·구간 묶기, 원인 맥락 대조, 동반 변화, 문서 검색(BM25), 로컬 판단 모델 연동과 규칙 대체, 로컬 Agent(질문하기), 검증기, HTML 브리핑·저장/삭제, 외국인 신호·국적별 분해, 인근 읍면동·작년 반복 근거, 근거 자료 기간 밖 '확인 불가', 화면 4개, 평가 스크립트 8개, 1_설치.bat/2_실행.bat, 매뉴얼·데이터 명세·결과 설명서, 노트북 6개"],
+  ["구현 완료", "제주 윤곽 지도(시군구 경계: 관제판 '어디서', 상세 탭 위치·인근 읍면동), 허브 수집기(한도·이어받기), 위치 매핑, 이상 탐지 2방법·구간 묶기, 원인 맥락 대조, 동반 변화, 문서 검색(BM25), 로컬 판단 모델 연동과 규칙 대체, 로컬 Agent(질문하기), 검증기, HTML 브리핑·저장/삭제, 외국인 신호·국적별 분해, 인근 읍면동·작년 반복 근거, 근거 자료 기간 밖 '확인 불가', 화면 4개, 평가 스크립트 8개, 1_설치.bat/2_실행.bat, 매뉴얼·데이터 명세·결과 설명서, 노트북 6개"],
   ["이번 버전 제외", "센터 반출 CSV 업로드, 이상 발생 알림, 2025년 4월 이후 기상·축제 근거(허브 미제공), 외국인 원인 근거(크루즈·항공편 일 단위 자료 없음)"],
 ], { firstColShade: true }));
 c.push(H2("7.2 기술 환경"));
@@ -309,11 +315,11 @@ c.push(table([2300, 7338], ["항목", "내용"], [
   ["라이브러리(버전 고정)", "pandas 3.1.1, numpy 2.5.4, pyarrow 26.0.1, statsmodels 0.15.0, holidays 0.108, rank-bm25 0.2.2, plotly 7.1.0, streamlit 1.67.0, requests 2.34.2, python-dotenv 1.2.4, openpyxl 3.1.5"],
   ["판단 모델", "Ollama + tev1:4b (127.0.0.1:11434, 설치 시 자동 내려받기)"],
   ["데이터 저장", "parquet 캐시(13MB, 결과물 포함), 상태·로그는 data/state"],
-  ["품질 관리", "pytest 자동 테스트 177개, 화면 스모크 테스트(Streamlit AppTest), 깨끗한 폴더 설치 재현"],
+  ["품질 관리", "pytest 자동 테스트 197개, 화면 스모크 테스트(Streamlit AppTest), 깨끗한 폴더 설치 재현"],
 ], { firstColShade: true }));
 c.push(H2("7.3 UI 구성"));
 c.push(img("shots/04_ask_c.png", 500));
-c.push(CAP("그림 4. 질문하기 — tev1은 질문 종류(원인 설명 94%)와 원인 후보('판단 불가' 93.5%)를 고르기만 하고, 문장은 계산 결과를 틀에 넣어 만듦(글을 생성하는 AI 없음)"));
+c.push(CAP("그림 4. 질문하기 — tev1은 질문 종류(원인 설명 94%)와 원인 후보('판단 불가' 98.0%)를 고르기만 하고, 문장은 계산 결과를 틀에 넣어 만듦(글을 생성하는 AI 없음)"));
 c.push(B("Streamlit 웹 화면, 1920×1080·Chrome/Edge 기준. 사이드바(신호·탐지 방법·민감도·저장 삭제·판단 모델 연결 상태) + 탭 4개(3.2절)"));
 c.push(H2("7.4 센터 실행환경과 외부 서비스 의존성"));
 c.push(table([3000, 6638], ["항목", "대응"], [
@@ -359,8 +365,9 @@ c.push(P("제주데이터허브(jejudatahub.net) 데이터 상세 페이지·API
 
 // ---------- document ----------
 const doc = new Document({
+  ...(EMBED_TTF ? { fonts: [{ name: FONT_NAME, data: fs.readFileSync(EMBED_TTF), characterSet: CharacterSet.ANSI }] } : {}),
   creator: "숨비소리",
-  title: "제주 데이터 관제실 AI Agent 기획서 v0.4",
+  title: "제주 데이터 관제실 AI Agent 기획서 v0.5",
   styles: {
     default: { document: { run: { font: FONT, size: 19 } } },
     paragraphStyles: [
@@ -378,7 +385,7 @@ const doc = new Document({
   sections: [{
     properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } } },
     footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [
-      new TextRun({ text: "숨비소리 · 제주 데이터 관제실 기획서 v0.4  |  ", font: FONT, size: 16, color: GRAY }),
+      new TextRun({ text: "숨비소리 · 제주 데이터 관제실 기획서 v0.5  |  ", font: FONT, size: 16, color: GRAY }),
       new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, color: GRAY }) ] })] }) },
     children: c,
   }],

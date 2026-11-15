@@ -116,8 +116,9 @@ def plot(fig, height: int | None = None):
     fig.update_layout(font=dict(family=FONT, size=12, color=INK_2), paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
                       hoverlabel=dict(font_family=FONT, bgcolor="#FFFFFF", bordercolor=LINE_STRONG),
                       legend=dict(orientation="h", y=1.08, x=0, font=dict(size=12)))
-    fig.update_xaxes(showgrid=False, linecolor=LINE_STRONG, ticks="outside", tickcolor=LINE_STRONG)
-    fig.update_yaxes(gridcolor=LINE, zerolinecolor=LINE_STRONG, linecolor=LINE_STRONG)
+    axis_text = dict(tickfont=dict(color=MUTED), title_font=dict(color=MUTED))
+    fig.update_xaxes(showgrid=False, linecolor=LINE_STRONG, ticks="outside", tickcolor=LINE_STRONG, **axis_text)
+    fig.update_yaxes(gridcolor=LINE, zerolinecolor=LINE_STRONG, linecolor=LINE_STRONG, **axis_text)
     if height:
         fig.update_layout(height=height)
     return fig

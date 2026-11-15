@@ -18,11 +18,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "숨비소리"
-PLAN_PDF = "숨비소리_AI_Agent_기획서_v0.4.pdf"
+PLAN_PDF = "숨비소리_AI_Agent_기획서_v0.5.pdf"
 
 FILES = ["README.md", "install.bat", "run.bat", "requirements.txt", "requirements-dev.txt", "pytest.ini", ".env.example",
          ".streamlit/config.toml", "02_게시판_QA정리.md", "데이터명세서_kr.xlsx"]
-DIRS = ["app", "tests", "eval", "notebooks", "docs", "data/cache", "data/manual"]
+DIRS = ["app", "tests", "eval", "notebooks", "docs", "data/cache", "data/manual", "data/geo"]
 SKIP = ["__pycache__", "*.pyc", ".pytest_cache", ".ipynb_checkpoints", "~$*"]
 FORBIDDEN = ["제주데이터허브 데이터목록*", ".env", ".venv", ".tools", "state", "results/briefing*"]
 

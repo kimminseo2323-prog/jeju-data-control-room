@@ -118,10 +118,11 @@ def render_briefing(run: AgentRun, generated_at: pd.Timestamp, data_as_of: dict,
     evid = "".join(f'<section id="{rid}"><h3>{rid} · {html.escape(r.tool)}</h3><p class="args">{html.escape(str(r.args))}</p>{_table(r.data)}</section>'
                    for rid, r in run.results.items())
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>제주 데이터 관제실 브리핑</title>
-<style>body{{font-family:'Malgun Gothic',sans-serif;max-width:960px;margin:24px auto;color:#1f2a37}}
-h1{{color:#1F3A5F}}.badge{{display:inline-block;padding:2px 10px;border-radius:12px;background:{'#2A7F7F' if run.verified else '#B5473A'};color:#fff}}
-table{{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}}th,td{{border:1px solid #cfd8e3;padding:4px 6px}}th{{background:#1F3A5F;color:#fff}}
-.muted{{color:#5B6770;font-size:13px}}</style></head><body>
+<style>body{{font-family:'IBM Plex Sans KR','Malgun Gothic',sans-serif;max-width:960px;margin:24px auto;color:#161616;letter-spacing:.16px}}
+h1{{background:#161616;color:#fff;font-weight:300;padding:12px 16px;margin:0 0 8px}}h2{{font-weight:600;font-size:18px;border-top:3px solid #E8630A;padding-top:6px;margin-top:28px}}
+.badge{{display:inline-block;padding:1px 8px;border:1px solid {'#161616' if run.verified else '#DA1E28'};color:{'#161616' if run.verified else '#DA1E28'}}}
+table{{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}}th,td{{border:1px solid #C6C6C6;padding:4px 6px;text-align:left}}th{{background:#E0E0E0;color:#161616;font-weight:600}}
+a{{color:#0043CE}}.muted{{color:#525252;font-size:13px}}</style></head><body>
 <h1>제주 데이터 관제실 브리핑</h1>
 <p class="muted">질문: {html.escape(run.question)} · 생성: {generated_at:%Y-%m-%d %H:%M} · <span class="badge">{status}</span></p>
 <h2>요약</h2>{body}

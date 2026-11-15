@@ -26,6 +26,7 @@ from app.report import board
 from app.ui import style
 from app.report.briefing import ResultStore, markdown_safe, render_briefing, template_text
 from app.store.cache import CacheStore
+from app.store.jeju_map import CHUJA_LAT, load_outline, outline_traces
 
 st.set_page_config(page_title="제주 데이터 관제실", page_icon="📡", layout="wide")
 UP, DOWN, PICK, INK = style.UP, style.DOWN, style.PICK, style.INK
@@ -52,6 +53,21 @@ def get_results() -> ResultStore:
 @st.cache_resource
 def get_toolbox() -> Toolbox:
     return Toolbox(get_store(), get_index())
+
+
+@st.cache_resource
+def get_outline():
+    return load_outline()
+
+
+def jeju_base(fig, chuja_shift=None, include_chuja=True) -> None:
+    """제주 해안선·두 시 경계(연회색 면)를 지도 맨 아래에 깐다. 윤곽 파일(data/geo/jeju_outline.json)이 없으면 그리지 않는다."""
+    outline = get_outline()
+    if not outline:
+        return
+    for tr in outline_traces(outline, chuja_shift=chuja_shift, include_chuja=include_chuja):
+        fig.add_scatter(x=tr["lon"], y=tr["lat"], mode="lines", fill="toself", fillcolor=style.LEDGER,
+                        line=dict(color=style.LINE_STRONG, width=0.8), hoverinfo="skip", showlegend=False, name=tr["name"])
 
 
 @st.cache_data(show_spinner="이상 신호 계산 중…")
@@ -163,26 +179,36 @@ with tab_board:
         with left:
             st.markdown("#### 어디서")
             m = regs.join(store.centroids, how="inner").copy()
-            far = m["lat"] > 33.7   # 추자면(본섬 북쪽 약 45km)은 본섬 북서쪽 위에 붙여 그린다(지도가 작아지지 않게)
+            far = m["lat"] > CHUJA_LAT   # 추자면(본섬 북쪽 약 45km)은 본섬 북서쪽 위에 붙여 그린다(지도가 작아지지 않게)
             main = m[~far]
-            m.loc[far, "lat"], m.loc[far, "lon"] = main["lat"].max() + 0.06, main["lon"].min() + 0.03
+            shift = None
+            if far.any():
+                old = m.loc[far, ["lon", "lat"]].iloc[0]
+                new_lon, new_lat = main["lon"].min() + 0.03, main["lat"].max() + 0.12
+                shift = (new_lon - old["lon"], new_lat - old["lat"])   # 추자 해안선도 같은 만큼 옮긴다
+                m.loc[far, "lat"], m.loc[far, "lon"] = new_lat, new_lon
             hit = m["alarm_days"] > 0
             color = [(UP if v > 0 else DOWN) if h else style.LINE_STRONG for v, h in zip(m["peak_z"], hit)]
             size = [10 + 3 * min(abs(v), 10) if h else 7 for v, h in zip(m["peak_z"], hit)]
             top = set(m[hit]["peak_z"].abs().nlargest(8).index)
-            fmap = go.Figure(go.Scatter(
+            fmap = go.Figure()
+            jeju_base(fmap, chuja_shift=shift)
+            if shift:   # 옮겨 그린 추자면임을 점선 상자로 표시
+                fmap.add_shape(type="rect", x0=new_lon - 0.09, x1=new_lon + 0.09, y0=new_lat - 0.06, y1=new_lat + 0.07,
+                               line=dict(color=style.SUBTLE, width=1, dash="dot"))
+            fmap.add_trace(go.Scatter(
                 x=m["lon"], y=m["lat"], mode="markers+text", marker=dict(color=color, size=size, opacity=0.9, line=dict(color="white", width=1)),
                 text=[(e.split(" ")[1] + ("↑" if f else "")) if (e in top or f) else "" for e, f in zip(m.index, far)],
                 textposition="top center", textfont=dict(size=11, color=INK),
                 hovertext=[f"{e}<br>가장 큰 점수 {v:+.1f}, 이상일 {n}일" for e, v, n in zip(m.index, m["peak_z"], m["alarm_days"])],
-                hoverinfo="text"))
+                hoverinfo="text", showlegend=False))
             style.plot(fmap, height=380)
             fmap.update_layout(margin=dict(l=0, r=0, t=10, b=0), showlegend=False,
                                xaxis=dict(visible=False), yaxis=dict(visible=False, scaleanchor="x", scaleratio=1.2))
             st.plotly_chart(fmap, width="stretch")
             st.markdown(style.key_html([(UP, "평소보다 많았던 곳"), (DOWN, "적었던 곳"), (style.LINE_STRONG, "이상 없음")]), unsafe_allow_html=True)
-            st.caption("읍면동 위치는 정류소·AP 좌표 평균입니다. 원이 클수록 변화가 크고, 이름은 변화가 큰 8곳만 붙였습니다(나머지는 마우스를 올리면 보임). "
-                       "추자면↑은 실제로 본섬 북쪽 약 45km에 있습니다.")
+            st.caption("읍면동 위치는 정류소·AP 좌표 평균, 바탕은 제주시·서귀포시 경계입니다. 원이 클수록 변화가 크고, 이름은 변화가 큰 8곳만 붙였습니다"
+                       "(나머지는 마우스를 올리면 보임). 점선 상자 안의 추자면↑은 실제로 본섬 북쪽 약 45km에 있습니다.")
         with right:
             st.markdown("#### 언제")
             isl = store.island_series(signal)
@@ -192,8 +218,9 @@ with tab_board:
             ftr.add_scatter(x=isl.index, y=isl.values, name=f"제주 전체 {signal}", line=dict(color=style.SUBTLE, width=1.5), secondary_y=True)
             style.plot(ftr, height=380)
             ftr.update_layout(margin=dict(l=0, r=0, t=10, b=0), bargap=0.15)
-            ftr.update_yaxes(title_text="이상 읍면동 수", secondary_y=False)
-            ftr.update_yaxes(title_text=f"제주 전체 {signal}", secondary_y=True, showgrid=False)
+            ftr.update_yaxes(title_text="이상 읍면동 수", secondary_y=False, title_font_color=style.MUTED, tickfont_color=style.MUTED)
+            ftr.update_yaxes(title_text=f"제주 전체 {signal}", secondary_y=True, showgrid=False, title_font_color=style.MUTED,
+                             tickfont_color=style.MUTED)
             st.plotly_chart(ftr, width="stretch")
             st.caption("막대 = 그날 평소와 크게 달랐던 읍면동 수(여러 곳이 함께 움직인 날은 연휴·성수기처럼 섬 전체 요인일 가능성이 큼), 선 = 제주 전체 합계.")
 
@@ -304,8 +331,36 @@ with tab_detail:
                     pr = pd.DataFrame({"원인": [CAUSE_KO[k] for k in j.probabilities], "확률": list(j.probabilities.values())}).sort_values("확률")
                     bars = px.bar(pr, x="확률", y="원인", orientation="h")
                     bars.update_traces(marker_color=[PICK if c == CAUSE_KO[j.choice] else style.LINE_STRONG for c in pr["원인"]])
+                    bars.update_yaxes(title=None).update_xaxes(title=None, tickformat=".0%")
                     st.plotly_chart(style.plot(bars, height=240).update_layout(margin=dict(l=0, r=0, t=0, b=0)),
                                     width="stretch")
+
+        with right:   # 위치: 고른 읍면동과 '인근 읍면동' 동반 변화에 쓴 이웃(제주 윤곽 위)
+            cent = store.centroids
+            if emd in cent.index:
+                st.markdown("#### 위치와 인근 읍면동")
+                nb = res["R2"].data.get("neighbors", [])
+                is_chuja = cent.loc[emd, "lat"] > CHUJA_LAT
+                pts = cent if is_chuja else cent[cent["lat"] <= CHUJA_LAT]
+                loc = go.Figure()
+                jeju_base(loc, include_chuja=is_chuja)
+                others = pts.drop(index=[e for e in [emd, *nb] if e in pts.index])
+                loc.add_scatter(x=others["lon"], y=others["lat"], mode="markers", marker=dict(color=style.LINE_STRONG, size=6),
+                                hovertext=list(others.index), hoverinfo="text", showlegend=False)
+                if nb:
+                    loc.add_scatter(x=cent.loc[nb, "lon"], y=cent.loc[nb, "lat"], mode="markers+text", text=[e.split(" ")[1] for e in nb],
+                                    textposition="bottom center", textfont=dict(size=11, color=style.INK_2),
+                                    marker=dict(color="#FFFFFF", size=11, line=dict(color=INK, width=2)), name="인근 읍면동", hoverinfo="text",
+                                    hovertext=nb)
+                loc.add_scatter(x=[cent.loc[emd, "lon"]], y=[cent.loc[emd, "lat"]], mode="markers+text", text=[emd.split(" ")[1]],
+                                textposition="top center", textfont=dict(size=12, color=INK), marker=dict(color=PICK, size=14),
+                                name="고른 읍면동", hoverinfo="text", hovertext=[emd])
+                style.plot(loc, height=280)
+                loc.update_layout(margin=dict(l=0, r=0, t=6, b=0), showlegend=False,
+                                  xaxis=dict(visible=False), yaxis=dict(visible=False, scaleanchor="x", scaleratio=1.2))
+                st.plotly_chart(loc, width="stretch")
+                st.markdown(style.key_html([(PICK, "고른 읍면동"), (INK, "인근 읍면동(동반 변화 비교에 씀)")]), unsafe_allow_html=True)
+                st.caption("인근 읍면동 = 대표 좌표가 가까운 3곳(15km 이내). " + ("이웃이 15km 안에 없어 인근 비교를 하지 않습니다." if not nb else ""))
 
         st.markdown("#### 브리핑")
         text = template_text(res)

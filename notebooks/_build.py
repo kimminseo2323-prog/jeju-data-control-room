@@ -395,21 +395,25 @@ new.groupby("가장 큰 날").size().sort_values(ascending=False).head(10).renam
 pd.DataFrame({"① 1년치·근거 문장 수정 전": summ("eval/results/_1year/judge_eval_before_label.json"),
               "② 1년치·근거 문장 수정 후": summ("eval/results/_1year/judge_eval.json"),
               "③ 기간 연장+외국인·한국 공휴일": summ("eval/results/judge_eval_before_foreign_holiday.json"),
-              "④ 기간 연장+외국인·중국·일본 공휴일(현재)": summ("eval/results/judge_eval.json")}).T"""),
+              "④ 기간 연장+외국인·중국·일본 공휴일": summ("eval/results/judge_eval_before_nodata_fix.json"),
+              "⑤ 자료 없는 신호를 '자료 없음'으로(현재)": summ("eval/results/judge_eval.json")}).T"""),
     ("md", "### 신호별 일치율 (정답이 있는 구간)"),
     ("code", """def by_signal(p):
     r = pd.DataFrame(json.loads(Path(p).read_text("utf-8"))["rows"])
     r = r[r["labels"].map(len).gt(0)]
     r["agree"] = [c in l for c, l in zip(r["choice"], r["labels"])]
     return r.groupby("signal")["agree"].agg(lambda a: f"{a.mean():.3f} ({len(a)})")
-pd.DataFrame({"③ 한국 공휴일": by_signal("eval/results/judge_eval_before_foreign_holiday.json"), "④ 중국·일본 공휴일(현재)": by_signal("eval/results/judge_eval.json")})"""),
+pd.DataFrame({"③ 한국 공휴일": by_signal("eval/results/judge_eval_before_foreign_holiday.json"),
+              "④ 중국·일본 공휴일": by_signal("eval/results/judge_eval_before_nodata_fix.json"),
+              "⑤ '자료 없음' 분리(현재)": by_signal("eval/results/judge_eval.json")})"""),
     ("code", """s = json.loads(Path("eval/results/judge_eval.json").read_text("utf-8"))["summary"]
 pd.DataFrame({"정답 없음(근거 기간 안)": pd.Series(s["unlabeled_choices"]), "근거 기간 밖(전체)": pd.Series(s["outside_coverage_choices"])}).fillna(0).astype(int)"""),
     ("md", """**읽은 것**
 - ① → ②: 근거 문장에 맥락 종류(날씨·공휴일 등)를 붙이자 일치율이 81.5% → 95.2%. 날씨는 23% → 54%로 여전히 낮다(13건)
 - ③ 기간을 2026-08까지 늘리고 외국인 신호를 넣으니 이상 구간이 1,262개, 정답 있는 구간이 464개로 늘었다. 유동인구·버스·와이파이는 91~97%로 비슷하지만, **외국인은 55.6%**
 - 2절에서 본 것처럼 한국 공휴일은 외국인 급증과 거의 관계가 없다(1.1배) → ④ 외국인 신호에는 중국·일본 공휴일을 넘기도록 바꿨다. 외국인 정답 구간이 108개로 늘었지만 일치율은 56.5%로 거의 그대로다. 중국·일본 공휴일도 급증과의 관계가 1.6~2.3배로 약해, '공휴일이 겹치면 정답은 공휴일'이라는 약한 정답 자체가 외국인에게는 잘 맞지 않는다. 이웃 읍면동이 함께 움직였으면 판정은 '관광 수요 변화'를 고르는 경우가 많았다
-- **평가를 본 뒤 정답이나 판정 규칙을 더 맞추지 않았다**(맞추면 평가가 의미를 잃는다). ③·④ 결과를 모두 남긴다
+- ⑤ 2026-11-15 코드 점검에서, 그날 자료가 없는 신호(와이파이 2025-04 이후 등)까지 '확인한 다른 신호는 평소 수준이었다'고 판정 모델에 넘기던 잘못을 찾았다. '자료 없음(확인 불가)'으로 따로 적도록 고친 뒤 다시 돌리니 일치율이 88.2% → 83.1%로 내려갔다(1,262개 중 53개 판정이 바뀜, 주로 공휴일 → 판단 불가·관광 수요 변화). 정확한 근거로 낸 ⑤가 현재 값이다
+- **평가를 본 뒤 정답이나 판정 규칙을 더 맞추지 않았다**(맞추면 평가가 의미를 잃는다). ③·④·⑤ 결과를 모두 남긴다
 - 근거 제거 시험은 모든 경우 100%: 정답 근거를 지우면 그 원인을 고르지 않는다(근거 없이 원인을 지어내지 않음)
 - 규칙 판정의 일치율(95.7%)이 더 높은 것은 규칙이 약한 정답을 만드는 방식과 거의 같기 때문이며, 규칙이 더 낫다는 뜻은 아니다"""),
 ]

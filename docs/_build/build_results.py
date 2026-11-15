@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -13,29 +14,38 @@ DOCS = Path(__file__).resolve().parents[1]
 SRC, OUT = DOCS / "결과_설명서.md", DOCS / "결과_설명서.pdf"
 BROWSERS = [Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"),
             Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")]
+FONTS = DOCS.parent / "app" / "ui" / "static" / "fonts"   # 화면과 같은 글꼴(IBM Plex Sans KR, OFL)
+# 디자인 기준: docs/디자인_기준.md — 각진 면, 먹색·회색 단계, 감귤색은 강조 막대에만
 CSS = """
+@font-face { font-family: 'Plex KR'; font-weight: 300; src: url('FONTDIR/IBMPlexSansKR-Light.woff2') format('woff2'); }
+@font-face { font-family: 'Plex KR'; font-weight: 400; src: url('FONTDIR/IBMPlexSansKR-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Plex KR'; font-weight: 600 700; src: url('FONTDIR/IBMPlexSansKR-SemiBold.woff2') format('woff2'); }
 @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
-body { font-family: 'Malgun Gothic', sans-serif; font-size: 10pt; line-height: 1.55; color: #1f2a37; max-width: none; margin: 0; }
-h1 { color: #1F3A5F; font-size: 19pt; border-bottom: 3px solid #1F3A5F; padding-bottom: 4px; margin: 0 0 8px; }
-h2 { color: #1F3A5F; font-size: 13.5pt; border-left: 5px solid #2A7F7F; padding-left: 8px; margin: 18px 0 6px; page-break-after: avoid; }
-h3 { color: #2A7F7F; font-size: 11pt; margin: 12px 0 4px; page-break-after: avoid; }
+body { font-family: 'Plex KR', 'Malgun Gothic', sans-serif; font-size: 9.6pt; line-height: 1.6; color: #161616; max-width: none; margin: 0; letter-spacing: 0.1px; }
+strong, b { font-weight: 600; }
+h1 { color: #FFFFFF; background: #161616; font-size: 18pt; font-weight: 300; padding: 10px 14px; margin: 0 0 10px; }
+h2 { color: #161616; font-size: 13pt; font-weight: 600; border-top: 3px solid #E8630A; padding-top: 5px; margin: 18px 0 6px; page-break-after: avoid; }
+h3 { color: #161616; font-size: 10.6pt; font-weight: 600; margin: 12px 0 4px; page-break-after: avoid; }
 p, li { margin: 3px 0; }
-table { border-collapse: collapse; width: 100%; margin: 6px 0 8px; font-size: 9pt; page-break-inside: avoid; }
-th { background: #1F3A5F; color: #fff; font-weight: 600; }
-th, td { border: 1px solid #cfd8e3; padding: 3px 6px; vertical-align: top; word-break: keep-all; }
-tr:nth-child(even) td { background: #f5f8fa; }
-blockquote { margin: 6px 0; padding: 6px 10px; background: #E8F1F1; border-left: 4px solid #2A7F7F; color: #1f2a37; }
-pre { background: #f5f3ee; border: 1px solid #e3ddd0; padding: 6px 8px; font-size: 8.3pt; line-height: 1.45; white-space: pre-wrap; page-break-inside: avoid; }
-code { font-family: Consolas, 'Malgun Gothic', monospace; font-size: 8.8pt; }
-img { display: block; max-width: 100%; max-height: 105mm; margin: 6px auto; border: 1px solid #dde3ea; }
+a { color: #0043CE; }
+table { border-collapse: collapse; width: 100%; margin: 6px 0 8px; font-size: 8.8pt; page-break-inside: avoid; }
+th { background: #E0E0E0; color: #161616; font-weight: 600; text-align: left; }
+th, td { border: 1px solid #C6C6C6; padding: 3px 6px; vertical-align: top; word-break: keep-all; }
+tr:nth-child(even) td { background: #F4F4F4; }
+blockquote { margin: 6px 0; padding: 6px 10px; background: #F4F4F4; border-left: 4px solid #E8630A; color: #161616; }
+pre { background: #F4F4F4; border: 1px solid #E0E0E0; padding: 6px 8px; font-size: 8.2pt; line-height: 1.45; white-space: pre-wrap; page-break-inside: avoid; }
+code { font-family: Consolas, 'Plex KR', 'Malgun Gothic', monospace; font-size: 8.6pt; }
+img { display: block; max-width: 100%; max-height: 105mm; margin: 6px auto; border: 1px solid #E0E0E0; }
 p:has(> img) { page-break-inside: avoid; }
-"""
+""".replace("FONTDIR/", "")   # 글꼴은 style.css 옆(임시 폴더)에 복사해 두고 pandoc이 HTML 안에 넣는다
 
 
 def main(src: Path = SRC, out: Path = OUT):
     with tempfile.TemporaryDirectory() as tmp:
         css = Path(tmp) / "style.css"
         css.write_text(CSS, "utf-8")
+        for f in FONTS.glob("*.woff2"):
+            shutil.copy2(f, Path(tmp) / f.name)
         html = DOCS / f"_{src.stem}_tmp.html"   # 이미지 상대경로(images/) 때문에 docs 폴더에 잠깐 만든다
         try:
             subprocess.run(["pandoc", str(src), "-f", "gfm", "-t", "html5", "-s", "--metadata", f"title={src.stem.replace('_', ' ')}",

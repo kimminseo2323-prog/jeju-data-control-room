@@ -6,16 +6,22 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
-plt.rcParams["font.family"] = "Malgun Gothic"
+from matplotlib import font_manager
+
+# 디자인 기준(docs/디자인_기준.md): 각진 상자, 먹색·회색 단계, 판단 모델 상자만 먹색 채움, 글꼴 IBM Plex Sans KR
+FONTS = Path(__file__).with_name("fonts")
+for f in FONTS.glob("*.ttf"):
+    font_manager.fontManager.addfont(str(f))
+plt.rcParams["font.family"] = "IBM Plex Sans KR" if any(FONTS.glob("*.ttf")) else "Malgun Gothic"
 OUT = Path(__file__).with_name("workflow_v2.png")
-NAVY, TEAL, SAND, GRAY, RED, LT = "#1F3A5F", "#2A7F7F", "#F3EBDD", "#5B6770", "#B5473A", "#E8F1F1"
+NAVY, TEAL, SAND, GRAY, RED, LT = "#161616", "#525252", "#F4F4F4", "#525252", "#161616", "#F4F4F4"
 
 fig, ax = plt.subplots(figsize=(10, 6.2), dpi=200)
 ax.set_xlim(0, 100); ax.set_ylim(0, 62); ax.axis("off")
 
 
 def box(x, y, w, h, title, sub="", fc="white", ec=NAVY, tc=NAVY, fs=9.5, sc=GRAY):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.35,rounding_size=1.0", fc=fc, ec=ec, lw=1.3))
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="square,pad=0.35", fc=fc, ec=ec, lw=1.3))
     n = sub.count("\n") + 1 if sub else 0
     if n > 2:   # 여러 줄 설명: 제목은 위, 설명은 그 아래로
         ax.text(x + w / 2, y + h - 2.6, title, ha="center", va="center", fontsize=fs, color=tc, weight="bold")
@@ -44,7 +50,7 @@ box(X, 40.5, Wd, 7, "② 조건 추출 (규칙)", "읍면동·날짜·기간·�
 box(X, 30, Wd, 8, "③ 도구 실행 (정해진 순서)", "결과마다 id(R1, R2…) 부여", ec=TEAL, tc=TEAL)
 box(X, 20.5, Wd, 7, "④ 원인 판정", "tev1:4b · 근거 문장만 보고 확률 산출", fc=NAVY, tc="white", sc="#D9E2EC")
 box(X, 11.5, Wd, 6.5, "⑤ 문장 작성 (템플릿)", "결과 id를 인용한 문장만")
-box(X, 2, Wd, 7, "⑥ 검증기 (코드)", "숫자·날짜·근거 id·원인 표현 대조", ec=RED, tc=RED)
+box(X, 2, Wd, 7, "⑥ 검증기 (코드)", "숫자·날짜·근거 id·원인 표현 대조", ec="#E8630A", tc=NAVY)
 
 for y1, y2 in [(50, 47.5), (40.5, 38), (30, 27.5), (20.5, 18), (11.5, 9)]:
     arrow(X + Wd / 2, y1, X + Wd / 2, y2)
