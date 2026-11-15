@@ -2,10 +2,45 @@
 address = "127.0.0.1"
 port = 8501
 headless = true
+# app/ui/static 의 글꼴(IBM Plex Sans KR, OFL)을 이 PC에서 직접 내보낸다(센터 PC는 인터넷이 막혀 있을 수 있음)
+enableStaticServing = true
 
 [browser]
 gatherUsageStats = false
 
+# 화면 디자인: IBM Carbon 디자인 시스템의 구조(각진 모서리, 1px 선, 회색 단계 면)를 따르고,
+# 색은 의미가 있을 때만 쓴다(빨강 = 평소보다 많음, 파랑 = 적음, 귤색 = 지금 고른 것). 자세한 기준은 docs/디자인_기준.md
 [theme]
-primaryColor = "#2A7F7F"
-font = "sans serif"
+base = "light"
+primaryColor = "#161616"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F4F4F4"
+textColor = "#161616"
+borderColor = "#C6C6C6"
+linkColor = "#0043CE"
+baseRadius = "none"
+buttonRadius = "none"
+showWidgetBorder = true
+font = "IBM Plex Sans KR, Malgun Gothic, sans-serif"
+headingFont = "IBM Plex Sans KR, Malgun Gothic, sans-serif"
+baseFontSize = 15
+headingFontWeights = [400, 400, 600, 600, 600, 600]
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans KR"
+url = "app/static/fonts/IBMPlexSansKR-Light.woff2"
+weight = 300
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans KR"
+url = "app/static/fonts/IBMPlexSansKR-Regular.woff2"
+weight = 400
+
+[[theme.fontFaces]]
+family = "IBM Plex Sans KR"
+url = "app/static/fonts/IBMPlexSansKR-SemiBold.woff2"
+weight = 600
+
+[theme.sidebar]
+backgroundColor = "#F4F4F4"
+secondaryBackgroundColor = "#FFFFFF"

@@ -28,7 +28,7 @@ from app.report.briefing import ResultStore, markdown_safe, render_briefing, tem
 from app.store.cache import CacheStore
 
 st.set_page_config(page_title="제주 데이터 관제실", page_icon="📡", layout="wide")
-NAVY, TEAL, RED = "#1F3A5F", "#2A7F7F", "#B5473A"
+UP, DOWN, PICK, INK = style.UP, style.DOWN, style.PICK, style.INK
 
 
 @st.cache_resource
@@ -152,15 +152,12 @@ with tab_board:
         for rank, (i, r) in enumerate(pe.head(5).iterrows(), 1):
             up = r["방향"] == "증가"
             qc = cached_quick_cause(signal, r["읍면동"], str(r["최대일"]), "up" if up else "down")
-            span = str(r["시작"]) if r["시작"] == r["끝"] else f"{r['시작']}~{r['끝']}"
-            with st.container(border=True):
-                a, b, c, d = st.columns([2.3, 1.3, 4.6, 1.1])
-                a.markdown(f"**{rank}. {r['읍면동']}**  \n{markdown_safe(span)} · {r['유형']}")
-                b.markdown(f"<div style='color:{RED if up else '#2166AC'};font-size:1.35em;font-weight:700'>"
-                           f"{'+' if up else '−'}{abs(r['기대 대비(%)'])}%</div><small>기대값 대비 · 점수 {r['점수']}</small>",
-                           unsafe_allow_html=True)
-                c.markdown(f"**{qc['cause']}** <span class='jj-tag'>빠른 판정</span>  \n{markdown_safe(qc['reason'])}", unsafe_allow_html=True)
-                d.button("상세 보기", key=f"go_{i}", on_click=_pick_episode, args=(int(i), f"{r['읍면동']} {r['최대일']}"))
+            span = str(r["시작"]) if r["시작"] == r["끝"] else f"{r['시작']} ~ {r['끝']}"
+            row_col, btn_col = st.columns([11, 1.4], vertical_alignment="center", gap="small")
+            row_col.markdown(style.episode_row_html(rank, r["읍면동"], span, r["유형"], up, r["기대 대비(%)"], r["점수"],
+                                                    qc["cause"], qc["reason"]), unsafe_allow_html=True)
+            btn_col.button("상세 보기", key=f"go_{i}", on_click=_pick_episode, args=(int(i), f"{r['읍면동']} {r['최대일']}"),
+                           width="stretch")
 
         left, right = st.columns([2, 3])
         with left:
@@ -170,28 +167,31 @@ with tab_board:
             main = m[~far]
             m.loc[far, "lat"], m.loc[far, "lon"] = main["lat"].max() + 0.06, main["lon"].min() + 0.03
             hit = m["alarm_days"] > 0
-            color = [("#B2182B" if v > 0 else "#2166AC") if h else "#C9D1D9" for v, h in zip(m["peak_z"], hit)]
+            color = [(UP if v > 0 else DOWN) if h else style.LINE_STRONG for v, h in zip(m["peak_z"], hit)]
             size = [10 + 3 * min(abs(v), 10) if h else 7 for v, h in zip(m["peak_z"], hit)]
             top = set(m[hit]["peak_z"].abs().nlargest(8).index)
             fmap = go.Figure(go.Scatter(
-                x=m["lon"], y=m["lat"], mode="markers+text", marker=dict(color=color, size=size, line=dict(color="white", width=1)),
+                x=m["lon"], y=m["lat"], mode="markers+text", marker=dict(color=color, size=size, opacity=0.9, line=dict(color="white", width=1)),
                 text=[(e.split(" ")[1] + ("↑" if f else "")) if (e in top or f) else "" for e, f in zip(m.index, far)],
-                textposition="top center", textfont=dict(size=11),
-                hovertext=[f"{e}<br>가장 큰 점수 {v:+.1f} · 이상일 {n}일" for e, v, n in zip(m.index, m["peak_z"], m["alarm_days"])],
+                textposition="top center", textfont=dict(size=11, color=INK),
+                hovertext=[f"{e}<br>가장 큰 점수 {v:+.1f}, 이상일 {n}일" for e, v, n in zip(m.index, m["peak_z"], m["alarm_days"])],
                 hoverinfo="text"))
-            fmap.update_layout(height=380, margin=dict(l=0, r=0, t=10, b=0), plot_bgcolor="white", showlegend=False,
+            style.plot(fmap, height=380)
+            fmap.update_layout(margin=dict(l=0, r=0, t=10, b=0), showlegend=False,
                                xaxis=dict(visible=False), yaxis=dict(visible=False, scaleanchor="x", scaleratio=1.2))
             st.plotly_chart(fmap, width="stretch")
-            st.caption("읍면동 위치(정류소·AP 좌표 평균). 빨강 = 평소보다 많았던 곳, 파랑 = 적었던 곳, 원이 클수록 변화가 큼, 회색 = 이상 없음. "
-                       "이름은 변화가 큰 8곳만 표시(나머지는 마우스를 올리면 보임). 추자면↑은 실제로 본섬 북쪽 약 45km.")
+            st.markdown(style.key_html([(UP, "평소보다 많았던 곳"), (DOWN, "적었던 곳"), (style.LINE_STRONG, "이상 없음")]), unsafe_allow_html=True)
+            st.caption("읍면동 위치는 정류소·AP 좌표 평균입니다. 원이 클수록 변화가 크고, 이름은 변화가 큰 8곳만 붙였습니다(나머지는 마우스를 올리면 보임). "
+                       "추자면↑은 실제로 본섬 북쪽 약 45km에 있습니다.")
         with right:
             st.markdown("#### 언제")
             isl = store.island_series(signal)
             isl = isl[(isl.index >= start) & (isl.index <= end)]
             ftr = make_subplots(specs=[[{"secondary_y": True}]])
-            ftr.add_bar(x=counts.index, y=counts.values, name="이상 읍면동 수", marker_color=TEAL, opacity=0.75)
-            ftr.add_scatter(x=isl.index, y=isl.values, name=f"제주 전체 {signal}", line=dict(color=NAVY, width=1.6), secondary_y=True)
-            ftr.update_layout(height=380, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h", y=1.08), bargap=0.1)
+            ftr.add_bar(x=counts.index, y=counts.values, name="이상 읍면동 수", marker_color=style.INK_2, marker_line_width=0)
+            ftr.add_scatter(x=isl.index, y=isl.values, name=f"제주 전체 {signal}", line=dict(color=style.SUBTLE, width=1.5), secondary_y=True)
+            style.plot(ftr, height=380)
+            ftr.update_layout(margin=dict(l=0, r=0, t=10, b=0), bargap=0.15)
             ftr.update_yaxes(title_text="이상 읍면동 수", secondary_y=False)
             ftr.update_yaxes(title_text=f"제주 전체 {signal}", secondary_y=True, showgrid=False)
             st.plotly_chart(ftr, width="stretch")
@@ -200,9 +200,10 @@ with tab_board:
         with st.expander("읍면동 × 날짜 점수 지도 (기준을 넘은 칸만 색칠)"):
             w = z.loc[:, (cols >= start) & (cols <= end)]
             wm = w.where(w.abs() >= threshold).clip(-8, 8)
-            fig = px.imshow(wm, aspect="auto", color_continuous_scale=[[0, "#2166AC"], [0.5, "#F7F7F7"], [1, "#B2182B"]],
+            fig = px.imshow(wm, aspect="auto", color_continuous_scale=[[0, DOWN], [0.5, "#F4F4F4"], [1, UP]],
                             zmin=-8, zmax=8, labels={"color": "점수"})
-            fig.update_layout(height=max(420, 16 * len(wm)), margin=dict(l=0, r=0, t=10, b=0), xaxis_title=None, yaxis_title=None)
+            style.plot(fig, height=max(420, 16 * len(wm)))
+            fig.update_layout(margin=dict(l=0, r=0, t=10, b=0), xaxis_title=None, yaxis_title=None)
             st.plotly_chart(fig, width="stretch")
         with st.expander(f"이 기간 이상 구간 전체 목록 ({len(pe)}개)"):
             st.dataframe(pe, width="stretch", hide_index=True, height=360)
@@ -227,13 +228,15 @@ with tab_detail:
         s = store.series(signal, emd)
         _, expected, zz = score_series(s, method)
         fig = go.Figure()
-        fig.add_scatter(x=s.index, y=s.values, name="실제", line=dict(color=NAVY))
-        fig.add_scatter(x=expected.index, y=expected.values, name="기대값(기준선)", line=dict(color="#9AA5B1", dash="dot"))
+        fig.add_scatter(x=s.index, y=s.values, name="실제", line=dict(color=INK, width=1.3))
+        fig.add_scatter(x=expected.index, y=expected.values, name="기대값(기준선)", line=dict(color=style.SUBTLE, dash="dot", width=1.3))
         an = zz[zz.abs() >= threshold].dropna()
-        fig.add_scatter(x=an.index, y=s.reindex(an.index), mode="markers", name="이상일", marker=dict(color=RED, size=9))
+        for name, part, col in (("평소보다 많은 날", an[an > 0], UP), ("평소보다 적은 날", an[an < 0], DOWN)):
+            fig.add_scatter(x=part.index, y=s.reindex(part.index), mode="markers", name=name, marker=dict(color=col, size=8, symbol="square"))
         fig.add_vrect(x0=pd.Timestamp(row["시작"]) - pd.Timedelta(hours=12), x1=pd.Timestamp(row["끝"]) + pd.Timedelta(hours=12),
-                      fillcolor=RED, opacity=0.08, line_width=0)
-        fig.update_layout(height=320, margin=dict(l=0, r=0, t=10, b=0), legend=dict(orientation="h"))
+                      fillcolor=PICK, opacity=0.18, line_width=0)
+        style.plot(fig, height=320)
+        fig.update_layout(margin=dict(l=0, r=0, t=10, b=0))
         st.plotly_chart(fig, width="stretch")
 
         tb = get_toolbox()
@@ -285,7 +288,9 @@ with tab_detail:
                 if j.note:
                     st.caption(j.note)
                 pr = pd.DataFrame({"원인": [CAUSE_KO[k] for k in j.probabilities], "확률": list(j.probabilities.values())}).sort_values("확률")
-                st.plotly_chart(px.bar(pr, x="확률", y="원인", orientation="h", height=240).update_layout(margin=dict(l=0, r=0, t=0, b=0)),
+                bars = px.bar(pr, x="확률", y="원인", orientation="h")
+                bars.update_traces(marker_color=[PICK if c == CAUSE_KO[j.choice] else style.LINE_STRONG for c in pr["원인"]])
+                st.plotly_chart(style.plot(bars, height=240).update_layout(margin=dict(l=0, r=0, t=0, b=0)),
                                 width="stretch")
 
         st.markdown("#### 브리핑")
