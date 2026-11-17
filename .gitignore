@@ -18,3 +18,15 @@ data/manual/
 data/results/
 # 제출 폴더(docs/_build/make_submission.py로 생성)
 숨비소리/
+# 공개 저장소에서 뺀 것(제출 ZIP에는 그대로 포함, docs/_build/make_submission.py)
+# - 허브 문서 원문: 게시판 답변(11/9) "외부 공개 시엔 원문 대신 출처·링크 표기" → docs/sources/README.md에 출처·링크
+docs/sources/**/*.txt
+# - 내부 작업 메모, 게시판 답변 정리
+00_프로젝트_시작프롬프트.md
+01_공고분석.md
+02_게시판_QA정리.md
+04_기획서목차_구현계획.md
+05_데이터_구현가능성.md
+# - 전체 기록 백업(공개 전 정리, 11/17)
+_backup/
+숨비소리.zip
