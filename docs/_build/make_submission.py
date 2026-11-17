@@ -51,7 +51,8 @@ README_TXT = """제주 데이터 관제실 (팀 숨비소리)
   실행 소스 코드     프로그램/app (Agent 실행 코드·Prompt·도구·데이터 처리), 모델·라이브러리는 프로그램/requirements.txt
   실행환경·매뉴얼    프로그램/README.md, 문서/설치_실행_매뉴얼.pdf, 프로그램/requirements.txt, 프로그램/.env.example
   데이터 활용 명세   문서/데이터_활용_명세.pdf
-  결과 설명자료      문서/결과_설명서.pdf, 문서/숨비소리_AI_Agent_기획서_v0.6.pdf
+  결과 설명자료      문서/결과_설명서.pdf
+  AI Agent 기획서    문서/숨비소리_AI_Agent_기획서_v0.6.pdf (15쪽 이내, 필수 제출 1번 항목)
   항목별 자세한 위치는 프로그램/README.md 의 '대회 제출 요건별 위치' 표
 
 [알아 둘 것]
