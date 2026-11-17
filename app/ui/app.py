@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from app.agent.local import INTENT_KO, answer
+from app.agent.local import INTENT_KO, add_judgment, answer
 from app.agent.loop import WITHHELD, AgentRun
 from app.agent.tools import Toolbox
 from app.agent.verify import verify
@@ -506,6 +506,8 @@ with tab_detail:
 
         st.markdown("#### 브리핑")
         text = template_text(res)
+        if st.session_state.get("judge", (None,))[0] == labels[pick]:   # 원인 판정을 실행했으면 질문하기와 같은 판정 문장을 붙인다(저장 HTML에도)
+            text = add_judgment(text, res, st.session_state["judge"][1], evidence, refs=["R2", "R3"])
         v = verify(text, res)
         if not v.ok:   # 질문하기와 같이, 검증을 통과하지 못한 문장은 보이지 않는다
             text = WITHHELD

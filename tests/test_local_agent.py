@@ -174,3 +174,22 @@ def test_cause_sentence_says_who_chose_it():
     assert "판단 모델(tev1)이 근거를 보고 고른 원인 후보" in by_model.final_text and "71.0%" in by_model.final_text
     last = [l for l in by_rule.final_text.splitlines() if "원인 후보" in l][-1]
     assert "규칙으로 고른 원인 후보" in last and "%" not in last and by_rule.verified, by_rule.verify_errors
+
+
+def test_judgment_added_to_detail_briefing_still_verifies():
+    # 상세 분석 탭에서 원인 판정을 실행해도 브리핑(저장 HTML 포함)에 판정이 빠져 있었다(2026-11-17). 질문하기와 같은 문장을 붙인다
+    from app.agent.local import add_judgment
+    from app.agent.verify import verify
+    from app.report.briefing import template_text
+    from tests.test_briefing import RESULTS
+    evidence = {"anomaly": {"emd": "서귀포시 성산읍", "signal": "유동인구", "date": "2025-01-29", "pct": 35.4, "kind": "일시 급변", "days": 1},
+                "context": RESULTS["R2"].data["items"], "co_movements": [], "not_covered": [], "co_checked": [], "co_no_data": []}
+    res = dict(RESULTS)
+    text = add_judgment(template_text(res), res, Judgment("holiday", {"holiday": 0.87, "unknown": 0.13}, 0.87, "tev1:4b"), evidence, refs=["R2"])
+    assert "R3" in res and res["R3"].tool == "judge_cause"
+    assert "판단 모델(tev1)이 근거를 보고 고른 원인 후보는 '공휴일·연휴'(확률 87.0%, 확신도 상)입니다 [R3][R2]." in text
+    assert text.endswith("이는 상관에 기반한 후보이며 인과를 뜻하지 않습니다.") and verify(text, res).ok, verify(text, res).errors
+    res2 = dict(RESULTS)
+    text2 = add_judgment(template_text(res2), res2, Judgment("holiday", {"holiday": 0.75}, 0.75, "rule"), evidence, refs=["R2"])
+    last = [l for l in text2.splitlines() if "원인 후보" in l][-1]
+    assert "규칙으로 고른 원인 후보" in last and "%" not in last and verify(text2, res2).ok

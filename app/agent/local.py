@@ -16,7 +16,7 @@ from app.agent.loop import WITHHELD, AgentRun
 from app.agent.tools import ToolError, ToolResult, Toolbox
 from app.agent.verify import verify
 from app.analytics.context import KR_HOLIDAYS
-from app.llm.judge import CAUSE_KO, CONNECT_TIMEOUT, DEFAULT_HOST, DEFAULT_MODEL, evidence_text, judge_cause, local_model_ready
+from app.llm.judge import CAUSE_KO, CONNECT_TIMEOUT, DEFAULT_HOST, DEFAULT_MODEL, Judgment, evidence_text, judge_cause, local_model_ready
 from app.report.briefing import template_text
 from app.store.geo import EMD_43
 
@@ -210,20 +210,25 @@ def _explain(q, s: Slots, tb: Toolbox, judge, method, threshold) -> tuple[str, d
                 "context": cx.data["items"], "co_movements": co.data["co_movements"], "not_covered": cx.data.get("not_covered", []),
                 "co_checked": co.data["checked"], "co_no_data": co.data.get("no_data", [])}
     j = judge(evidence)
-    r4 = f"R{len(call.results) + 1}"
+    return add_judgment(template_text(shown), call.results, j, evidence, refs=[r2, r3]), call.results
+
+
+def add_judgment(text: str, results: dict, j: Judgment, evidence: dict, refs: list[str]) -> str:
+    """원인 판정을 결과 묶음에 새 id로 넣고, 판정 문장과 '인과 아님' 문장을 text 뒤에 붙인다.
+    질문하기(원인 설명)와 상세 분석 탭 브리핑이 같은 문장을 쓴다. refs = 판정 근거가 된 결과 id(동반 변화·맥락)."""
+    rid = f"R{len(results) + 1}"
     prob = round(j.probabilities.get(j.choice, 0) * 100, 1)
-    call.results[r4] = ToolResult(r4, "judge_cause", {"evidence": evidence_text(evidence)},
-                                  {"choice": j.choice, "choice_ko": CAUSE_KO[j.choice], "probability": prob, "level": j.level,
-                                   "backend": j.backend, "note": j.note,
-                                   "probabilities": {k: round(v * 100, 1) for k, v in j.probabilities.items()}},
-                                  [f"로컬 판단 모델 {j.backend}" if j.backend != "rule" else "규칙 기반 판정(로컬 판단 모델 연결 실패)"])
-    lines = [template_text(shown),
-             # 문장은 템플릿이 만든다. 원인 후보를 고른 주체를 밝히고, 규칙일 때는 고정 확률(75%)을 보이지 않는다
-             (f"판단 모델({j.backend.split(':')[0]})이 근거를 보고 고른 원인 후보는 '{CAUSE_KO[j.choice]}'(확률 {prob:.1f}%, 확신도 {j.level})입니다 [{r4}][{r2}][{r3}]."
-              if j.backend != "rule" else
-              f"규칙으로 고른 원인 후보는 '{CAUSE_KO[j.choice]}'입니다(판단 모델 미연결, 확률 없음) [{r4}][{r2}][{r3}]."),
-             "이는 상관에 기반한 후보이며 인과를 뜻하지 않습니다."]
-    return "\n".join(lines), call.results
+    results[rid] = ToolResult(rid, "judge_cause", {"evidence": evidence_text(evidence)},
+                              {"choice": j.choice, "choice_ko": CAUSE_KO[j.choice], "probability": prob, "level": j.level,
+                               "backend": j.backend, "note": j.note,
+                               "probabilities": {k: round(v * 100, 1) for k, v in j.probabilities.items()}},
+                              [f"로컬 판단 모델 {j.backend}" if j.backend != "rule" else "규칙 기반 판정(로컬 판단 모델 연결 실패)"])
+    cite = "".join(f"[{r}]" for r in [rid, *refs])
+    # 문장은 템플릿이 만든다. 원인 후보를 고른 주체를 밝히고, 규칙일 때는 고정 확률(75%)을 보이지 않는다
+    sentence = (f"판단 모델({j.backend.split(':')[0]})이 근거를 보고 고른 원인 후보는 '{CAUSE_KO[j.choice]}'(확률 {prob:.1f}%, 확신도 {j.level})입니다 {cite}."
+                if j.backend != "rule" else
+                f"규칙으로 고른 원인 후보는 '{CAUSE_KO[j.choice]}'입니다(판단 모델 미연결, 확률 없음) {cite}.")
+    return "\n".join([text, sentence, "이는 상관에 기반한 후보이며 인과를 뜻하지 않습니다."])
 
 
 def _scan(s: Slots, tb: Toolbox, method, threshold) -> tuple[str, dict]:

@@ -29,3 +29,15 @@ def test_switching_signal_after_using_board_does_not_crash():
     assert not at.exception, [e.message for e in at.exception]
     at.sidebar.selectbox[0].set_value("외국인").run()
     assert not at.exception, [e.message for e in at.exception]
+
+
+def test_detail_briefing_includes_judgment_after_running_it():
+    """상세 분석 탭에서 원인 판정을 실행하면 브리핑(저장 HTML 포함)에도 판정 문장이 들어가야 한다(2026-11-17 빠져 있던 문제)."""
+    from streamlit.testing.v1 import AppTest
+    at = AppTest.from_file(str(ROOT / "app" / "ui" / "app.py"), default_timeout=300).run()
+    before = " ".join(m.value for m in at.markdown)
+    assert "고른 원인 후보는" not in before
+    next(b for b in at.button if b.label == "원인 판정 실행").click().run()
+    assert not at.exception, [e.message for e in at.exception]
+    after = " ".join(m.value for m in at.markdown)
+    assert "고른 원인 후보는" in after and "인과를 뜻하지 않습니다" in after and "검증 통과" in after

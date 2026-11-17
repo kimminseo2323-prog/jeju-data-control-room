@@ -44,14 +44,15 @@ README_TXT = """제주 데이터 관제실 (팀 숨비소리)
      - 끝낼 때는 검은 창을 닫습니다.
 
 [폴더]
-  문서       설치·실행 매뉴얼, 결과 설명서, 기획서, 데이터 활용 명세 (PDF)
+  문서       결과보고서(화면과 사용법), 설치·실행 매뉴얼, 결과 설명서, 기획서, 데이터 활용 명세 (PDF)
+             처음이라면 문서/결과보고서.pdf 로 화면과 쓰는 법을 먼저 보세요.
   프로그램   실행 소스·데이터·평가 결과 (직접 열 필요 없음, 개발자용 안내는 프로그램/README.md)
 
 [대회 제출 요건별 위치]
   실행 소스 코드     프로그램/app (Agent 실행 코드·Prompt·도구·데이터 처리), 모델·라이브러리는 프로그램/requirements.txt
   실행환경·매뉴얼    프로그램/README.md, 문서/설치_실행_매뉴얼.pdf, 프로그램/requirements.txt, 프로그램/.env.example
   데이터 활용 명세   문서/데이터_활용_명세.pdf
-  결과 설명자료      문서/결과_설명서.pdf
+  결과 설명자료      문서/결과_설명서.pdf, 문서/결과보고서.pdf(실제 화면과 사용법)
   AI Agent 기획서    문서/숨비소리_AI_Agent_기획서_v0.6.pdf (15쪽 이내, 필수 제출 1번 항목)
   항목별 자세한 위치는 프로그램/README.md 의 '대회 제출 요건별 위치' 표
 
@@ -63,7 +64,7 @@ README_TXT = """제주 데이터 관제실 (팀 숨비소리)
 
 WRAPPER = '@echo off\r\nchcp 65001 >nul\r\ncall "%~dp0프로그램\\{bat}"\r\n'   # 압축을 푼 맨 위에서 프로그램 폴더의 배치 파일을 부른다
 PY_SETUP = ROOT / ".tools" / "python" / "python-3.12.10-amd64.exe"   # python.org 공식 설치 파일(PSF 서명). 파이썬 3.12가 없는 PC에서 install.bat이 자동 설치
-DOC_PDFS = {"설치_실행_매뉴얼.pdf": ROOT / "docs" / "설치_실행_매뉴얼.pdf", "결과_설명서.pdf": ROOT / "docs" / "결과_설명서.pdf",
+DOC_PDFS = {"결과보고서.pdf": ROOT / "docs" / "결과보고서.pdf", "설치_실행_매뉴얼.pdf": ROOT / "docs" / "설치_실행_매뉴얼.pdf", "결과_설명서.pdf": ROOT / "docs" / "결과_설명서.pdf",
             "데이터_활용_명세.pdf": ROOT / "docs" / "데이터_활용_명세.pdf", PLAN_PDF: ROOT / "기획서" / PLAN_PDF}
 
 

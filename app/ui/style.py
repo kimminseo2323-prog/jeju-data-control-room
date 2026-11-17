@@ -124,6 +124,8 @@ h4 {{ font-weight:600 !important; font-size:1.05rem !important; color:var(--jj-i
 [data-testid="stBaseButton-tertiary"]:hover p {{ color:{INK} !important; }}
 
 [data-testid="stSidebar"] {{ border-right:1px solid var(--jj-line); }}
+/* 위젯 이름표·본문도 낱말 중간에서 줄을 바꾸지 않는다(사이드바 '브리핑 삭/제'처럼 끊기던 문제, 11/17) */
+[data-testid="stWidgetLabel"] p, [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {{ word-break:keep-all; overflow-wrap:anywhere; }}
 [data-testid="stExpander"] details {{ border-radius:0; border-color:var(--jj-line); }}
 </style>
 """
