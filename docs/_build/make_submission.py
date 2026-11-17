@@ -23,7 +23,8 @@ PLAN_PDF = "숨비소리_AI_Agent_기획서_v0.6.pdf"
 FILES = ["README.md", "install.bat", "run.bat", "requirements.txt", "requirements-dev.txt", "pytest.ini", ".env.example",
          ".streamlit/config.toml", "02_게시판_QA정리.md", "데이터명세서_kr.xlsx"]
 DIRS = ["app", "tests", "eval", "notebooks", "docs", "data/cache", "data/manual", "data/geo"]
-SKIP = ["__pycache__", "*.pyc", ".pytest_cache", ".ipynb_checkpoints", "~$*"]
+SKIP = ["__pycache__", "*.pyc", ".pytest_cache", ".ipynb_checkpoints", "~$*",
+        "demo", "index.html", ".nojekyll"]   # GitHub Pages 결과 데모(docs/index.html, docs/demo, 13MB)는 제출 ZIP에 넣지 않음
 FORBIDDEN = ["제주데이터허브 데이터목록*", ".env", ".venv", ".tools", "state", "results/briefing*"]
 
 
