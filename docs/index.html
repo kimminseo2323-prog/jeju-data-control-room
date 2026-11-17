@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제주 데이터 관제실 — 결과 데모</title>
+<meta name="description" content="제주 43개 읍면동의 관광·교통 이상 신호를 찾고 원인 후보를 근거와 함께 설명하는 AI Agent의 결과 화면 데모(팀 숨비소리)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="demo/app.css">
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@4.1.1/plotly.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--jj-ink); font-family: "IBM Plex Sans KR", "Malgun Gothic", sans-serif; font-size: 15px; line-height: 1.55; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px 64px; }
+  .demo-bar { background: var(--jj-ledger); border-bottom: 1px solid var(--jj-line); }
+  .demo-bar .wrap { padding-top: 10px; padding-bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; font-size: 0.9rem; color: var(--jj-muted); }
+  .demo-bar b { color: var(--jj-ink); font-weight: 600; }
+  .demo-bar a { color: var(--jj-down); }
+  .demo-bar .links { margin-left: auto; display: flex; gap: 14px; flex-wrap: wrap; }
+  header.jj { padding-top: 28px; }
+  h4 { font-weight: 600; font-size: 1.05rem; color: var(--jj-ink); margin: 26px 0 8px; }
+  .tabs { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 6px; }
+  .tabs button { flex: 1 1 160px; min-height: 50px; padding: 0 18px; text-align: left; font: inherit; font-size: 1rem; cursor: pointer;
+    background: var(--jj-ledger); color: var(--jj-muted); border: none; border-top: 3px solid transparent; border-bottom: 1px solid var(--jj-line-strong); }
+  .tabs button:hover { background: var(--jj-line); color: var(--jj-ink); }
+  .tabs button[aria-selected="true"] { background: #FFFFFF; color: var(--jj-ink); font-weight: 600; border-top-color: var(--jj-pick);
+    border-bottom-color: transparent; box-shadow: inset 1px 0 0 var(--jj-line-strong), inset -1px 0 0 var(--jj-line-strong); }
+  .tabs button:focus-visible, select:focus-visible, .go:focus-visible { outline: 2px solid var(--jj-ink); outline-offset: -2px; }
+  .panel { padding-top: 18px; }
+  .panel[hidden] { display: none; }
+  .bar { display: grid; grid-template-columns: 260px 1fr; gap: 16px; align-items: center; }
+  select { font: inherit; padding: 8px 10px; border: 1px solid var(--jj-line-strong); background: var(--jj-ledger); color: var(--jj-ink); width: 100%; border-radius: 0; }
+  .cols { display: grid; gap: 40px; }
+  .c75 { grid-template-columns: 7fr 5fr; }
+  .c84 { grid-template-columns: 8fr 4fr; }
+  .c11 { grid-template-columns: 1fr 1fr; }
+  .cap { color: var(--jj-muted); font-size: 0.86rem; margin: 6px 0 0; }
+  .card { border-left: 3px solid var(--jj-subtle); padding: 10px 14px 10px 12px; margin: 0 0 14px; }
+  .card.up { border-left-color: var(--jj-up); }
+  .card.down { border-left-color: var(--jj-down); }
+  .go { margin: 6px 0 0 42px; padding: 0; border: none; background: none; color: var(--jj-down); text-decoration: underline; font: inherit; font-size: 0.92rem; cursor: pointer; }
+  .plot { width: 100%; }
+  details { border: 1px solid var(--jj-line); padding: 8px 12px; margin-top: 10px; }
+  details summary { cursor: pointer; color: var(--jj-ink2); }
+  details pre { white-space: pre-wrap; font: inherit; font-size: 0.88rem; color: var(--jj-ink2); margin: 8px 0 0; }
+  .qa { border: 1px solid var(--jj-line); padding: 14px 18px; margin: 0 0 18px; }
+  .qa .q { font-weight: 600; margin: 0 0 8px; }
+  .qa .refs { color: var(--jj-muted); font-size: 0.84rem; margin-top: 8px; }
+  .loading { color: var(--jj-muted); padding: 20px 0; }
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--jj-line); color: var(--jj-muted); font-size: 0.86rem; }
+  footer a { color: var(--jj-down); }
+  @media (max-width: 900px) {
+    .wrap { padding: 0 16px 48px; }
+    .c75, .c84, .c11, .bar { grid-template-columns: 1fr; gap: 12px; }
+    .demo-bar .links { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="demo-bar"><div class="wrap">
+  <span><b>정적 데모</b> 제출본 프로그램을 실제 데이터로 실행해 화면에 나온 그래프·문장을 그대로 저장해 보여 줍니다. 실제 프로그램은 센터 PC에서 로컬로 실행합니다.</span>
+  <span class="links">
+    <a href="https://github.com/kimminseo2323-prog/jeju-data-control-room">GitHub</a>
+    <a href="결과보고서.pdf">결과보고서(PDF)</a>
+    <a href="결과_설명서.pdf">결과 설명서(PDF)</a>
+  </span>
+</div></div>
+
+<div class="wrap">
+  <header class="jj" id="head"></header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="board">관제판</button>
+    <button role="tab" aria-selected="false" data-tab="detail">상세 분석·브리핑</button>
+    <button role="tab" aria-selected="false" data-tab="ask">질문하기(예시)</button>
+  </nav>
+
+  <section class="panel" id="board" role="tabpanel">
+    <div class="bar"><select id="month" aria-label="기간"></select><div id="summary"></div></div>
+    <div class="cols c75">
+      <div><h4>어디서 달라졌나</h4><div class="plot" id="map"></div><div id="mapkey"></div><p class="cap" id="mapcap"></p></div>
+      <div><h4>주요 이상 TOP 5</h4><p class="cap" id="topnote"></p><div id="top"></div><p class="cap" id="topcap"></p></div>
+    </div>
+    <h4>언제 달라졌나</h4><div class="plot" id="when"></div><p class="cap" id="whencap"></p>
+  </section>
+
+  <section class="panel" id="detail" role="tabpanel" hidden>
+    <select id="ep" aria-label="이상 구간"></select>
+    <div id="dbody"></div>
+  </section>
+
+  <section class="panel" id="ask" role="tabpanel" hidden>
+    <h4>자료에 대해 물어보기</h4>
+    <p class="cap">실제 프로그램에서는 문장으로 묻습니다. 아래는 제출본에 질문을 넣어 받은 답을 그대로 옮긴 것입니다. 지역·날짜를 읽고 계산하는 일은 코드가 하고, 로컬 판단 모델 tev1은 질문 종류와 원인 후보를 보기 중에서 고르기만 합니다. 문장 끝 작은 번호(R1, R2…)는 그 숫자를 낸 계산 결과입니다.</p>
+    <p class="cap">문서 질문(예: "반출 가능한 결과물 기준이 뭐야?")은 답에 허브 공개 문서와 게시판 답변의 원문 일부를 인용합니다. 외부 공개 시에는 원문 대신 출처·링크만 적는다는 대회 안내에 따라 이 데모에서는 뺐습니다. 출처 목록은 <a href="https://github.com/kimminseo2323-prog/jeju-data-control-room/blob/main/docs/sources/README.md">docs/sources/README.md</a>에 있습니다.</p>
+    <div id="asks"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const D = "demo/data/";
+const $ = (id) => document.getElementById(id);
+const md = (s) => s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const cache = {};
+async function load(path) {
+  if (!cache[path]) cache[path] = fetch(D + path).then((r) => { if (!r.ok) throw new Error(path); return r.json(); });
+  return cache[path];
+}
+function draw(el, fig) {
+  if (!fig) { el.innerHTML = '<p class="cap">그래프 없음</p>'; return; }
+  const layout = Object.assign({}, fig.layout, { autosize: true });
+  delete layout.width;
+  delete layout.template;   // Streamlit이 화면에서 바꿔 넣는 자리표시 색(#0000xx)이라 그대로 쓰면 안 됨
+  // 앱(Streamlit)은 눈금 글자 자리만큼 여백을 자동으로 늘린다. 여기서도 같게: 따로 끄지 않은 축은 automargin을 켠다
+  Object.keys(layout).filter((k) => /^[xy]axis\d*$/.test(k)).forEach((k) => {
+    layout[k] = Object.assign({}, layout[k]);
+    if (layout[k].automargin === undefined) layout[k].automargin = true;
+  });
+  // 지도(가로·세로 비율 고정)는 칸이 좁으면 높이를 비율에 맞춰 줄인다(좁은 화면에서 위아래 빈 바다를 없앰)
+  const ya = layout.yaxis || {}, xa = layout.xaxis || {};
+  if (ya.scaleanchor === "x" && xa.range && ya.range && el.clientWidth) {
+    const h = Math.round(el.clientWidth * (ya.range[1] - ya.range[0]) * (ya.scaleratio || 1) / (xa.range[1] - xa.range[0]));
+    layout.height = Math.min(layout.height || h, h);
+  }
+  Plotly.react(el, fig.data, layout, Object.assign({}, fig.config, { responsive: true }));
+  el._fig = fig;
+}
+let resizeT;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeT);
+  resizeT = setTimeout(() => document.querySelectorAll(".plot").forEach((el) => { if (el._fig && el.offsetParent) draw(el, el._fig); }), 200);
+});
+function tab(name) {
+  document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach((p) => (p.hidden = p.id !== name));
+  window.dispatchEvent(new Event("resize"));
+}
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => tab(b.dataset.tab)));
+
+let INDEX;
+async function showMonth(m) {
+  const b = await load("board/" + (m === "전체 기간" ? "all" : m) + ".json");
+  $("summary").innerHTML = b.summary;
+  const cap = (pre) => b.captions.find((c) => c.startsWith(pre)) || "";
+  $("mapcap").textContent = cap("읍면동마다").replace(" 제주시 동 지역은 작으니 마우스 휠로 확대해 보세요.", " 제주시 동 지역은 작으니 그래프를 확대해 보세요.");
+  $("topnote").textContent = cap("이 기간은");
+  $("topcap").textContent = cap("원인 후보는");
+  $("whencap").textContent = cap("여러 곳이");
+  $("mapkey").innerHTML = b.map_key;
+  $("top").innerHTML = b.rows.length ? "" : '<p class="cap">이 기간에는 기준을 넘는 이상 구간이 없습니다.</p>';
+  b.rows.forEach((r) => {
+    const card = document.createElement("div");
+    card.className = "card " + (r.html.includes('jj-row up') ? "up" : "down");
+    card.innerHTML = r.html;
+    const go = document.createElement("button");
+    go.className = "go"; go.textContent = "상세 분석 보기";
+    go.addEventListener("click", () => { $("ep").value = r.ep; showEp(r.ep); tab("detail"); window.scrollTo(0, 0); });
+    card.appendChild(go); $("top").appendChild(card);
+  });
+  draw($("map"), b.map); draw($("when"), b.when);
+  if (b.rows.length && !$("ep").dataset.touched) { $("ep").value = b.rows[0].ep; showEp(b.rows[0].ep); }
+}
+async function showEp(i) {
+  $("dbody").innerHTML = '<p class="loading">불러오는 중…</p>';
+  const d = await load("detail/" + i + ".json"), s = d.sections, c = d.captions;
+  const sec = (k) => (s[k] || []).map(md).join("");
+  const capOf = (pre) => c.filter((x) => x.startsWith(pre)).map((x) => `<p class="cap">${esc(x)}</p>`).join("");
+  const other = c.filter((x) => !x.startsWith("다른 신호") && !x.startsWith("1% 미만")).map((x) => `<p class="cap">${esc(x)}</p>`).join("");
+  $("dbody").innerHTML = `
+    <div style="margin-top:14px">${sec("title")}</div>
+    <div class="cols c84">
+      <div><h4>실제 값과 평소 값</h4>${sec("실제 값과 평소 값")}<div class="plot" id="trend"></div><p class="cap">실제 프로그램에서는 '전체 기간'으로 넓혀 볼 수 있습니다. 데모는 구간 앞뒤 8주만 보여 줍니다.</p></div>
+      <div><h4>위치와 인근 읍면동</h4><div class="plot" id="loc"></div>${sec("위치와 인근 읍면동")}</div>
+    </div>
+    <div class="cols c11">
+      <div><h4>같은 날 맥락</h4>${sec("같은 날 맥락")}<h4>함께 움직인 신호</h4>${sec("함께 움직인 신호")}${capOf("다른 신호")}
+        ${s["국적별 변화(평소 대비)"] ? "<h4>국적별 변화(평소 대비)</h4>" + sec("국적별 변화(평소 대비)") : ""}</div>
+      <div><h4>원인 후보 판정</h4>${sec("원인 후보 판정")}${other}<div class="plot" id="judge"></div>${capOf("1% 미만")}
+        <details><summary>판정 모델에 넘기는 근거</summary><pre>${esc(d.evidence_text.join("\n"))}</pre></details></div>
+    </div>
+    <h4>브리핑</h4>${sec("브리핑")}`;
+  draw($("trend"), d.trend); draw($("loc"), d.location);
+  if (d.judge) draw($("judge"), d.judge); else $("judge").remove();
+}
+
+(async () => {
+  INDEX = await load("index.json");
+  $("head").innerHTML = INDEX.header;
+  INDEX.months.forEach((m) => $("month").add(new Option(m, m)));
+  Object.entries(INDEX.episodes).forEach(([k, v]) => $("ep").add(new Option(v, k)));
+  $("month").addEventListener("change", (e) => showMonth(e.target.value));
+  $("ep").addEventListener("change", (e) => { e.target.dataset.touched = "1"; showEp(e.target.value); });
+  const pick = INDEX.months.includes("2024-09") ? "2024-09" : INDEX.months[0];
+  $("month").value = pick; showMonth(pick);
+  $("asks").innerHTML = INDEX.asks.map((a) => `<div class="qa"><p class="q">${esc(a.q)}</p>${a.html.map(md).join("")}
+    ${a.refs.length ? `<div class="refs">근거: ${a.refs.map((r) => md(r)).join("<br>")}</div>` : ""}</div>`).join("");
+  $("foot").innerHTML = `「제주 AI·빅데이터 활용 AI Agent 개발 챌린지」 제출작 · 팀 숨비소리 · 데이터: 제주데이터허브 Open API(읍면동 단위 내국인 유동인구 등) ·
+    지도 경계: 행정동 경계 admdongkor(통계청 SGIS 기반, 공공누리 제1유형·CC BY 4.0) · ${esc(INDEX.model)} · 데모 자료 생성 ${esc(INDEX.generated)}.
+    원인은 상관에 기반한 후보이며 인과를 뜻하지 않습니다.`;
+})().catch((e) => { document.body.insertAdjacentHTML("beforeend", `<p class="wrap cap">데모 자료를 불러오지 못했습니다: ${esc(String(e))}</p>`); });
+</script>
+</body>
+</html>
