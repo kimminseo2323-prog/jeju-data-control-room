@@ -4,7 +4,7 @@
 결과: <프로젝트>/숨비소리/  (다시 실행하면 이 폴더만 지우고 새로 만든다)
 
 넣는 것: 실행 소스(app), 테스트, 평가 스크립트·결과, 노트북, 문서(README·설치 매뉴얼·데이터 활용 명세·결과 설명서),
-         허브 공개 데이터 캐시(parquet)·축제 CSV, 센터 데이터명세서(공개 자료, 문서 검색용), 게시판 답변 정리(문서 검색용), 기획서 PDF
+         파이썬 3.12.10 공식 설치 파일(installer/, .tools/python에 받아 둔 것), 허브 공개 데이터 캐시(parquet)·축제 CSV, 센터 데이터명세서(공개 자료, 문서 검색용), 게시판 답변 정리(문서 검색용), 기획서 PDF
 빼는 것: .env(API 키), 허브 데이터목록 xlsx(배포 금지), 가상환경·모델 파일(.venv, .tools), 수집 상태·로그(data/state),
          저장 결과(data/results), git 기록, 개인·내부 작업 메모(00·01·04·05), 기획서 작업 파일(docx·생성기)
 """
@@ -36,7 +36,7 @@ README_TXT = """제주 데이터 관제실 (팀 숨비소리)
 
 [쓰는 순서]
   1. 1_설치.bat 더블클릭 (처음 한 번, 약 3분, 인터넷 필요)
-     - 파이썬 3.12가 없으면 내려받기 페이지가 열립니다. 설치할 때 "Add python.exe to PATH"에 체크한 뒤, 1_설치.bat을 다시 더블클릭하세요.
+     - 파이썬 3.12가 없으면 함께 들어 있는 설치 파일(프로그램/installer)로 자동 설치합니다(관리자 권한 불필요).
      - Ollama(https://ollama.com/download)가 설치되어 있으면 판단 모델(tev1:4b, 4.6GB)도 자동으로 받습니다.
        없어도 실행되며, 이때 원인 판정과 질문 분류는 규칙 기반으로 동작합니다.
   2. 2_실행.bat 더블클릭 (쓸 때마다)
@@ -62,6 +62,7 @@ README_TXT = """제주 데이터 관제실 (팀 숨비소리)
 """
 
 WRAPPER = '@echo off\r\nchcp 65001 >nul\r\ncall "%~dp0프로그램\\{bat}"\r\n'   # 압축을 푼 맨 위에서 프로그램 폴더의 배치 파일을 부른다
+PY_SETUP = ROOT / ".tools" / "python" / "python-3.12.10-amd64.exe"   # python.org 공식 설치 파일(PSF 서명). 파이썬 3.12가 없는 PC에서 install.bat이 자동 설치
 DOC_PDFS = {"설치_실행_매뉴얼.pdf": ROOT / "docs" / "설치_실행_매뉴얼.pdf", "결과_설명서.pdf": ROOT / "docs" / "결과_설명서.pdf",
             "데이터_활용_명세.pdf": ROOT / "docs" / "데이터_활용_명세.pdf", PLAN_PDF: ROOT / "기획서" / PLAN_PDF}
 
@@ -82,6 +83,8 @@ def build() -> Path:
                 dst = prog / src.relative_to(ROOT)
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
+    (prog / "installer").mkdir()
+    shutil.copy2(PY_SETUP, prog / "installer" / PY_SETUP.name)
     (OUT / "문서").mkdir()
     for name, src in DOC_PDFS.items():
         shutil.copy2(src, OUT / "문서" / name)

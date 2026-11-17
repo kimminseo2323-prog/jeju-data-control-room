@@ -7,29 +7,26 @@ echo ==============================================
 
 echo [1/4] 파이썬 3.12 찾는 중...
 set "PY="
-where py >nul 2>nul
-if not errorlevel 1 (
-  py -3.12 -c "import sys" >nul 2>nul
-  if not errorlevel 1 set "PY=py -3.12"
-)
-if not defined PY (
-  python -c "import sys; sys.exit(0 if sys.version_info[:2]==(3,12) else 1)" >nul 2>nul
-  if not errorlevel 1 set "PY=python"
+set "PYSETUP=%~dp0installer\python-3.12.10-amd64.exe"
+call :findpy
+if not defined PY if exist "%PYSETUP%" (
+  echo  파이썬 3.12가 없어 함께 들어 있는 설치 파일로 설치합니다. 1~3분 걸립니다.
+  echo  이 사용자 계정에만 설치하며 관리자 권한은 필요 없습니다. 창을 닫지 말고 기다려 주세요.
+  "%PYSETUP%" /quiet InstallAllUsers=0 Include_launcher=0 Include_test=0 Include_doc=0 Include_tcltk=0 Shortcuts=0 AssociateFiles=0 PrependPath=0
+  call :findpy
 )
 if not defined PY (
   echo.
-  echo  파이썬 3.12를 찾지 못했습니다.
-  where python >nul 2>nul
-  if not errorlevel 1 (
-    for /f "delims=" %%v in ('python --version 2^>^&1') do echo  지금 이 PC에 있는 파이썬: %%v ^(이 프로그램은 3.12가 필요합니다^)
+  echo  파이썬 3.12를 자동으로 설치하지 못했습니다.
+  if exist "%PYSETUP%" (
+    echo  설치 창을 직접 엽니다. 첫 화면 아래 "Add python.exe to PATH"에 체크한 뒤 "Install Now"를 누르고,
+    echo  설치가 끝나면 이 창을 닫고 1_설치.bat 을 다시 더블클릭해 주세요.
+    if not defined JEJU_NO_BROWSER start "" "%PYSETUP%"
+  ) else (
+    echo  프로그램\installer 폴더의 파이썬 설치 파일이 없습니다. 압축을 다시 풀거나,
+    echo  python.org 에서 Python 3.12 "Windows installer (64-bit)"를 설치한 뒤 1_설치.bat 을 다시 실행해 주세요.
   )
-  echo.
-  echo  파이썬 내려받기 페이지를 엽니다. 다음 순서로 설치해 주세요.
-  echo    1^) "Python 3.12.x" 항목의 "Windows installer (64-bit)"를 내려받아 실행
-  echo    2^) 첫 화면 아래 "Add python.exe to PATH"에 체크한 뒤 "Install Now"
-  echo    3^) 설치가 끝나면 이 창을 닫고 1_설치.bat 을 다시 더블클릭
   echo  자세한 내용: docs\설치_실행_매뉴얼.md 1단계
-  if not defined JEJU_NO_BROWSER start "" "https://www.python.org/downloads/windows/"
   pause
   exit /b 1
 )
@@ -68,3 +65,19 @@ if not exist ".env" copy ".env.example" ".env" >nul
 echo.
 echo  설치가 끝났습니다. 2_실행.bat 을 더블클릭하면 화면이 열립니다.
 pause
+exit /b 0
+
+rem 파이썬 3.12 찾기: py 런처 → PATH의 python → 사용자 설치 위치 → 모든 사용자 설치 위치
+:findpy
+where py >nul 2>nul
+if not errorlevel 1 (
+  py -3.12 -c "import sys" >nul 2>nul
+  if not errorlevel 1 set "PY=py -3.12"
+)
+if not defined PY (
+  python -c "import sys; sys.exit(0 if sys.version_info[:2]==(3,12) else 1)" >nul 2>nul
+  if not errorlevel 1 set "PY=python"
+)
+if not defined PY if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PY="%LOCALAPPDATA%\Programs\Python\Python312\python.exe""
+if not defined PY if exist "%ProgramFiles%\Python312\python.exe" set "PY="%ProgramFiles%\Python312\python.exe""
+goto :eof
